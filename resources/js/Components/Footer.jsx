@@ -25,7 +25,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="border-t border-gray-200 py-10">
+    <footer className="border-t mx-20 border-gray-200 py-10">
       <div className="container mx-auto">
 
         {/* First Row: Customer Service, About Us, Verified By */}

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -22,9 +23,14 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+  
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+Route::get('/category-details', [CategoryController::class, 'index'])->name('category');
+Route::get('/product-details', [CategoryController::class, 'product'])->name('product');
+Route::get('/cart', [CategoryController::class, 'cart'])->name('cart');
+Route::get('/wishlist', [CategoryController::class, 'wishlist'])->name('wishlist');
 
 // SSLCOMMERZ payment Gateway Routes -  Start
 Route::get('/example1', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);
@@ -38,6 +44,9 @@ Route::post('/fail', [SslCommerzPaymentController::class, 'fail']);
 Route::post('/cancel', [SslCommerzPaymentController::class, 'cancel']);
 
 Route::post('/ipn', [SslCommerzPaymentController::class, 'ipn']);
+
+
+// Route::get('/category-details', CategoryController::class , 'index')->name('category-details');
 
 
 Route::get('/offers', [OfferController::class, 'index']);
