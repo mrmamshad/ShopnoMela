@@ -28,12 +28,12 @@ function Header() {
         <nav>
           <ul className="flex space-x-4">
             <li>
-              <a href="#" className="hover:underline">
+              <a href={route('login')} className="hover:underline">
                 Login
               </a>
             </li>
             <li>
-              <a href="#" className="hover:underline">
+              <a href={route('register')} className="hover:underline">
                 Sign Up
               </a>
             </li>

@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SslCommerzPaymentController;
+use App\Http\Controllers\OfferController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -37,5 +38,11 @@ Route::post('/fail', [SslCommerzPaymentController::class, 'fail']);
 Route::post('/cancel', [SslCommerzPaymentController::class, 'cancel']);
 
 Route::post('/ipn', [SslCommerzPaymentController::class, 'ipn']);
+
+
+Route::get('/offers', [OfferController::class, 'index']);
+Route::post('/offers', [OfferController::class, 'store']);
+Route::put('/offers/{offer}', [OfferController::class, 'update']);
+Route::delete('/offers/{offer}', [OfferController::class, 'destroy']);
 
 require __DIR__.'/auth.php';
