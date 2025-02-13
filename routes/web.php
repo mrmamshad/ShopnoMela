@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\GoogleAuth;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -23,7 +25,7 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-  
+
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
@@ -48,10 +50,13 @@ Route::post('/ipn', [SslCommerzPaymentController::class, 'ipn']);
 
 // Route::get('/category-details', CategoryController::class , 'index')->name('category-details');
 
+Route::get('google-login', [GoogleAuth::class, 'googleLogin'])->name('auth.google');
+Route::get('auth/google/callback', [GoogleAuth::class, 'googleLoginCallback'])->name('auth.google.callback');
+
 
 Route::get('/offers', [OfferController::class, 'index']);
 Route::post('/offers', [OfferController::class, 'store']);
 Route::put('/offers/{offer}', [OfferController::class, 'update']);
 Route::delete('/offers/{offer}', [OfferController::class, 'destroy']);
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
