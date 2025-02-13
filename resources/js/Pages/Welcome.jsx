@@ -7,13 +7,13 @@ import Header from "@/Components/Header";
 import OfferSlider from "@/Components/OfferSlider";
 import FlashSale from "@/Components/FlashSale";
 
-export default function Welcome({  }) {
+export default function Welcome({ user }) {
     return (
         <div className="min-h-screen bg-gray-100">
             <Head>
                 <title>Home</title>
             </Head>
-            <Header />
+            <Header  user={user} />
             <main className="container mx-auto px-4 py-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

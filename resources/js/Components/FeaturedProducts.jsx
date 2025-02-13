@@ -1,5 +1,6 @@
 import { motion } from "framer-motion"
 import placeholderimage from "@/assets/placeholder.jpg"
+import { Link } from "@inertiajs/react"
 
 const products = [
   { id: 1, name: "Smartphone", price: 499.99, image: { placeholderimage } },
@@ -23,6 +24,7 @@ function FeaturedProducts() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
           >
+            <Link href={route('product' )}>
             <img src={placeholderimage} alt={product.name} className="w-full h-48 object-cover" />
             <div className="p-4">
               <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
@@ -31,6 +33,7 @@ function FeaturedProducts() {
                 Add to Cart
               </button>
             </div>
+            </Link>
           </motion.div>
         ))}
       </div>

@@ -26,18 +26,19 @@ class GoogleAuth extends Controller
         
             if ($user) {
                 Auth::login($user);
-                return redirect()->route('dashboard');
+                return redirect()->route('home');
             } else {
                 $userData = User::create([
                     'name' => $googleUser->name,
                     'email' => $googleUser->email,
+                    'image' => $googleUser->avatar,
                     'password' => Hash::make('Password@1234'),
                     'google_id' => $googleUser->id,
                 ]);
         
                 if ($userData) {
                     Auth::login($userData);
-                    return redirect()->route('dashboard');
+                    return redirect()->route('home');
                 }
             }
         } catch (Exception $e) {
