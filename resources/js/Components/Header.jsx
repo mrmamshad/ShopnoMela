@@ -5,30 +5,32 @@ import { GiShoppingCart } from "react-icons/gi";
 import Dropdown from "@/Components/Dropdown";
 import { usePage } from "@inertiajs/react";
 
-function Header({ user }) {
-    console.log(user);
+function Header({  }) {
+    const user = usePage().props.auth.user;
     const [searchTerm, setSearchTerm] = useState("");
 
     return (
         <header className="bg-green-500 text-white py-4">
             <div className="container mx-auto px-4 flex items-center justify-between">
+                
                 <motion.h1
-                    className="text-3xl px-8 font-bold"
+                    className="text-3xl whitespace-nowrap  sm:px-8 font-bold"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <Link href="/">
+                    <Link href="/"  >
                         {" "}
                         স্বপ্ন
                         <span className="text-2xl font-semibold"> Mela</span>
                     </Link>
                 </motion.h1>
+
                 <div className=" flex items-center flex-1 mx-4">
                     <input
                         type="text"
                         placeholder="Search products..."
-                        className="w-[50%] px-4 ml-5 py-2 rounded-full text-gray-800"
+                        className=" w-full sm:w-[50%] px-4 ml-5 py-2 rounded-full text-gray-800"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -73,10 +75,13 @@ function Header({ user }) {
                                     </p>
                                     <hr className="mx-5 my-2 border-gray-400" />
                                     <Dropdown.Link href={route("profile.edit")}>
-                                        Profile
+                                        orders
                                     </Dropdown.Link>
                                     <Dropdown.Link href={route("dashboard")}>
-                                        Dashboard
+                                        Reviews
+                                    </Dropdown.Link>
+                                    <Dropdown.Link href={route("wishlist")}>
+                                        Wishlist
                                     </Dropdown.Link>
                                     <Dropdown.Link
                                         href={route("logout")}

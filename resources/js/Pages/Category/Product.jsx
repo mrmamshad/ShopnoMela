@@ -21,6 +21,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb";
+import { Link } from "@inertiajs/react";
 
 
 
@@ -276,9 +277,9 @@ const ProductDetails = () => {
 
                         {/* Action Buttons */}
                         <div className="flex space-x-4">
-                            <button className="flex-1 bg-orange-500 text-white py-3 rounded-md hover:bg-orange-600">
+                            <Link  href={route('checkout')}  className="flex-1 text-center bg-orange-500 text-white py-3 rounded-md hover:bg-orange-600">
                                 Buy Now
-                            </button>
+                            </Link >
                             <button className="flex-1 border border-orange-500 text-orange-500 py-3 rounded-md hover:bg-orange-50">
                                 Add to Cart
                             </button>

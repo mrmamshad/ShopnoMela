@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GoogleAuth;
+use App\Http\Controllers\MarchantController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +26,8 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/contact-us', function (){ return Inertia::render('ContactUs');  } )->name('contact-us');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 
@@ -34,6 +38,15 @@ Route::get('/category-details', [CategoryController::class, 'index'])->name('cat
 Route::get('/product-details', [CategoryController::class, 'product'])->name('product');
 Route::get('/cart', [CategoryController::class, 'cart'])->name('cart');
 Route::get('/wishlist', [CategoryController::class, 'wishlist'])->name('wishlist');
+Route::get('/checkout', [CategoryController::class, 'checkout'])->name('checkout');
+Route::get('/payments', [CategoryController::class, 'payments'])->name('payments');
+Route::get('/admin', [AdminController::class, 'index'])->name('admin');
+Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
+
+// Route::get('/offers', [OfferController::class, 'index'])->name('offers');
+
+
+
 
 // SSLCOMMERZ payment Gateway Routes -  Start
 Route::get('/example1', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);

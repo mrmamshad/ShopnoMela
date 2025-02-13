@@ -34,6 +34,7 @@ const Footer = () => {
           <div>
             <h3 className="font-bold mb-4">Customer Service</h3>
             <ul>
+              <li><a href={route('contact-us')} className="hover:underline">Contact us</a></li>
               <li><a href="#" className="hover:underline">Help Center</a></li>
               <li><a href="#" className="hover:underline">How to Buy</a></li>
               <li><a href="#" className="hover:underline">Returns & Refunds</a></li>

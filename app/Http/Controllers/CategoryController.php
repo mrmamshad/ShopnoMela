@@ -27,4 +27,19 @@ class CategoryController extends Controller
     {
       return Inertia::render('Category/Wishlist');
     }
+    public function checkout()
+    {
+      return Inertia::render('Category/Checkout');
+    }
+
+    // SSLCOMMERZ payment Gateway Routes -  Start
+    //  payments selection page 
+    public function payments()
+    {
+      return Inertia::render('Category/Payments');
+    }
+
+    public function admin(){
+        dd('admin');
+    }
 }
