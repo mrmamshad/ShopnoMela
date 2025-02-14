@@ -8,7 +8,7 @@ import { usePage } from "@inertiajs/react";
 function Header({  }) {
     const user = usePage().props.auth.user;
     const [searchTerm, setSearchTerm] = useState("");
-
+    // console.log(user.image);
     return (
         <header className="bg-green-500 text-white py-4">
             <div className="container mx-auto px-4 flex items-center justify-between">
@@ -50,7 +50,7 @@ function Header({  }) {
                                         >
                                             <img
                                                 src={user.image}
-                                                alt="User Avatar"
+                                                alt={user.name}
                                                 className="h-8 w-8 rounded-full"
                                             />
                                             <svg

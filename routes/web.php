@@ -40,11 +40,30 @@ Route::get('/cart', [CategoryController::class, 'cart'])->name('cart');
 Route::get('/wishlist', [CategoryController::class, 'wishlist'])->name('wishlist');
 Route::get('/checkout', [CategoryController::class, 'checkout'])->name('checkout');
 Route::get('/payments', [CategoryController::class, 'payments'])->name('payments');
-Route::get('/admin', [AdminController::class, 'index'])->name('admin');
-Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
+
+
+
+// Admin only
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->group(function () {
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin');
+});
+
+// Admin and Merchant
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin,merchant'])->group(function () {
+    Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
+});
+// Route::middleware(['auth'])->group(function () {
+//     Route::middleware('role:admin')->group(function () {
+//         Route::get('/admin', [AdminController::class, 'index'])->name('admin');
+//         Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
+//     });
+
+//     Route::middleware('role:merchant')->group(function () {
+//         Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
+//     });
+// });
 
 // Route::get('/offers', [OfferController::class, 'index'])->name('offers');
-
 
 
 
