@@ -7,7 +7,8 @@ import Header from "@/Components/Header";
 import OfferSlider from "@/Components/OfferSlider";
 import FlashSale from "@/Components/FlashSale";
 
-export default function Welcome({ user }) {
+export default function Welcome({ user, category }) {
+    // console.log(category);
     return (
         <div className="min-h-screen bg-gray-100">
             <Head>
@@ -22,7 +23,7 @@ export default function Welcome({ user }) {
                 >
                     <OfferSlider />
                     <FlashSale />
-                    <CategoryMenu />
+                    <CategoryMenu  category={category}   />
                     <FeaturedProducts />
                 </motion.div>
             </main>
