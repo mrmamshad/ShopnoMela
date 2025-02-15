@@ -40,8 +40,9 @@ class DatabaseSeeder extends Seeder
 
         // Create a merchant user
         $merchant = User::factory()->create([
-            'name' => 'Merchant User',
+            'name' => 'Merchant',
             'email' => 'merchant@shopnomela.com',
+            'password' => bcrypt('marchant123'), 
         ]);
 
         $merchant->assignRole('merchant');

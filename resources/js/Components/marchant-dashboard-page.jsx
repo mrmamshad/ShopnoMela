@@ -28,8 +28,8 @@ export default function AdminDashboardPage() {
       {/* Page header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
-          <p className="text-muted-foreground">Welcome back, here's what's happening with your store today.</p>
+          <h2 className="text-2xl font-bold tracking-tight"> Marchant Dashboard</h2>
+          <p className="text-muted-foreground">here a marchant will show his products , orders , sales , revenue</p>
         </div>
 
         <div className="flex items-center gap-2">
