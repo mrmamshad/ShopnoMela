@@ -55,16 +55,8 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin,merchant'])->group(function () {
     Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
 });
-// Route::middleware(['auth'])->group(function () {
-//     Route::middleware('role:admin')->group(function () {
-//         Route::get('/admin', [AdminController::class, 'index'])->name('admin');
-//         Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
-//     });
 
-//     Route::middleware('role:merchant')->group(function () {
-//         Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
-//     });
-// });
+
 
 // Route::get('/offers', [OfferController::class, 'index'])->name('offers');
 

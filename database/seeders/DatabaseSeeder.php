@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ProductDetail;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
@@ -57,5 +58,13 @@ class DatabaseSeeder extends Seeder
 
         // Generate additional random users (optional)
         User::factory(10)->create();
+
+        $this->call([
+            CategorySeeder::class,
+            BrandSeeder::class,
+            ProductSeeder::class,
+            ProductDetailsSeeder::class
+        ]);
+        
     }
 }

@@ -14,8 +14,9 @@ class Product extends Model
     // A product belongs to a category
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'category_id');
     }
+
 
     // A product belongs to a brand
     public function brand()
@@ -33,5 +34,9 @@ class Product extends Model
     public function reviews()
     {
         return $this->hasMany(ProductReview::class);
+    }
+    public function details()
+    {
+        return $this->hasOne(ProductDetail::class, 'product_id');
     }
 }
