@@ -63,7 +63,9 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             BrandSeeder::class,
             ProductSeeder::class,
-            ProductDetailsSeeder::class
+            ProductDetailsSeeder::class,
+            CustomerProfileSeeder::class,
+            ProductReviewSeeder::class,
         ]);
         
     }

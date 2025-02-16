@@ -10,6 +10,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SslCommerzPaymentController;
 use App\Http\Controllers\OfferController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductReviewController;
 use App\Models\Category;
 use Inertia\Inertia;
 
@@ -37,8 +39,18 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// category routes 
 Route::get('/category-details', [CategoryController::class, 'index'])->name('category');
+Route::get('/category/{id}', [ProductController::class, 'categoryProducts'])->name('category.products');
+
+// product-details route 
 Route::get('/product-details', [CategoryController::class, 'product'])->name('product');
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
+
+
+Route::post('/reviews', [ProductReviewController::class, 'store'])->name('reviews.store');
+
 Route::get('/cart', [CategoryController::class, 'cart'])->name('cart');
 Route::get('/wishlist', [CategoryController::class, 'wishlist'])->name('wishlist');
 Route::get('/checkout', [CategoryController::class, 'checkout'])->name('checkout');

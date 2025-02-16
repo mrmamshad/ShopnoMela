@@ -13,16 +13,19 @@ return new class extends Migration
     {
         Schema::create('product_reviews', function (Blueprint $table) {
             $table->id();
-            $table->string('description');
+            $table->text('description'); // Changed from string to text for longer reviews
             $table->unsignedTinyInteger('rating');
+            $table->string('image')->nullable();
             $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('product_id');
             $table->timestamps();
-
-            $table->foreign('customer_id')->references('id')->on('users')->onDelete('cascade');
+    
+            // Updated foreign key reference to customer_profiles instead of users
+            $table->foreign('customer_id')->references('id')->on('customer_profiles')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
+    
 
     public function down()
     {

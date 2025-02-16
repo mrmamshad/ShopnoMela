@@ -27,7 +27,7 @@ class BrandSeeder extends Seeder
         // Generate random brands
         for ($i = 1; $i <= 10; $i++) {
             // Generate a random image
-            $image = $faker->image($brandImgPath, 200, 200, null, false); // Generate and save a random image
+            $image = 'https://picsum.photos/600/600?random=' . rand(1, 10000); // Generate and save a random image
 
             // Save brand data
             Brand::create([

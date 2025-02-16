@@ -14,7 +14,7 @@ const Categories = ({ category }) => {
                         className="bg-white shadow-md p-4 rounded-lg text-center cursor-pointer hover:shadow-lg transition-all"
                         whileHover={{ scale: 1.05 }}
                     >
-                        <Link href={route("category")}>
+                        <Link href={route("category.products", { id: category.id })}>
                             <img
                                 src={`${category.categoryImg}`}
                                 alt={category.name}
