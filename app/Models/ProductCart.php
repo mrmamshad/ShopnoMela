@@ -11,6 +11,8 @@ class ProductCart extends Model
 
     protected $fillable = ['user_id', 'product_id', 'color', 'size', 'qty', 'price'];
 
+
+
     // A cart belongs to a user
     public function user()
     {

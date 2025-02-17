@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Star,
     Heart,
@@ -50,6 +50,13 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ShoppingCart, Eye } from "lucide-react";
 import { useForm, usePage, Link } from "@inertiajs/react";
 import { StarHalf } from "lucide-react";
+// import { Toast } from "@/components/ui/toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useToast } from "@/hooks/use-toast"
+// import { ToastAction } from "@/components/ui/toast"
+
+// import { ToastProvider } from "@/components/ui/toast";
+
 
 const ProductDetails = ({
     productdetails,
@@ -61,7 +68,7 @@ const ProductDetails = ({
     // console.log("Product details:", productdetails);
     // console.log("Single product:", singleproduct);
     console.log("Reviews:", reviews);
-
+    const { toast } = useToast();
     const [currentImage, setCurrentImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const [cart, setCart] = useState([]);
@@ -132,11 +139,13 @@ const ProductDetails = ({
         ));
     };
 
-    const addToCart = (product) => {
-        setCart([...cart, product]);
-        // Here you would typically send this data to your backend or update a global state
-        console.log(`Added ${product.name} to cart`);
-    };
+    // const { data, setData, post, processing } = useForm({
+    //     product_id: singleproduct.id,
+    //     color: "",
+    //     size: "",
+    //     qty: 1,
+    //     price: singleproduct.price,
+    // });
 
     const { data, setData, post, processing, reset } = useForm({
         description: "",
@@ -144,6 +153,58 @@ const ProductDetails = ({
         image: null,
         product_id: productdetails.id,
     });
+    const [selectedSize, setSelectedSize] = useState(null);
+    const [selectedColor, setSelectedColor] = useState(null);
+
+    // {console.log("size",productdetails.size)}
+    const cartForm = useForm({
+        product_id: singleproduct.id,
+        color: selectedColor,
+        size: selectedSize,
+        qty: 1,
+        price: singleproduct.price,
+    });
+
+    const wishlistForm = useForm({
+        product_id: singleproduct.id,
+    });
+
+    // Handle quantity change
+    const increaseQty = () => {
+        cartForm.setData("qty", cartForm.data.qty + 1);
+    };
+    const decreaseQty = () => {
+        cartForm.setData("qty", Math.max(1, cartForm.data.qty - 1));
+    };
+
+    // Submit Add to Cart
+    const addToCart = (e) => {
+        e.preventDefault();
+        cartForm.post(route("cart.store"), {
+            onSuccess: () => {
+                reset("qty");
+                toast({
+                    title: "Added to Cart",
+                    description: "The product was added to your cart successfully!",
+                  });
+            },
+        });
+    };
+
+    // Submit Wishlist
+    const addToWishlist = (e) => {
+        e.preventDefault();
+        wishlistForm.post(route("wishlist.store")  , {
+            onSuccess: () => {
+                reset("qty");
+                toast({
+                    title: "Added to Wishlist",
+                    description: "The product was added to your wishlist successfully!",
+                  });
+            },
+        });
+       
+    };
 
     const [preview, setPreview] = useState(null);
 
@@ -168,6 +229,16 @@ const ProductDetails = ({
             },
         });
     };
+
+    // Update form when selectedSize changes
+    useEffect(() => {
+        cartForm.setData("size", selectedSize);
+    }, [selectedSize]);
+
+    // Update form when selectedColor changes
+    useEffect(() => {
+        cartForm.setData("color", selectedColor);
+    }, [selectedColor]);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -250,9 +321,15 @@ const ProductDetails = ({
                                         <Share2 className="h-5 w-5 mr-1" />
                                         Share
                                     </button>
-                                    <button className="flex items-center text-gray-500">
+                                    <button
+                                        onClick={addToWishlist}
+                                        className="flex items-center text-gray-500"
+                                        disabled={wishlistForm.processing}
+                                    >
                                         <Heart className="h-5 w-5 mr-1" />
-                                        Save
+                                        {wishlistForm.processing
+                                            ? "Saving..."
+                                            : "Save"}
                                     </button>
                                 </div>
                             </div>
@@ -267,7 +344,87 @@ const ProductDetails = ({
                         {/* Size Selection */}
                         <div className="space-y-2">
                             <h3 className="font-medium">Size</h3>
-                            <Button>{productdetails.size}</Button>
+                            <div className="flex space-x-2">
+                                {Array.isArray(productdetails.size)
+                                    ? productdetails.size.map((size, index) => (
+                                          <button
+                                              key={index}
+                                              onClick={() =>
+                                                  setSelectedSize(size)
+                                              }
+                                              className={`px-3 py-1 border rounded-lg text-sm font-medium ${
+                                                  selectedSize === size
+                                                      ? "bg-orange-500 text-white border-orange-500"
+                                                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                              }`}
+                                          >
+                                              {size}
+                                          </button>
+                                      ))
+                                    : JSON.parse(productdetails.size).map(
+                                          (size, index) => (
+                                              <button
+                                                  key={index}
+                                                  onClick={() =>
+                                                      setSelectedSize(size)
+                                                  }
+                                                  className={`px-3 py-1 border rounded-lg text-sm font-medium ${
+                                                      selectedSize === size
+                                                          ? "bg-orange-500 text-white border-orange-500"
+                                                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                                  }`}
+                                              >
+                                                  {size}
+                                              </button>
+                                          )
+                                      )}
+                            </div>
+                        </div>
+
+                        {/* Color Selection */}
+                        <div className="space-y-2">
+                            <h3 className="font-medium">Color</h3>
+                            <RadioGroup
+                                value={selectedColor}
+                                onValueChange={setSelectedColor}
+                                className="flex space-x-3"
+                            >
+                                {console.log("color", productdetails.color)}
+
+                                {Array.isArray(productdetails.color)
+                                    ? productdetails.color.map(
+                                          (color, index) => (
+                                              <RadioGroupItem
+                                                  key={index}
+                                                  value={color}
+                                                  className={`w-8 h-8 rounded-full border ${
+                                                      selectedColor === color
+                                                          ? "ring-2 ring-orange-500"
+                                                          : ""
+                                                  }`}
+                                                  style={{
+                                                      backgroundColor: color,
+                                                  }}
+                                              />
+                                          )
+                                      )
+                                    : JSON.parse(productdetails.color).map(
+                                          (color, index) => (
+                                              <RadioGroupItem
+                                                  key={index}
+                                                  value={color}
+                                                  className={`w-8 h-8 rounded-full border ${
+                                                      selectedColor === color
+                                                          ? "ring-2 ring-orange-500"
+                                                          : ""
+                                                  }`}
+                                                  style={{
+                                                      backgroundColor: color,
+                                                  }}
+                                              />
+                                          )
+                                      )}
+                            </RadioGroup>
                         </div>
 
                         {/* Quantity */}
@@ -275,18 +432,16 @@ const ProductDetails = ({
                             <h3 className="font-medium">Quantity</h3>
                             <div className="flex items-center space-x-2">
                                 <button
-                                    onClick={() =>
-                                        setQuantity(Math.max(1, quantity - 1))
-                                    }
+                                    onClick={decreaseQty}
                                     className="p-2 border rounded-md"
                                 >
                                     <Minus className="h-4 w-4" />
                                 </button>
                                 <span className="w-12 text-center">
-                                    {quantity}
+                                    {cartForm.data.qty}
                                 </span>
                                 <button
-                                    onClick={() => setQuantity(quantity + 1)}
+                                    onClick={increaseQty}
                                     className="p-2 border rounded-md"
                                 >
                                     <Plus className="h-4 w-4" />
@@ -317,8 +472,14 @@ const ProductDetails = ({
                             <button className="flex-1 text-center bg-orange-500 text-white py-3 rounded-md hover:bg-orange-600">
                                 Buy Now
                             </button>
-                            <button className="flex-1 border border-orange-500 text-orange-500 py-3 rounded-md hover:bg-orange-50">
-                                Add to Cart
+                            <button
+                                onClick={addToCart}
+                                className="flex-1 border border-orange-500 text-orange-500 py-3 rounded-md hover:bg-orange-50"
+                                disabled={cartForm.processing}
+                            >
+                                {cartForm.processing
+                                    ? "Adding..."
+                                    : "Add to Cart"}
                             </button>
                         </div>
                     </div>

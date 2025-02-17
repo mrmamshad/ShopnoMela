@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GoogleAuth;
 use App\Http\Controllers\MarchantController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\SslCommerzPaymentController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductReviewController;
+use App\Http\Controllers\WishlistController;
 use App\Models\Category;
 use Inertia\Inertia;
 
@@ -52,7 +54,11 @@ Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.s
 Route::post('/reviews', [ProductReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
 
 Route::get('/cart', [CategoryController::class, 'cart'])->name('cart');
+Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.store');
+
 Route::get('/wishlist', [CategoryController::class, 'wishlist'])->name('wishlist');
+Route::post('/wishlist/save', [WishlistController::class, 'saveToWishlist'])->name('wishlist.store');
+
 Route::get('/checkout', [CategoryController::class, 'checkout'])->name('checkout');
 Route::get('/payments', [CategoryController::class, 'payments'])->name('payments');
 

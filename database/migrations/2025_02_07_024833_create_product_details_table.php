@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('img3');
             $table->string('img4');
             $table->longText('des');
-            $table->string('color');
-            $table->string('size');
+            $table->json('color');
+            $table->json('size');
             $table->unsignedBigInteger('product_id');
             $table->timestamps();
 

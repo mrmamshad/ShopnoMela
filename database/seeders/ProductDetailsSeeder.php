@@ -31,8 +31,8 @@ class ProductDetailsSeeder extends Seeder
                 'img3' => $img3,
                 'img4' => $img4,
                 'des' => $faker->paragraph(3),
-                'color' => $faker->randomElement(['Red', 'Blue', 'Black', 'White', 'Green']),
-                'size' => $faker->randomElement(['S', 'M', 'L', 'XL']),
+               'color' => json_encode($faker->randomElements(['Red', 'Blue', 'Black', 'White', 'Green'], rand(2, 4))),
+            'size' => json_encode($faker->randomElements(['S', 'M', 'L', 'XL', 'XXL'], rand(2, 3))),
             ]);
         }
     }
