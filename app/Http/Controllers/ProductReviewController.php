@@ -22,10 +22,10 @@ class ProductReviewController extends Controller
         $customerProfile = \App\Models\CustomerProfile::where('user_id', auth()->id())->first();
         // dd($customerProfile);
 
-    
+    // dd($request->all());
         ProductReview::create([
             'description' => $request->description,
-            'customer_id' => auth()->id(),
+            'user_id' => auth()->id(),
             'product_id' => $request->product_id,
             'rating' => $request->rating,
             'image' => $imagePath,

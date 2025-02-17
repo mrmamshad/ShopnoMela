@@ -10,7 +10,7 @@ class ProductReview extends Model
     use HasFactory;
     
     protected $fillable = [
-        'customer_id',
+        'user_id',
         'product_id',
         'description',
         'rating',
@@ -21,10 +21,11 @@ class ProductReview extends Model
      * Relationship with Customer Profile
      */
     // A review belongs to a customer profile
-    public function customerProfile()
-    {
-        return $this->belongsTo(CustomerProfile::class, 'customer_id');
-    }
+   // ProductReview.php
+public function user()
+{
+    return $this->belongsTo(User::class);
+}
 
     /**
      * Relationship with Product

@@ -16,12 +16,12 @@ return new class extends Migration
             $table->text('description'); // Changed from string to text for longer reviews
             $table->unsignedTinyInteger('rating');
             $table->string('image')->nullable();
-            $table->unsignedBigInteger('customer_id');
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('product_id');
             $table->timestamps();
     
             // Updated foreign key reference to customer_profiles instead of users
-            $table->foreign('customer_id')->references('id')->on('customer_profiles')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }

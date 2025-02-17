@@ -36,7 +36,7 @@ class ProductReviewSeeder extends Seeder
                     'description' => $reviews[array_rand($reviews)]['description'],
                     'rating' => $reviews[array_rand($reviews)]['rating'],
                     'image' => 'https://picsum.photos/600/600?random=' . rand(1, 10000), // Random real image
-                    'customer_id' => $customers[array_rand($customers)],
+                    'user_id' => $customers[array_rand($customers)],
                     'product_id' => $product_id,
                     'created_at' => now(),
                     'updated_at' => now(),

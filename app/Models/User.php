@@ -46,6 +46,9 @@ class User extends Authenticatable
             }
         });
     }
-
-
+    // User.php
+    public function productReviews()
+    {
+        return $this->hasMany(ProductReview::class);
+    }
 }

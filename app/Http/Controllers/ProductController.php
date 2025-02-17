@@ -41,7 +41,7 @@ class ProductController extends Controller
             ->get();
         // Fetch reviews with customer details
         $reviews = ProductReview::where('product_id', $id)
-        ->with(['customerProfile', 'product']) // Eager loading
+        ->with(['user', 'product']) // Eager loading
         ->latest()
         ->get();
     

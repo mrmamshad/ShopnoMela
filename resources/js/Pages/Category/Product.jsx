@@ -425,13 +425,13 @@ const ProductDetails = ({
                                             <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
                                                 <AvatarImage
                                                     src={
-                                                        comment.customer_profile
+                                                        comment.image
                                                             .avatar ||
                                                         `/placeholder.svg`
                                                     }
                                                 />
                                                 <AvatarFallback>
-                                                    {comment.customer_profile.cus_name
+                                                    {comment.user.name
                                                         .split(" ")
                                                         .map((n) => n[0])
                                                         .join("")
@@ -441,8 +441,8 @@ const ProductDetails = ({
                                             <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
                                                 <span className="font-semibold text-sm sm:text-base">
                                                     {
-                                                        comment.customer_profile
-                                                            .cus_name
+                                                        comment.user.name
+                                                            
                                                     }
                                                 </span>
                                                 <span className="text-muted-foreground text-xs sm:text-sm">
