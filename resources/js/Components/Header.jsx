@@ -77,8 +77,8 @@ function Header({  }) {
                                     <Dropdown.Link href={route("profile.edit")}>
                                         orders
                                     </Dropdown.Link>
-                                    <Dropdown.Link href={route("dashboard")}>
-                                        Reviews
+                                    <Dropdown.Link href={route("cart")}>
+                                        My cart
                                     </Dropdown.Link>
                                     <Dropdown.Link href={route("wishlist")}>
                                         Wishlist

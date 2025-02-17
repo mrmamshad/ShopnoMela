@@ -53,7 +53,7 @@ Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.s
 
 Route::post('/reviews', [ProductReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
 
-Route::get('/cart', [CategoryController::class, 'cart'])->name('cart');
+Route::get('/cart', [CategoryController::class, 'cart'])->name('cart')->middleware('auth');
 Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.store');
 
 Route::get('/wishlist', [CategoryController::class, 'wishlist'])->name('wishlist');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProductCart;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -9,37 +10,39 @@ class CategoryController extends Controller
 {
     public function index()
     {
-      return Inertia::render('Category/Index');
+        return Inertia::render('Category/Index');
     }
 
     public function product()
     {
-      return Inertia::render('Category/Product');
-
+        return Inertia::render('Category/Product');
     }
 
     public function cart()
     {
-      return Inertia::render('Category/Cart');
+        $cartItems = ProductCart::with('product')->where('user_id', auth()->id())->get();
+        // dd($cartItems);
+        return Inertia::render('Category/Cart', ['cartItems' => $cartItems]);
     }
 
     public function wishlist()
     {
-      return Inertia::render('Category/Wishlist');
+        return Inertia::render('Category/Wishlist');
     }
     public function checkout()
     {
-      return Inertia::render('Category/Checkout');
+        return Inertia::render('Category/Checkout');
     }
 
     // SSLCOMMERZ payment Gateway Routes -  Start
     //  payments selection page 
     public function payments()
     {
-      return Inertia::render('Category/Payments');
+        return Inertia::render('Category/Payments');
     }
 
-    public function admin(){
+    public function admin()
+    {
         dd('admin');
     }
 }

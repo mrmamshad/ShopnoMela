@@ -10,6 +10,7 @@ class WishlistController extends Controller
 {
     public function saveToWishlist(Request $request)
     {
+        // dd($request->all());
         ProductWish::firstOrCreate([
             'user_id' => Auth::id(), // Correct usage of Auth
             'product_id' => $request->product_id,
