@@ -34,7 +34,6 @@ import {
     Bold,
     Code,
     ImageIcon,
-    Link,
     List,
     MessageSquare,
     MoreHorizontal,
@@ -49,7 +48,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ShoppingCart, Eye } from "lucide-react";
-import { useForm } from "@inertiajs/react";
+import { useForm, usePage, Link } from "@inertiajs/react";
 import { StarHalf } from "lucide-react";
 
 const ProductDetails = ({
@@ -95,6 +94,10 @@ const ProductDetails = ({
             replies: 0,
         },
     ]);
+
+    const { auth } = usePage().props;
+
+    console.log("auth", auth);
 
     // Extract images into an array
     const productImages = [
@@ -322,6 +325,14 @@ const ProductDetails = ({
                 </div>
             </main>
 
+            {auth.user ? (
+                <h2 className="hidden"> you are logged in </h2>
+            ) : (
+                <h2 className="text-lg sm:text-md text-green-600  text-center font-semibold">
+                    You have to login to post a review
+                </h2>
+            )}
+
             {/* Product Reviews */}
             <div className="w-full max-w-5xl mx-auto px-4 p-2 sm:p-4">
                 <div className="flex justify-between items-center mb-4 sm:mb-6">
@@ -336,7 +347,7 @@ const ProductDetails = ({
                     </Button>
                 </div>
 
-                {/* Comment Input */}
+                {/* review form */}
                 <Card className="mb-4 sm:mb-6">
                     <CardContent className="p-3 sm:p-4">
                         <form
@@ -414,7 +425,7 @@ const ProductDetails = ({
                     </CardContent>
                 </Card>
 
-                {/* Comments List */}
+                {/* Review List */}
                 <div className="space-y-3 sm:space-y-4">
                     {reviews.map((comment) => (
                         <Card key={comment.id} className="relative">
@@ -425,11 +436,14 @@ const ProductDetails = ({
                                             <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
                                                 <AvatarImage
                                                     src={
-                                                        comment.image
-                                                            .avatar ||
-                                                        `/placeholder.svg`
+                                                        comment.image &&
+                                                        comment.image.avatar
+                                                            ? comment.image
+                                                                  .avatar
+                                                            : `/placeholder.svg`
                                                     }
                                                 />
+
                                                 <AvatarFallback>
                                                     {comment.user.name
                                                         .split(" ")
@@ -440,10 +454,7 @@ const ProductDetails = ({
                                             </Avatar>
                                             <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
                                                 <span className="font-semibold text-sm sm:text-base">
-                                                    {
-                                                        comment.user.name
-                                                            
-                                                    }
+                                                    {comment.user.name}
                                                 </span>
                                                 <span className="text-muted-foreground text-xs sm:text-sm">
                                                     {new Date(
@@ -459,9 +470,10 @@ const ProductDetails = ({
                                         </p>
 
                                         {/* Display Uploaded Image (if exists) */}
+                                        {/* {console.log(comment.image)} */}
                                         {comment.image && (
                                             <img
-                                                src={comment.image}
+                                                src={`/${comment.image}`}
                                                 alt="Review"
                                                 className="w-32 h-32 object-cover rounded-lg mb-2"
                                             />
@@ -504,6 +516,7 @@ const ProductDetails = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  gap-4">
                     {relatedproducts.map((product) => (
                         <Card key={product.id} className="flex flex-col">
+                            {console.log(product.id)}
                             <CardHeader className="p-0">
                                 <img
                                     src={product.image || "/placeholder.svg"}
@@ -529,13 +542,17 @@ const ProductDetails = ({
                                     Add to Cart
                                 </Button>
                                 <Button
-                                    onClick={() => viewDetails(product.id)}
                                     variant="outline"
                                     className="w-full"
                                     size="sm"
                                 >
-                                    <Eye className="mr-2 h-4 w-4" /> View
-                                    Details
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    <Link
+                                        href={route("product.show", product.id)}
+                                    >
+                                        {" "}
+                                        View Details
+                                    </Link>
                                 </Button>
                             </CardFooter>
                         </Card>

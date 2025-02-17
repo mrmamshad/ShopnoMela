@@ -179,9 +179,9 @@ export default function Index({ category, products }) {
                                         )}
                                     </div>
                                     <Button
-                                        as={Link}
-                                        href={`/product/${product.id}`}
-                                        variant="outline"
+                                            as={Link}
+                                            href={`/product/${product.id}`}
+                                            variant="outline"
                                     >
                                         <Link
                                             href={route(

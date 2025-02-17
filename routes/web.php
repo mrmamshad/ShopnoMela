@@ -49,7 +49,7 @@ Route::get('/product-details', [CategoryController::class, 'product'])->name('pr
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
 
 
-Route::post('/reviews', [ProductReviewController::class, 'store'])->name('reviews.store');
+Route::post('/reviews', [ProductReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
 
 Route::get('/cart', [CategoryController::class, 'cart'])->name('cart');
 Route::get('/wishlist', [CategoryController::class, 'wishlist'])->name('wishlist');
