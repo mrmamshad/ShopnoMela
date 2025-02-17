@@ -472,15 +472,15 @@ const ProductDetails = ({
                             <button className="flex-1 text-center bg-orange-500 text-white py-3 rounded-md hover:bg-orange-600">
                                 Buy Now
                             </button>
-                            <button
-                                onClick={addToCart}
-                                className="flex-1 border border-orange-500 text-orange-500 py-3 rounded-md hover:bg-orange-50"
-                                disabled={cartForm.processing}
-                            >
-                                {cartForm.processing
-                                    ? "Adding..."
-                                    : "Add to Cart"}
-                            </button>
+                                <button
+                                    onClick={addToCart}
+                                    className="flex-1 border border-orange-500 text-orange-500 py-3 rounded-md hover:bg-orange-50"
+                                    disabled={cartForm.processing}
+                                >
+                                    {cartForm.processing
+                                        ? "Adding..."
+                                        : "Add to Cart"}
+                                </button>
                         </div>
                     </div>
                 </div>

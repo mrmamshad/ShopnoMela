@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProductCart;
+use App\Models\ProductWish;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -27,7 +28,10 @@ class CategoryController extends Controller
 
     public function wishlist()
     {
-        return Inertia::render('Category/Wishlist');
+        $wishlistItems = ProductWish::with('product')
+        ->where('user_id', auth()->id())
+        ->get();
+        return Inertia::render('Category/Wishlist' , ['wishlistItems' => $wishlistItems]);
     }
     public function checkout()
     {

@@ -11,6 +11,7 @@ const CartPage = ({ cartItems }) => {
 
     // Convert received cart items to local state
     const [cart, setCart] = useState(cartItems);
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
     const updateQuantity = (id, action) => {
         setCart((prev) =>
@@ -62,10 +63,10 @@ const CartPage = ({ cartItems }) => {
 
     // Submit Wishlist
     const addToWishlist = (e, productId) => {
-        e.preventDefault();  // ✅ Prevent default event behavior
-    
+        e.preventDefault(); // ✅ Prevent default event behavior
+
         wishlistForm.setData("product_id", productId); // ✅ Correctly set product ID
-    
+
         wishlistForm.post(route("wishlist.store"), {
             onSuccess: () => {
                 toast({
@@ -75,15 +76,13 @@ const CartPage = ({ cartItems }) => {
             },
             onError: (errors) => {
                 console.error("Error adding to wishlist:", errors);
-            }
+            },
         });
     };
-    
 
-    const subtotal = cart.reduce(
-        (acc, item) => acc + parseFloat(item.price) * parseInt(item.qty),
-        0
-    );
+    const subtotal = selectedProduct
+        ? parseFloat(selectedProduct.price) * parseInt(selectedProduct.qty)
+        : 0;
     const discount = subtotal * 0.15;
     const tax = 0;
     const shipping = "Free";
@@ -103,7 +102,8 @@ const CartPage = ({ cartItems }) => {
                             cart.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="bg-white border rounded-lg p-6 shadow-sm hover:shadow-md"
+                                    className="bg-white cursor-pointer border rounded-lg p-6 shadow-sm hover:shadow-md"
+                                    onClick={() => setSelectedProduct(item)}
                                 >
                                     <div className="flex gap-6">
                                         <img
@@ -205,46 +205,83 @@ const CartPage = ({ cartItems }) => {
                         )}
                     </div>
 
-                    {/* Order Summary */}
-                    <div className="lg:col-span-1 border rounded-lg shadow-sm">
+                    {/* Product  Summary */}
+                    {/* Single Product Summary (Shown on Click) */}
+                    <div className="sm:h-[400px]  lg:col-span-1 border rounded-lg shadow-sm">
                         <div className="bg-white rounded-lg p-6 shadow-sm">
                             <h2 className="text-lg font-medium mb-4">
-                                Order Summary
+                                Product Summary
                             </h2>
-                            <div className="space-y-3">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">
-                                        Sub Total
-                                    </span>
-                                    <span>${subtotal.toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">
-                                        Discount
-                                    </span>
-                                    <span className="text-green-600">
-                                        ${discount.toFixed(2)}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">Tax</span>
-                                    <span>${tax.toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">
-                                        Shipping
-                                    </span>
-                                    <span className="text-orange-500">
-                                        {shipping}
-                                    </span>
-                                </div>
-                                <div className="border-t pt-3">
-                                    <div className="flex justify-between font-medium">
+                            {selectedProduct ? (
+                                <div>
+                                    <div className="border-b pb-3 mb-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-700 font-medium">
+                                                {selectedProduct.product.title}
+                                            </span>
+                                            <span className="text-gray-600">
+                                                x{selectedProduct.qty}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between text-gray-500 text-sm">
+                                            <span>Price:</span>
+                                            <span>
+                                                $
+                                                {parseFloat(
+                                                    selectedProduct.price
+                                                ).toFixed(2)}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between text-gray-500 text-sm">
+                                            <span>Subtotal:</span>
+                                            <span>
+                                                $
+                                                {(
+                                                    parseFloat(
+                                                        selectedProduct.price
+                                                    ) * selectedProduct.qty
+                                                ).toFixed(2)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between border-t pt-3">
+                                        <span className="text-gray-600">
+                                            Sub Total
+                                        </span>
+                                        <span>${subtotal.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">
+                                            Discount
+                                        </span>
+                                        <span className="text-green-600">
+                                            -${discount.toFixed(2)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">
+                                            Tax
+                                        </span>
+                                        <span>${tax.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">
+                                            Shipping
+                                        </span>
+                                        <span className="text-orange-500">
+                                            {shipping}
+                                        </span>
+                                    </div>
+                                    <div className="border-t pt-3 flex justify-between font-medium text-lg">
                                         <span>Total</span>
                                         <span>${total.toFixed(2)}</span>
                                     </div>
                                 </div>
-                            </div>
+                            ) : (
+                                <p className="text-gray-500 text-sm">
+                                    Click a product to view details.
+                                </p>
+                            )}
 
                             <button className="w-full bg-black text-white rounded-lg py-3 mt-6 hover:bg-gray-800">
                                 Proceed to Checkout
