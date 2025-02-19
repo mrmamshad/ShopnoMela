@@ -37,11 +37,11 @@ export default function AdminDashboardLayout({ children }) {
         },
         {
             name: "All Merchants",
-            href: "#",
+            href: route("marchantlist"),
             icon: LayoutDashboard,
             current: true,
         },
-        { name: "Users", href: "#", icon: Users, current: false },
+        { name: "Users", href: route("userlist"), icon: Users, current: false },
         {
             name: "Merchant Applications",
             href: "#",
@@ -121,7 +121,7 @@ export default function AdminDashboardLayout({ children }) {
                                     )}
                                 </>
                             ) : (
-                                <a
+                                <Link
                                     href={item.href}
                                     className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium 
                                     transition-colors hover:bg-muted ${
@@ -130,7 +130,7 @@ export default function AdminDashboardLayout({ children }) {
                                 >
                                     <item.icon className="h-5 w-5" />
                                     {item.name}
-                                </a>
+                                </Link>
                             )}
                         </div>
                     ))}

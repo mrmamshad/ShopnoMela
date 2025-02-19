@@ -79,11 +79,19 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
 
     Route::get('/admin/flash-sales', [FlashSaleController::class, 'index'])->name('flash-sales.index');
     Route::post('/admin/flash-sales', [FlashSaleController::class, 'store'])->name('flash-sales.store');
-    Route::delete('admin/flash-sales/{flashSale}', [FlashSaleController::class, 'destroy'])->name('flash-sales.destroy');  
+    Route::delete('admin/flash-sales/{flashSale}', [FlashSaleController::class, 'destroy'])->name('flash-sales.destroy');
 
-    
-
-
+    // marchant manage routes
+    Route::get('/admin/marchants', [AdminController::class, 'marchantlist'])->name('marchantlist');
+    // all users manage routes
+    Route::get('/admin/users', [AdminController::class, 'userlist'])->name('userlist');
+    //  to give a user merchant role
+    Route::post('/admin/users/{id}/assign-merchant', [AdminController::class, 'assignMerchant'])
+        ->name('admin.assign-merchant');
+    //  to take back marchant role from a user and give them normal customer role
+    Route::post('/admin/users/{id}/take-over', [AdminController::class, 'takeOverMerchantRole'])
+   
+        ->name('admin.takeOverMerchant');
 });
 
 // Admin and Merchant
@@ -94,8 +102,8 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,
 
 
 Route::middleware(['auth', 'admin'])->group(function () {
-   
-  
+
+
 
     Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
 });
