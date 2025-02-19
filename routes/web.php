@@ -79,8 +79,9 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
 
     Route::get('/admin/flash-sales', [FlashSaleController::class, 'index'])->name('flash-sales.index');
     Route::post('/admin/flash-sales', [FlashSaleController::class, 'store'])->name('flash-sales.store');
-    Route::put('/admin/flash-sales/{flashSale}', [FlashSaleController::class, 'update'])->name('flash-sales.update');
-    Route::delete('/admin/flash-sales/{flashSale}', [FlashSaleController::class, 'destroy'])->name('flash-sales.destroy');
+    Route::delete('admin/flash-sales/{flashSale}', [FlashSaleController::class, 'destroy'])->name('flash-sales.destroy');  
+
+    
 
 
 });
