@@ -17,6 +17,7 @@ use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductReviewController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Middleware\RoleMiddleware;
 use App\Models\Category;
 use App\Models\FlashSale;
 use App\Models\Offer;
@@ -65,8 +66,23 @@ Route::get('/payments', [CategoryController::class, 'payments'])->name('payments
 
 
 // Admin only
-Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin'])->group(function () {
+Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin');
+
+    // Slider manage routes
+    Route::get('/admin/sliders', [OfferController::class, 'index'])->name('offers.index');
+    Route::post('/admin/offers', [OfferController::class, 'store'])->name('offers.store');
+    Route::put('admin/offers/{offer}', [OfferController::class, 'update'])->name('offers.update');
+    Route::delete('admin/offers/{offer}', [OfferController::class, 'destroy'])->name('offers.destroy');
+
+    // flash sale manage routes 
+
+    Route::get('/admin/flash-sales', [FlashSaleController::class, 'index'])->name('flash-sales.index');
+    Route::post('/admin/flash-sales', [FlashSaleController::class, 'store'])->name('flash-sales.store');
+    Route::put('/admin/flash-sales/{flashSale}', [FlashSaleController::class, 'update'])->name('flash-sales.update');
+    Route::delete('/admin/flash-sales/{flashSale}', [FlashSaleController::class, 'destroy'])->name('flash-sales.destroy');
+
+
 });
 
 // Admin and Merchant
@@ -77,13 +93,8 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,
 
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/offers', [OfferController::class, 'index'])->name('admin.offers');
-    Route::post('/admin/offers', [OfferController::class, 'store']);
-    Route::delete('/admin/offers/{id}', [OfferController::class, 'destroy']);
-
-    Route::get('/admin/flash-sales', [FlashSaleController::class, 'index'])->name('admin.flash_sales');
-    Route::post('/admin/flash-sales', [FlashSaleController::class, 'store']);
-    Route::delete('/admin/flash-sales/{id}', [FlashSaleController::class, 'destroy']);
+   
+  
 
     Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
 });

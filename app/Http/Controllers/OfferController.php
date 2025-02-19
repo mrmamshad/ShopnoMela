@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Offer;
-
+use Inertia\Inertia;
 
 class OfferController extends Controller
 {
@@ -12,38 +12,51 @@ class OfferController extends Controller
      * Display a listing of the resource.
      */ public function index()
     {
-        return response()->json(Offer::where('valid_until', '>=', now())->orderByDesc('id')->get());
+
+        return Inertia::render('Admin/slider', [
+          'offers' => Offer::latest()->get()
+        ]);
     }
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $request->validate([
-            'title' => 'required|string',
-            'image' => 'required|string', // Image path (upload handling needed)
+            'title' => 'required|string|max:255',
+            'image' => 'required|url',
             'discount' => 'required|numeric|min:0|max:100',
             'valid_until' => 'required|date',
         ]);
 
-        $offer = Offer::create($request->all());
-        return response()->json($offer, 201);
+        Offer::create([
+            'title' => $request->title,
+            'image' => $request->image,
+            'discount' => $request->discount,
+            'valid_until' => $request->valid_until,
+        ]);
+
+        return redirect()->back()->with('success', 'Offer added successfully.');
     }
 
+    // Update an offer
     public function update(Request $request, Offer $offer)
     {
         $request->validate([
-            'title' => 'sometimes|string',
-            'image' => 'sometimes|string',
-            'discount' => 'sometimes|numeric|min:0|max:100',
-            'valid_until' => 'sometimes|date',
+            'title' => 'required|string|max:255',
+            'image' => 'required|url',
+            'discount' => 'required|numeric|min:0|max:100',
+            'valid_until' => 'required|date',
         ]);
-
+    
         $offer->update($request->all());
-        return response()->json($offer);
+    
+        return redirect()->back()->with('success', 'Offer updated successfully.');
     }
-
+    
     public function destroy(Offer $offer)
     {
         $offer->delete();
-        return response()->json(['message' => 'Offer deleted']);
+        return redirect()->back()->with('success', 'Offer deleted successfully.');
     }
+    
 }

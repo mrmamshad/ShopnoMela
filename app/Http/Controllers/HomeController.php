@@ -17,7 +17,10 @@ class HomeController extends Controller
     
     public function index()
     {
-        $offers = Offer::where('valid_until', '>=', now())->get();
+        $offers = Offer::where('valid_until', '>=', now())
+        ->orderBy('created_at', 'desc') // Sort by newest first
+        ->get();
+    
         $flashSales = FlashSale::with('product')->latest()->get();
         // dd($flashSales);
         //    dd($offers);

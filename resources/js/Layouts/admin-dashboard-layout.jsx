@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
+import { Link } from "@inertiajs/react";
 
 export default function AdminDashboardLayout({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -29,8 +30,8 @@ export default function AdminDashboardLayout({ children }) {
             current: false,
             hasDropdown: true,
             children: [
-                { name: "Slider", href: "#slider" },
-                { name: "Flash Sale", href: "#flash-sale" },
+                { name: "Slider", href: route("offers.index") },
+                { name: "Flash Sale", href: route("flash-sales.index") },
                 { name: "Section Manage", href: "#section-manage" },
             ],
         },
@@ -69,7 +70,7 @@ export default function AdminDashboardLayout({ children }) {
                 <div className="flex h-16 items-center gap-2 px-4 border-b">
                     <div className="flex items-center gap-2 font-semibold text-lg">
                         <div className="h-8 w-8 rounded-lg bg-primary"></div>
-                        Admin Panel
+                       <Link href={route("admin")}>স্বপ্ন মেলা  Admin Panel</Link>
                     </div>
                     <Button
                         variant="ghost"
@@ -108,13 +109,13 @@ export default function AdminDashboardLayout({ children }) {
                                     {homeDropdownOpen && (
                                         <div className="pl-8 space-y-1">
                                             {item.children.map((subItem) => (
-                                                <a
+                                                <Link
                                                     key={subItem.name}
                                                     href={subItem.href}
                                                     className="block px-3 py-2 text-sm rounded-lg transition-colors hover:bg-muted"
                                                 >
                                                     {subItem.name}
-                                                </a>
+                                                </Link>
                                             ))}
                                         </div>
                                     )}
