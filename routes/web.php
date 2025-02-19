@@ -17,11 +17,14 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductReviewController;
 use App\Http\Controllers\WishlistController;
 use App\Models\Category;
+use App\Models\FlashSale;
 use App\Models\Offer;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     $offers = Offer::where('valid_until', '>=', now())->get();
+    $flashSales = FlashSale::with('product')->latest()->get();
+    // dd($flashSales);
 //    dd($offers);
 
     return Inertia::render('Welcome', [
@@ -31,7 +34,8 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
         'user' => auth()->user(),
         'category' => Category::all(),
-        'offers' => $offers
+        'offers' => $offers,
+        'flashSales' => $flashSales
     ]);
 })->name('home');
 
