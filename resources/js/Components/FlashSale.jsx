@@ -1,70 +1,63 @@
 import { Link } from "@inertiajs/react";
 import React from "react";
 import Countdown from "react-countdown";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
-const FlashSale = ({ flashSales }) => {
-    console.log("flashSales", flashSales);
-
-    // Custom Countdown Renderer
-    const renderer = ({ hours, minutes, seconds, completed }) => {
-        if (completed) {
-            return <span className="text-gray-500 font-semibold">Expired</span>;
-        }
-
-        return (
-            <div className="flex items-center gap-2">
-                <span
-                    className={`px-2 py-1 text-xs font-bold text-white rounded ${
-                        hours === 0 && minutes < 5
-                            ? "bg-red-500"
-                            : "bg-gray-800"
-                    }`}
-                >
-                    {hours}:{minutes < 10 ? `0${minutes}` : minutes}:
-                    {seconds < 10 ? `0${seconds}` : seconds}
-                </span>
-                {hours === 0 && minutes < 5 && (
-                    <span className="text-red-500 font-bold text-xs">
-                        🔥 Ending Soon!
-                    </span>
-                )}
-            </div>
-        );
-    };
+// Custom Countdown Renderer
+const renderer = ({ hours, minutes, seconds, completed }) => {
+    if (completed) {
+        return <span className="text-gray-500 font-semibold">Expired</span>;
+    }
 
     return (
-        <div className="container mx-auto py-6  ">
-            <h2 className="text-xl font-bold mb-4">🔥 Flash Sale</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4   ">
+        <div className="bg-gray-900 text-white text-sm font-semibold px-3 py-1 rounded-lg">
+            {hours}:{minutes < 10 ? `0${minutes}` : minutes}:
+            {seconds < 10 ? `0${seconds}` : seconds}
+        </div>
+    );
+};
+
+const FlashSale = ({ flashSales }) => {
+    return (
+        <div className="container mx-auto py-6">
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+                🔥 Flash Sale
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {flashSales.map((sale) => (
-                    <Link
-                        key={sale.id}
-                        href={route("product.show", { id: sale.product_id })}
-                        >
-                            <div
-                        key={sale.id}
-                        className="p-3  border  shadow-md bg-white rounded-lg "
-                    >
-                        <img
-                            src={sale.product.image}
-                            alt={sale.product.title}
-                            className="w-full h-40 object-cover rounded"
-                        />
-                        <h3 className="text-lg mt-2 font-semibold">
-                            {sale.product.title}
-                        </h3>
-                        <div className="flex justify-between mt-2 items-center  ">
-                            {" "}
-                            <p className="text-red-500 font-bold text-lg">
+                    <Link key={sale.id} href={route("product.show", { id: sale.product_id })}>
+                        <Card className="overflow-hidden shadow-lg relative">
+                            {/* Discount Badge */}
+                            <Badge className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 text-xs rounded-md">
                                 {sale.discount_percentage}% OFF
-                            </p>
-                            <Countdown
-                                date={new Date(sale.end_time)}
-                                renderer={renderer}
+                            </Badge>
+
+                            <img
+                                src={sale.product.image || "/placeholder.jpg"}
+                                alt={sale.product.title}
+                                className="w-full h-48 object-cover rounded-t-lg"
                             />
-                        </div>
-                    </div>
-                        </Link>
+                            
+                            <CardHeader className="text-center">
+                                <CardTitle className="text-lg font-semibold">
+                                    {sale.product.title}
+                                </CardTitle>
+                            </CardHeader>
+
+                            <CardContent className="flex justify-center">
+                                <Countdown date={new Date(sale.end_time)} renderer={renderer} />
+                            </CardContent>
+
+                            <CardFooter>
+                                <Link href={route("product.show", { id: sale.product_id })} className="w-full">
+                                    <button className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">
+                                        View Details
+                                    </button>
+                                </Link>
+                            </CardFooter>
+                        </Card>
+                    </Link>
                 ))}
             </div>
         </div>

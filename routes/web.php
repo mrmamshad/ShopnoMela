@@ -19,6 +19,7 @@ use App\Http\Controllers\WishlistController;
 use App\Models\Category;
 use App\Models\FlashSale;
 use App\Models\Offer;
+use App\Models\Product;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -26,6 +27,31 @@ Route::get('/', function () {
     $flashSales = FlashSale::with('product')->latest()->get();
     // dd($flashSales);
 //    dd($offers);
+$userId = auth()->id(); // Get logged-in user ID
+
+if ($userId) {
+    // User is logged in: Exclude wishlist & cart products
+    $excludedProductIds = DB::table('product_wishes')
+        ->where('user_id', $userId)
+        ->pluck('product_id')
+        ->merge(DB::table('product_carts')
+            ->where('user_id', $userId)
+            ->pluck('product_id'))
+        ->toArray();
+
+    $randomProducts = Product::whereNotIn('id', $excludedProductIds)
+        ->inRandomOrder()
+        ->limit(10)
+        ->get();
+} else {
+    // User is a guest: Show mixed-category popular products
+    $randomCategories = Category::inRandomOrder()->limit(3)->pluck('id');
+
+    $randomProducts = Product::whereIn('category_id', $randomCategories)
+        ->inRandomOrder()
+        ->limit(10)
+        ->get();
+}
 
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -35,7 +61,8 @@ Route::get('/', function () {
         'user' => auth()->user(),
         'category' => Category::all(),
         'offers' => $offers,
-        'flashSales' => $flashSales
+        'flashSales' => $flashSales,
+        'randomProducts' => $randomProducts
     ]);
 })->name('home');
 
