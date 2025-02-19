@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FlashSaleController;
 use App\Http\Controllers\GoogleAuth;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\MarchantController;
 use App\Http\Controllers\ProfileController;
@@ -22,55 +23,15 @@ use App\Models\Offer;
 use App\Models\Product;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    $offers = Offer::where('valid_until', '>=', now())->get();
-    $flashSales = FlashSale::with('product')->latest()->get();
-    // dd($flashSales);
-//    dd($offers);
-$userId = auth()->id(); // Get logged-in user ID
-
-if ($userId) {
-    // User is logged in: Exclude wishlist & cart products
-    $excludedProductIds = DB::table('product_wishes')
-        ->where('user_id', $userId)
-        ->pluck('product_id')
-        ->merge(DB::table('product_carts')
-            ->where('user_id', $userId)
-            ->pluck('product_id'))
-        ->toArray();
-
-    $randomProducts = Product::whereNotIn('id', $excludedProductIds)
-        ->inRandomOrder()
-        ->limit(10)
-        ->get();
-} else {
-    // User is a guest: Show mixed-category popular products
-    $randomCategories = Category::inRandomOrder()->limit(3)->pluck('id');
-
-    $randomProducts = Product::whereIn('category_id', $randomCategories)
-        ->inRandomOrder()
-        ->limit(10)
-        ->get();
-}
-
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-        'user' => auth()->user(),
-        'category' => Category::all(),
-        'offers' => $offers,
-        'flashSales' => $flashSales,
-        'randomProducts' => $randomProducts
-    ]);
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/contact-us', function (){ return Inertia::render('ContactUs');  } )->name('contact-us');
+Route::get('/contact-us', function () {
+    return Inertia::render('ContactUs');
+})->name('contact-us');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -104,12 +65,12 @@ Route::get('/payments', [CategoryController::class, 'payments'])->name('payments
 
 
 // Admin only
-Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->group(function () {
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin');
 });
 
 // Admin and Merchant
-Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin,merchant'])->group(function () {
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,merchant'])->group(function () {
     Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
 });
 
