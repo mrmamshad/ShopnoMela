@@ -4,7 +4,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\FlashSaleController;
 use App\Http\Controllers\GoogleAuth;
+use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\MarchantController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -15,17 +17,21 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductReviewController;
 use App\Http\Controllers\WishlistController;
 use App\Models\Category;
+use App\Models\Offer;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-   
+    $offers = Offer::where('valid_until', '>=', now())->get();
+//    dd($offers);
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
         'user' => auth()->user(),
-        'category' => Category::all()
+        'category' => Category::all(),
+        'offers' => $offers
     ]);
 })->name('home');
 
@@ -76,6 +82,19 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin,me
     Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
 });
 
+
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/offers', [OfferController::class, 'index'])->name('admin.offers');
+    Route::post('/admin/offers', [OfferController::class, 'store']);
+    Route::delete('/admin/offers/{id}', [OfferController::class, 'destroy']);
+
+    Route::get('/admin/flash-sales', [FlashSaleController::class, 'index'])->name('admin.flash_sales');
+    Route::post('/admin/flash-sales', [FlashSaleController::class, 'store']);
+    Route::delete('/admin/flash-sales/{id}', [FlashSaleController::class, 'destroy']);
+
+    Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
+});
 
 
 // Route::get('/offers', [OfferController::class, 'index'])->name('offers');
