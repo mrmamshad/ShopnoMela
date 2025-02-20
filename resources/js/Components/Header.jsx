@@ -23,7 +23,7 @@ function Header() {
     const [openModal, setOpenModal] = useState(false);
     const { toast } = useToast();
 
-    console.log("user", user);
+    // console.log("user", user);
     const { data, setData, post, processing, reset, errors } = useForm({
         store_name: "",
         cover_photo: null,

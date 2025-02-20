@@ -40,6 +40,13 @@ class HandleInertiaRequests extends Middleware
                     'roles' => $request->user()->roles->pluck('name'), // Get only role names
                 ] : null,
             ],
+            'flash' => function () {
+            return [
+                'notification' => session('notification'),
+                'success'      => session('success'),
+                'error'        => session('error'),
+            ];
+        },
         ];
     }
 }

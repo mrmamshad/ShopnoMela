@@ -129,7 +129,7 @@ export default function Index({ category, products }) {
                     </div>
                 </div>
 
-                {/* Product List */}
+             
                 {/* Product List */}
                 <div
                     className={
@@ -152,8 +152,9 @@ export default function Index({ category, products }) {
                                     viewMode === "list" ? "w-48 shrink-0" : ""
                                 }
                             >
+                                {console.log("Product image:", product.image)}
                                 <img
-                                    src={product.image || "/placeholder.svg"}
+                                    src ={`/${product.image}`}
                                     alt={product.title}
                                     className="h-48 w-full object-cover rounded-t-lg"
                                 />

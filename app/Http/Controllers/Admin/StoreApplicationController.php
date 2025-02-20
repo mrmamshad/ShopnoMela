@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Store;
-
+use App\Notifications\MerchantApplicationStatus;
 
 class StoreApplicationController extends Controller
 {
@@ -37,15 +37,25 @@ class StoreApplicationController extends Controller
             $user->assignRole('merchant');
             $store->update(['application_status' => 'approved']);
         }
+        // Send notification to the user
+        $user->notify(new MerchantApplicationStatus('approved'));
 
-        return redirect()->back()->with('success', 'Merchant approved successfully.');
+        return redirect()->back()->with([
+            'success' => 'Merchant application approved!',
+            'notification' => 'Your merchant application has been approved!'
+        ]);
     }
 
     public function reject(Store $store)
     {
-        $store->delete(); // Remove the application
 
-        return redirect()->back()->with('success', 'Merchant application rejected.');
+        $user = $store->user;
+        $store->delete(); // Remove the application
+        $user->notify(new MerchantApplicationStatus('rejected'));
+        return redirect()->back()->with([
+            'success' => 'Merchant application rejected!',
+            'notification' => 'Your merchant application has been rejected.'
+        ]);
+    
     }
 }
-

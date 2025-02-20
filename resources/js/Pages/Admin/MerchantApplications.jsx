@@ -27,7 +27,7 @@ export default function MerchantApplications({ stores }) {
       },
     });
   };
-  
+      
 
   return (
     <DashboardLayout>

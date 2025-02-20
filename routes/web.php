@@ -19,6 +19,7 @@ use App\Http\Controllers\ProductReviewController;
 
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\Admin\StoreApplicationController;
+use App\Http\Controllers\Merchant\ProductController as MerchantProductController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Models\Category;
@@ -100,16 +101,26 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
 
     Route::get('/merchant-applications', [StoreApplicationController::class, 'index'])->name('merchant.applications.index');
     Route::post('/merchant-applications/{store}/approve', [StoreApplicationController::class, 'approve'])
-    ->name('merchant.applications.approve');
+        ->name('merchant.applications.approve');
 
-Route::post('/merchant-applications/{store}/reject', [StoreApplicationController::class, 'reject'])
-    ->name('merchant.applications.reject');
-
+    Route::post('/merchant-applications/{store}/reject', [StoreApplicationController::class, 'reject'])
+        ->name('merchant.applications.reject');
 });
 
 // Admin and Merchant
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,merchant'])->group(function () {
     Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
+     // Show store profile
+     Route::get('/marchant/profile', [StoreController::class, 'edit'])->name('merchant.store.edit');
+     // Update store profile
+     Route::post('/marchant/profile', [StoreController::class, 'update'])->name('merchant.store.update');
+     Route::get('/marchant/products', [MerchantProductController::class, 'index'])->name('merchant.products.index');
+     Route::get('/marchant/product/create', [MerchantProductController::class, 'create'])->name('merchant.products.create');
+     Route::post('/marchant/product/store', [MerchantProductController::class, 'store'])->name('merchant.products.store'); // ⬅ Added this
+     Route::delete('/merchant/products/{id}', [MerchantProductController::class, 'destroy'])
+    ->name('merchant.products.destroy')
+    ;
+
 });
 
 
@@ -118,9 +129,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/merchant/store', [StoreController::class, 'store'])->name('merchant.store');
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
-   
-});
+Route::middleware(['auth', 'role:admin'])->group(function () {});
 
 Route::middleware(['auth', 'admin'])->group(function () {
 

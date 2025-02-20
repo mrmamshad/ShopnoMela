@@ -52,11 +52,10 @@ import { useForm, usePage, Link } from "@inertiajs/react";
 import { StarHalf } from "lucide-react";
 // import { Toast } from "@/components/ui/toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast";
 // import { ToastAction } from "@/components/ui/toast"
 
 // import { ToastProvider } from "@/components/ui/toast";
-
 
 const ProductDetails = ({
     productdetails,
@@ -67,7 +66,8 @@ const ProductDetails = ({
     // console.log("Related products:", relatedproducts);
     // console.log("Product details:", productdetails);
     // console.log("Single product:", singleproduct);
-    console.log("Reviews:", reviews);
+    // console.log("Reviews:", reviews);
+    // console.log("Product details:", productdetails);
     const { toast } = useToast();
     const [currentImage, setCurrentImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
@@ -104,28 +104,33 @@ const ProductDetails = ({
 
     const { auth } = usePage().props;
 
-    console.log("auth", auth);
+    // console.log("auth", auth);
 
     // Extract images into an array
     const productImages = [
+        `${productdetails.img1}`,
+        `${productdetails.img2}`,
+        `${productdetails.img3}`,
+        `${productdetails.img4}`,
+    ].filter(Boolean); // Remove any undefined/null values
+
+    const images = [
         productdetails.img1,
         productdetails.img2,
         productdetails.img3,
         productdetails.img4,
-    ].filter(Boolean); // Remove any undefined/null values
+    ];
+    const [currentIndex, setCurrentIndex] = useState(0);
 
-    const nextImage = () => {
-        setCurrentImage((current) =>
-            current === productImages.length - 1 ? 0 : current + 1
-        );
-    };
-
+    // Previous Image
     const prevImage = () => {
-        setCurrentImage((current) =>
-            current === 0 ? productImages.length - 1 : current - 1
-        );
+        setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
     };
 
+    // Next Image
+    const nextImage = () => {
+        setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    };
     const renderStars = (rating) => {
         return [...Array(5)].map((_, i) => (
             <Star
@@ -185,8 +190,9 @@ const ProductDetails = ({
                 reset("qty");
                 toast({
                     title: "Added to Cart",
-                    description: "The product was added to your cart successfully!",
-                  });
+                    description:
+                        "The product was added to your cart successfully!",
+                });
             },
         });
     };
@@ -194,16 +200,16 @@ const ProductDetails = ({
     // Submit Wishlist
     const addToWishlist = (e) => {
         e.preventDefault();
-        wishlistForm.post(route("wishlist.store")  , {
+        wishlistForm.post(route("wishlist.store"), {
             onSuccess: () => {
                 reset("qty");
                 toast({
                     title: "Added to Wishlist",
-                    description: "The product was added to your wishlist successfully!",
-                  });
+                    description:
+                        "The product was added to your wishlist successfully!",
+                });
             },
         });
-       
     };
 
     const [preview, setPreview] = useState(null);
@@ -260,41 +266,42 @@ const ProductDetails = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Product Images */}
                     <div className="space-y-4">
-                        <div className="relative">
-                            <img
-                                src={
-                                    productImages[currentImage] ||
-                                    "/placeholder.svg"
-                                }
-                                alt={singleproduct.title}
-                                className="w-full aspect-square object-cover rounded-lg"
-                            />
-                            <button
-                                onClick={prevImage}
-                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
-                            >
-                                <ArrowLeft className="h-5 w-5" />
-                            </button>
-                            <button
-                                onClick={nextImage}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
-                            >
-                                <ArrowRight className="h-5 w-5" />
-                            </button>
-                        </div>
-                        <div className="flex space-x-2 overflow-x-auto">
-                            {productImages.map((img, index) => (
+  {/* Main Image Viewer */}
+  <div className="relative flex justify-center items-center">
+                <button
+                    onClick={prevImage}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
+                >
+                    <ArrowLeft className="h-5 w-5" />
+                </button>
+
+                <img
+                    src={`/${images[currentIndex]}`}
+                    alt="Product"
+                    className="w-64 h-64 object-cover rounded shadow-lg transition-all duration-300"
+                />
+
+                <button
+                    onClick={nextImage}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
+                >
+                    <ArrowRight className="h-5 w-5" />
+                </button>
+            </div>
+
+                        <div className="flex space-x-2 overflow-x-auto mt-4 p-2">
+                            {images.map((img, index) => (
                                 <button
                                     key={index}
-                                    onClick={() => setCurrentImage(index)}
-                                    className={`flex-shrink-0 ${
-                                        currentImage === index
+                                    onClick={() => setCurrentIndex(index)} // Fix: Use setCurrentIndex instead of setCurrentImage
+                                    className={`flex-shrink-0 border-2 rounded-lg transition-all duration-300 ${
+                                        currentIndex === index
                                             ? "ring-2 ring-orange-500"
                                             : ""
                                     }`}
                                 >
                                     <img
-                                        src={img}
+                                        src={`/${img}`}
                                         alt={`Product ${index + 1}`}
                                         className="w-20 h-20 object-cover rounded"
                                     />
@@ -472,15 +479,15 @@ const ProductDetails = ({
                             <button className="flex-1 text-center bg-orange-500 text-white py-3 rounded-md hover:bg-orange-600">
                                 Buy Now
                             </button>
-                                <button
-                                    onClick={addToCart}
-                                    className="flex-1 border border-orange-500 text-orange-500 py-3 rounded-md hover:bg-orange-50"
-                                    disabled={cartForm.processing}
-                                >
-                                    {cartForm.processing
-                                        ? "Adding..."
-                                        : "Add to Cart"}
-                                </button>
+                            <button
+                                onClick={addToCart}
+                                className="flex-1 border border-orange-500 text-orange-500 py-3 rounded-md hover:bg-orange-50"
+                                disabled={cartForm.processing}
+                            >
+                                {cartForm.processing
+                                    ? "Adding..."
+                                    : "Add to Cart"}
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -9,41 +9,36 @@ import {
     Search,
     Menu,
     X,
+    ChevronDown,
+    ChevronUp,
 } from "lucide-react";
 import { Button } from "@/Components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/Components/ui/input";
 import { MdStorefront } from "react-icons/md";
 import { RiProductHuntFill } from "react-icons/ri";
 import { MdReport } from "react-icons/md";
 import { MdOutlineRateReview } from "react-icons/md";
+import { Link } from "@inertiajs/react";
 
 export default function MarchantDashboardLayout({ children, marchantuser }) {
-    // console.log(marchantuser);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [productsDropdownOpen, setProductsDropdownOpen] = useState(false); // Dropdown state
 
     const navigation = [
-        { name: "store", href: "#", icon: MdStorefront, current: true },
+        { name: "Store", href: route("merchant.store.edit"), icon: MdStorefront, current: true },
         {
             name: "Products",
             href: "#",
             icon: RiProductHuntFill,
             current: false,
+            hasDropdown: true,
+            children: [
+                { name: "All Products", href: route("merchant.products.index") },
+                { name: "Add Product", href: route("merchant.products.create") },
+            ],
         },
         { name: "Reports", href: "#", icon: MdReport, current: false },
-        {
-            name: "Reviews",
-            href: "#",
-            icon: MdOutlineRateReview,
-            current: false,
-        },
+        { name: "Reviews", href: "#", icon: MdOutlineRateReview, current: false },
         { name: "Help", href: "#", icon: HelpCircle, current: false },
     ];
 
@@ -60,15 +55,15 @@ export default function MarchantDashboardLayout({ children, marchantuser }) {
             {/* Sidebar */}
             <div
                 className={`
-        fixed top-0 bottom-0 left-0 z-50 w-64 bg-card border-r
-        transform transition-transform duration-200 ease-in-out
-        lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-      `}
+                    fixed top-0 bottom-0 left-0 z-50 w-64 bg-card border-r
+                    transform transition-transform duration-200 ease-in-out
+                    lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+                `}
             >
                 <div className="flex h-16 items-center gap-2 px-4 border-b">
                     <div className="flex items-center gap-2 font-semibold text-lg">
                         <div className="h-8 w-8 rounded-lg bg-primary"></div>
-                        Marchant {marchantuser.name.split(" ")[0]}
+                        <Link href={route("marchant")}>Marchant {marchantuser?.name.split(" ")[0]}</Link>
                     </div>
 
                     <Button
@@ -80,20 +75,50 @@ export default function MarchantDashboardLayout({ children, marchantuser }) {
                         <X className="h-5 w-5" />
                     </Button>
                 </div>
+
+                {/* Navigation */}
                 <nav className="p-4 space-y-2">
                     {navigation.map((item) => (
-                        <a
-                            key={item.name}
-                            href={item.href}
-                            className={`
-                flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium
-                transition-colors hover:bg-muted
-                ${item.current ? "bg-muted" : ""}
-              `}
-                        >
-                            <item.icon className="h-5 w-5" />
-                            {item.name}
-                        </a>
+                        <div key={item.name}>
+                            {item.hasDropdown ? (
+                                <>
+                                    <button
+                                        onClick={() => setProductsDropdownOpen(!productsDropdownOpen)}
+                                        className="flex w-full items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-muted focus:outline-none"
+                                    >
+                                        <item.icon className="h-5 w-5" />
+                                        {item.name}
+                                        {productsDropdownOpen ? (
+                                            <ChevronUp className="ml-auto h-4 w-4" />
+                                        ) : (
+                                            <ChevronDown className="ml-auto h-4 w-4" />
+                                        )}
+                                    </button>
+
+                                    {productsDropdownOpen && (
+                                        <div className="pl-8 space-y-1">
+                                            {item.children.map((subItem) => (
+                                                <Link
+                                                    key={subItem.name}
+                                                    href={subItem.href}
+                                                    className="block px-3 py-2 text-sm rounded-lg transition-colors hover:bg-muted"
+                                                >
+                                                    {subItem.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <Link
+                                    href={item.href}
+                                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-muted ${item.current ? "bg-muted" : ""}`}
+                                >
+                                    <item.icon className="h-5 w-5" />
+                                    {item.name}
+                                </Link>
+                            )}
+                        </div>
                     ))}
                 </nav>
             </div>
@@ -112,7 +137,7 @@ export default function MarchantDashboardLayout({ children, marchantuser }) {
                             <Menu className="h-5 w-5" />
                         </Button>
 
-                        <div className=" flex flex-1 items-center   gap-4">
+                        <div className="flex flex-1 items-center gap-4">
                             <form className="flex-1 max-w-lg hidden md:block">
                                 <div className="relative">
                                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -125,43 +150,10 @@ export default function MarchantDashboardLayout({ children, marchantuser }) {
                             </form>
                         </div>
 
-                        <div className="flex   mr-8  justify-end items-center gap-3">
+                        <div className="flex mr-8 justify-end items-center gap-3">
                             <Button variant="ghost" size="icon">
                                 <Bell className="h-5 w-5" />
                             </Button>
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        className="relative h-8 w-8 rounded-full"
-                                    >
-                                        <img
-                                            src="/placeholder.svg"
-                                            alt="Avatar"
-                                            className="rounded-full object-cover"
-                                        />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                    align="end"
-                                    className="w-56"
-                                >
-                                    <DropdownMenuLabel>
-                                        My Account
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        Settings
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>Support</DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="text-red-600">
-                                        Log out
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
                         </div>
                     </div>
                 </header>

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('short_des');
             $table->decimal('price', 10, 2);
-            $table->tinyInteger('discount');
+            $table->tinyInteger('discount')->nullable();
             $table->string('image');
             $table->double('star', 2, 1);
             // remark enum

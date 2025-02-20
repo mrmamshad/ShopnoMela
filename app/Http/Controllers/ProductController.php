@@ -11,6 +11,7 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
+
     public function categoryProducts($id)
     {
         $category = Category::findOrFail($id);
