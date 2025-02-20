@@ -14,13 +14,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 function Header() {
     const { auth } = usePage().props;
     const user = auth.user;
     const [searchTerm, setSearchTerm] = useState("");
     const [openModal, setOpenModal] = useState(false);
+    const { toast } = useToast();
 
+    console.log("user", user);
     const { data, setData, post, processing, reset, errors } = useForm({
         store_name: "",
         cover_photo: null,
@@ -44,6 +47,11 @@ function Header() {
             onSuccess: () => {
                 reset();
                 setOpenModal(false);
+                toast({
+                    title: "Successfuly applied ",
+                    description: "Applied for merchant successfully!",
+                    variant: "default",
+                });
             },
         });
     };
@@ -78,15 +86,18 @@ function Header() {
                     </div>
 
                     <div className="flex items-center space-x-4">
-                        {user && user.roles.includes("customer") && (
-                            <Button
-                                variant="outline"
-                                onClick={() => setOpenModal(true)}
-                                className="text-black"
-                            >
-                                Become a Seller
-                            </Button>
-                        )}
+                        {user &&
+                            user.roles.includes("customer") &&
+                            !user.roles.includes("admin") &&
+                            !user.roles.includes("merchant") && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setOpenModal(true)}
+                                    className="text-black"
+                                >
+                                    Become a Seller
+                                </Button>
+                            )}
 
                         {user ? (
                             <div className="sm:ms-6 sm:flex sm:items-center">
@@ -128,9 +139,7 @@ function Header() {
                                             >
                                                 Orders
                                             </Dropdown.Link>
-                                            <Dropdown.Link
-                                                href={route("cart")}
-                                            >
+                                            <Dropdown.Link href={route("cart")}>
                                                 My cart
                                             </Dropdown.Link>
                                             <Dropdown.Link
@@ -176,14 +185,14 @@ function Header() {
             </header>
 
             {/* Become a Seller Modal */}
-            <Dialog open={openModal} onOpenChange={setOpenModal}   >
+            <Dialog open={openModal} onOpenChange={setOpenModal}>
                 {/* 
                     Added w-full and extra bottom padding. 
                     This ensures the content can scroll and the buttons aren’t hidden.
                 */}
                 <DialogContent className="w-full sm:max-w-lg max-h-[70vh]  sm:max-h-[90vh]  overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Become a Seller</DialogTitle>
+                        <DialogTitle>Apply to Become a Seller</DialogTitle>
                         <DialogDescription>
                             Please fill in your store details to create your
                             merchant profile.
@@ -353,9 +362,7 @@ function Header() {
                             </Button>
                         </div>
                     </form>
-                    <DialogClose asChild>
-
-                    </DialogClose>
+                    <DialogClose asChild></DialogClose>
                 </DialogContent>
             </Dialog>
         </>

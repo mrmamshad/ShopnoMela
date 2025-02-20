@@ -51,4 +51,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(ProductReview::class);
     }
+
+    // app/Models/User.php
+    public function store()
+    {
+        return $this->hasOne(Store::class);
+        // or hasMany(Store::class) if a user can own multiple stores
+    }
 }

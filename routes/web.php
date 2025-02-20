@@ -16,6 +16,9 @@ use App\Http\Controllers\SslCommerzPaymentController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductReviewController;
+
+use App\Http\Controllers\StoreController;
+use App\Http\Controllers\Admin\StoreApplicationController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Models\Category;
@@ -92,6 +95,16 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
     Route::post('/admin/users/{id}/take-over', [AdminController::class, 'takeOverMerchantRole'])
 
         ->name('admin.takeOverMerchant');
+
+    //marchant applications     
+
+    Route::get('/merchant-applications', [StoreApplicationController::class, 'index'])->name('merchant.applications.index');
+    Route::post('/merchant-applications/{store}/approve', [StoreApplicationController::class, 'approve'])
+    ->name('merchant.applications.approve');
+
+Route::post('/merchant-applications/{store}/reject', [StoreApplicationController::class, 'reject'])
+    ->name('merchant.applications.reject');
+
 });
 
 // Admin and Merchant
@@ -100,6 +113,14 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,
 });
 
 
+Route::middleware('auth')->group(function () {
+    // Become a Seller: store creation
+    Route::post('/merchant/store', [StoreController::class, 'store'])->name('merchant.store');
+});
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+   
+});
 
 Route::middleware(['auth', 'admin'])->group(function () {
 

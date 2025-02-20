@@ -48,7 +48,7 @@ export default function AdminDashboardLayout({ children }) {
         { name: "Users", href: route("userlist"), icon: Users, current: false },
         {
             name: "Merchant Applications",
-            href: "#",
+            href: route("merchant.applications.index"),
             icon: ShoppingCart,
             current: false,
         },
