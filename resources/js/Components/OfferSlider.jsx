@@ -25,7 +25,7 @@ const OfferSlider = ({offers}) => {
         <div className="w-full  max-w-6xl mx-auto py-6">
             <Slider {...settings}>
                 {offers.map((offer) => (
-                    <div key={offer.id} className="px-2">
+                    <div key={offer.id} className="px-1">
                         <img
                             src={offer.image}
                             alt={offer.title}

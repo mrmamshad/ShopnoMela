@@ -25,7 +25,8 @@ import { RiProductHuntFill } from "react-icons/ri";
 import { MdReport } from "react-icons/md";
 import { MdOutlineRateReview } from "react-icons/md";
 
-export default function AdminDashboardLayout({ children }) {
+export default function MarchantDashboardLayout({ children, marchantuser }) {
+    // console.log(marchantuser);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const navigation = [
@@ -67,8 +68,9 @@ export default function AdminDashboardLayout({ children }) {
                 <div className="flex h-16 items-center gap-2 px-4 border-b">
                     <div className="flex items-center gap-2 font-semibold text-lg">
                         <div className="h-8 w-8 rounded-lg bg-primary"></div>
-                        Marchant user name
+                        Marchant {marchantuser.name.split(" ")[0]}
                     </div>
+
                     <Button
                         variant="ghost"
                         size="icon"

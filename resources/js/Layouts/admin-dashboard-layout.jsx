@@ -11,9 +11,13 @@ import {
     X,
     ChevronDown,
     ChevronUp,
-  
     Home,
+    AlertTriangle, // Dangerous icon
+    Info, // Details icon
 } from "lucide-react";
+
+// import a lucide-react icon for showing danger icon
+
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Link } from "@inertiajs/react";
@@ -48,6 +52,18 @@ export default function AdminDashboardLayout({ children }) {
             icon: ShoppingCart,
             current: false,
         },
+        {
+            name: "Single Marchant details ",
+            href: "#",
+            icon: Info,
+            current: false,
+        },
+        {
+            name: "Product reports ",
+            href: "#",
+            icon: AlertTriangle,
+            current: false,
+        },
         { name: "Help", href: "#", icon: HelpCircle, current: false },
     ];
 
@@ -65,12 +81,16 @@ export default function AdminDashboardLayout({ children }) {
             <div
                 className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-card border-r 
                 transform transition-transform duration-200 ease-in-out 
-                lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+                lg:translate-x-0 ${
+                    sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                }`}
             >
                 <div className="flex h-16 items-center gap-2 px-4 border-b">
                     <div className="flex items-center gap-2 font-semibold text-lg">
                         <div className="h-8 w-8 rounded-lg bg-primary"></div>
-                       <Link href={route("admin")}>স্বপ্ন মেলা  Admin Panel</Link>
+                        <Link href={route("admin")}>
+                            স্বপ্ন মেলা Admin Panel
+                        </Link>
                     </div>
                     <Button
                         variant="ghost"

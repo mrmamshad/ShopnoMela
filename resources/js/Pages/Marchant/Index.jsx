@@ -1,10 +1,10 @@
-import DashboardLayout from "@/Layouts/marchat-layout"
+import DashboardLayout from "@/Layouts/marchant-layout"
 import DashboardPage from "@/Components/marchant-dashboard-page"
 
-export default function Marchant() {
+export default function Marchant({marchantuser}) {
   return (
-    <DashboardLayout>
-      <DashboardPage />
+    <DashboardLayout  marchantuser={marchantuser}>
+      <DashboardPage  marchantuser={marchantuser} />
     </DashboardLayout>
   )
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -12,7 +13,16 @@ class MarchantController extends Controller
      */
     public function index()
     {
-      return Inertia::render('Marchant/Index');
+        $user = User::where('id', auth()->id())->whereHas('roles', function ($query) {
+            $query->where('name', 'merchant');
+        })->first();
+        // dd($user);
+        return Inertia::render(
+            'Marchant/Index',
+            [
+                'marchantuser' => $user
+            ]
+        );
     }
 
     /**

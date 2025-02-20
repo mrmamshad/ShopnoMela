@@ -90,7 +90,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
         ->name('admin.assign-merchant');
     //  to take back marchant role from a user and give them normal customer role
     Route::post('/admin/users/{id}/take-over', [AdminController::class, 'takeOverMerchantRole'])
-   
+
         ->name('admin.takeOverMerchant');
 });
 

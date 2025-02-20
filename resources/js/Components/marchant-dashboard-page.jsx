@@ -5,7 +5,8 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { ArrowUpRight, ArrowDownRight, DollarSign, Users, ShoppingCart, Activity } from "lucide-react"
 import { RiProductHuntFill } from "react-icons/ri";
 
-export default function AdminDashboardPage() {
+export default function marchantDashboardPage({marchantuser}) {
+    // console.log(marchantuser)
   // Sample data for the chart
   const chartData = [
     { name: "Jan", value: 400 },
@@ -29,7 +30,7 @@ export default function AdminDashboardPage() {
       {/* Page header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight"> Marchant Dashboard</h2>
+          <h2 className="text-2xl font-bold tracking-tight">{marchantuser.name}  Marchant Dashboard</h2>
           <p className="text-muted-foreground">here a marchant will show his products , orders , sales , revenue</p>
         </div>
 
