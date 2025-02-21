@@ -54,7 +54,7 @@ import { StarHalf } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 // import { ToastAction } from "@/components/ui/toast"
-
+import { router } from "@inertiajs/react";
 // import { ToastProvider } from "@/components/ui/toast";
 
 const ProductDetails = ({
@@ -266,28 +266,28 @@ const ProductDetails = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Product Images */}
                     <div className="space-y-4">
-  {/* Main Image Viewer */}
-  <div className="relative flex justify-center items-center">
-                <button
-                    onClick={prevImage}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
-                >
-                    <ArrowLeft className="h-5 w-5" />
-                </button>
+                        {/* Main Image Viewer */}
+                        <div className="relative flex justify-center items-center">
+                            <button
+                                onClick={prevImage}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
+                            >
+                                <ArrowLeft className="h-5 w-5" />
+                            </button>
 
-                <img
-                    src={`/${images[currentIndex]}`}
-                    alt="Product"
-                    className="w-64 h-64 object-cover rounded shadow-lg transition-all duration-300"
-                />
+                            <img
+                                src={`/${images[currentIndex]}`}
+                                alt="Product"
+                                className="w-64 h-64 object-cover rounded shadow-lg transition-all duration-300"
+                            />
 
-                <button
-                    onClick={nextImage}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
-                >
-                    <ArrowRight className="h-5 w-5" />
-                </button>
-            </div>
+                            <button
+                                onClick={nextImage}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
+                            >
+                                <ArrowRight className="h-5 w-5" />
+                            </button>
+                        </div>
 
                         <div className="flex space-x-2 overflow-x-auto mt-4 p-2">
                             {images.map((img, index) => (
@@ -476,7 +476,18 @@ const ProductDetails = ({
 
                         {/* Action Buttons */}
                         <div className="flex space-x-4">
-                            <button className="flex-1 text-center bg-orange-500 text-white py-3 rounded-md hover:bg-orange-600">
+                            <button
+                                onClick={() => {
+                                    router.get("/checkout", {
+                                        product_id: singleproduct.id, // Product ID
+                                        quantity: cartForm.data.qty, // Quantity from cartForm
+                                        size: selectedSize, // Selected size
+                                        color: selectedColor, // Selected color
+                                        price: singleproduct.price, // Product price
+                                    });
+                                }}
+                                className="flex-1 text-center bg-orange-500 text-white py-3 rounded-md hover:bg-orange-600"
+                            >
                                 Buy Now
                             </button>
                             <button

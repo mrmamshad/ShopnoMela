@@ -58,4 +58,8 @@ class User extends Authenticatable
         return $this->hasOne(Store::class);
         // or hasMany(Store::class) if a user can own multiple stores
     }
+    public function customerProfile()
+    {
+        return $this->hasMany(CustomerProfile::class);
+    }
 }

@@ -19,6 +19,7 @@ use App\Http\Controllers\ProductReviewController;
 
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\Admin\StoreApplicationController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Merchant\ProductController as MerchantProductController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Middleware\RoleMiddleware;
@@ -64,7 +65,11 @@ Route::post('/wishlist/save', [WishlistController::class, 'saveToWishlist'])->na
 Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
 
 
-Route::get('/checkout', [CategoryController::class, 'checkout'])->name('checkout');
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+
+
+Route::post('/shipping/store', [CheckoutController::class, 'store'])->name('shipping.store');
+
 Route::get('/payments', [CategoryController::class, 'payments'])->name('payments');
 
 
