@@ -66,6 +66,8 @@ class DatabaseSeeder extends Seeder
             ProductDetailsSeeder::class,
             CustomerProfileSeeder::class,
             ProductReviewSeeder::class,
+            OfferSeeder::class,
+            FlashSaleSeeder::class
         ]);
         
     }

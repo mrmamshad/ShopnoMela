@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('facebook')->nullable();
             $table->string('instagram')->nullable();
             $table->string('twitter')->nullable();
-            $table->string('application_status')->default('pending')->after('twitter');
+            $table->string('application_status')->default('pending');
             $table->timestamps();
 
             $table->foreign('user_id')

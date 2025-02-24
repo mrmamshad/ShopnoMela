@@ -27,7 +27,11 @@ function FeaturedProducts({ randomProducts }) {
                 <CardTitle className="text-lg">{product.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">${product.price.toFixed(2)}</p>
+                {console.log("product.price",product.price)}
+                <p className="text-gray-600">
+  ${parseFloat(product.price).toFixed(2)}
+</p>
+
               </CardContent>
               <CardFooter>
                 <Link href={route("product.show", product.id)} className="w-full">

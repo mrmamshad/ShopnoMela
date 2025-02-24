@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\User;
 use Faker\Factory as Faker;
+use App\Models\User;
 
 class CustomerProfileSeeder extends Seeder
 {
@@ -25,20 +25,11 @@ class CustomerProfileSeeder extends Seeder
         foreach (range(1, 10) as $index) { // Generate 10 fake customers
             DB::table('customer_profiles')->insert([
                 'cus_name' => $faker->name,
-                'cus_add' => $faker->streetAddress,
-                'cus_city' => $faker->city,
-                'cus_state' => $faker->state,
-                'cus_postcode' => $faker->postcode,
-                'cus_country' => $faker->country,
-                'cus_phone' => $faker->phoneNumber,
-                'cus_fax' => $faker->phoneNumber,
+                'cus_phone' => $faker->phoneNumber, // ✅ This column still exists
                 'ship_name' => $faker->name,
                 'ship_add' => $faker->streetAddress,
                 'ship_city' => $faker->city,
                 'ship_state' => $faker->state,
-                'ship_postcode' => $faker->postcode,
-                'ship_country' => $faker->country,
-                'ship_phone' => $faker->phoneNumber,
                 'user_id' => $faker->randomElement($users), // Assign a random user
                 'created_at' => now(),
                 'updated_at' => now(),

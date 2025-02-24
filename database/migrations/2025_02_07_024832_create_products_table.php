@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,6 +12,9 @@ return new class extends Migration
      */
     public function up()
     {
+       // Disable foreign key checks temporarily
+       DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('title');
@@ -32,6 +36,13 @@ return new class extends Migration
 
     public function down()
     {
+        // Disable foreign key checks temporarily
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
         Schema::dropIfExists('products');
+
+        // Enable foreign key checks again
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
+
 };
