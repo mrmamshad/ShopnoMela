@@ -69,38 +69,7 @@ const ProductDetails = ({
     // console.log("Reviews:", reviews);
     // console.log("Product details:", productdetails);
     const { toast } = useToast();
-    const [currentImage, setCurrentImage] = useState(0);
-    const [quantity, setQuantity] = useState(1);
-    const [cart, setCart] = useState([]);
 
-    const [comments, setComments] = useState([
-        {
-            id: 1,
-            user: {
-                name: "Michael Gough",
-                avatar: "/placeholder.svg",
-                initials: "MG",
-            },
-            content:
-                "Very straight-to-point article. Really worth time reading. Thank you! But tools are just the instruments for the UX designers. The knowledge of the design tools are as important as the creation of the design strategy.",
-            likes: 11,
-            timestamp: "Nov 18 '22",
-            replies: 2,
-        },
-        {
-            id: 2,
-            user: {
-                name: "Bonnie Green",
-                avatar: "/placeholder.svg",
-                initials: "BG",
-            },
-            content:
-                "The article covers the essentials, challenges, myths and stages the UX designer should consider while creating the design strategy.",
-            likes: 24,
-            timestamp: "Nov 15 '22",
-            replies: 0,
-        },
-    ]);
 
     const { auth } = usePage().props;
 
@@ -708,7 +677,7 @@ const ProductDetails = ({
                                     {product.name}
                                 </CardTitle>
                                 <p className="text-sm text-gray-600 mt-1">
-                                    ${product.price.toFixed(2)}
+                                ${parseFloat(product.price).toFixed(2)}
                                 </p>
                             </CardContent>
                             <CardFooter className="p-4 pt-0 flex flex-col gap-2">
