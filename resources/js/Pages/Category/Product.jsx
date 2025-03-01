@@ -55,7 +55,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 // import { ToastAction } from "@/components/ui/toast"
 import { router } from "@inertiajs/react";
-// import { ToastProvider } from "@/components/ui/toast";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 const ProductDetails = ({
     productdetails,
@@ -69,7 +70,6 @@ const ProductDetails = ({
     // console.log("Reviews:", reviews);
     // console.log("Product details:", productdetails);
     const { toast } = useToast();
-
 
     const { auth } = usePage().props;
 
@@ -230,6 +230,20 @@ const ProductDetails = ({
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
+            <Alert className=" max-w-7xl  sm:mx-auto   bg-orange-100 border-l-4 border-orange-500 text-orange-900 p-4 rounded-lg">
+                <div className="flex items-center space-x-2">
+                    <Info className="h-5 w-5 text-orange-600" />
+                    <AlertTitle className="text-lg font-semibold">
+                        গুরুত্বপূর্ণ নির্দেশনা
+                    </AlertTitle>
+                </div>
+                <AlertDescription className="mt-2 text-sm">
+                    <span className="font-medium">1 . প্রথমে লগইন করুন।</span>{" "}
+                    <br />
+                    2. প্রোডাক্ট উইশলিস্টে যোগ করতে চাইলে প্রথমে{" "}
+                    <span className="font-medium">"Add to Cart"</span> করুন।
+                </AlertDescription>
+            </Alert>
 
             <main className="max-w-5xl mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -677,7 +691,7 @@ const ProductDetails = ({
                                     {product.name}
                                 </CardTitle>
                                 <p className="text-sm text-gray-600 mt-1">
-                                ${parseFloat(product.price).toFixed(2)}
+                                    ${parseFloat(product.price).toFixed(2)}
                                 </p>
                             </CardContent>
                             <CardFooter className="p-4 pt-0 flex flex-col gap-2">
