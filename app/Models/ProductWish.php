@@ -25,4 +25,9 @@ class ProductWish extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function productCarts()
+{
+    return $this->hasMany(ProductCart::class, 'product_id', 'product_id');
+}
+
 }

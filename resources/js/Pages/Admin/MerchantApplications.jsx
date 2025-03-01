@@ -58,11 +58,12 @@ export default function MerchantApplications({ stores }) {
                     <TableCell>{store.application_status}</TableCell>
                     <TableCell>{store.contact_email}</TableCell>
                     <TableCell>{store.contact_phone}</TableCell>
-                    <TableCell className="text-right space-x-2">
+                    <TableCell className="text-right space-x-2  ">
                       <Button
                         variant="success"
                         onClick={() => handleApprove(store.id)}
                         disabled={processing}
+                        className="border border-gray-500  hover:bg-green-500 hover:text-white"
                       >
                         {processing ? "Approving..." : "Approve"}
                       </Button>

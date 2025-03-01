@@ -365,7 +365,7 @@ const ProductDetails = ({
                                 onValueChange={setSelectedColor}
                                 className="flex space-x-3"
                             >
-                                {console.log("color", productdetails.color)}
+                                {/* {console.log("color", productdetails.color)} */}
 
                                 {Array.isArray(productdetails.color)
                                     ? productdetails.color.map(
@@ -455,13 +455,13 @@ const ProductDetails = ({
                                         price: singleproduct.price, // Product price
                                     });
                                 }}
-                                className="flex-1 text-center bg-orange-500 text-white py-3 rounded-md hover:bg-orange-600"
+                                className="flex-1 text-center bg-green-500 text-white py-3 rounded-md hover:bg-green-600"
                             >
                                 Buy Now
                             </button>
                             <button
                                 onClick={addToCart}
-                                className="flex-1 border border-orange-500 text-orange-500 py-3 rounded-md hover:bg-orange-50"
+                                className="flex-1 border border-green-500 text-green-500 py-3 rounded-md hover:bg-orange-50"
                                 disabled={cartForm.processing}
                             >
                                 {cartForm.processing

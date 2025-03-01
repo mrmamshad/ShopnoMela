@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
 export default function StoreProfile({ store, user }) {
+  console.log("store", store);
   const { toast } = useToast();
   const { flash } = usePage().props;
 
@@ -72,7 +73,7 @@ export default function StoreProfile({ store, user }) {
                 />
               </div>
             )}
-
+{/* storage/app/public/stores/profile_photos/eKb0iKhlgV4G0XR36lIZqRyDavIAlQkyZyoKIvU8.png */}
             {/* Display Profile Photo */}
             {store?.profile_photo && (
               <div className="mb-4">

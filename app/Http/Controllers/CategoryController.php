@@ -28,11 +28,17 @@ class CategoryController extends Controller
 
     public function wishlist()
     {
-        $wishlistItems = ProductWish::with('product')
-        ->where('user_id', auth()->id())
+        $userId = auth()->id();
+    
+        $wishlistItems = ProductWish::with(['product', 'productCarts' => function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        }])
+        ->where('user_id', $userId)
         ->get();
-        return Inertia::render('Category/Wishlist' , ['wishlistItems' => $wishlistItems]);
+        
+        return Inertia::render('Category/Wishlist', ['wishlistItems' => $wishlistItems]);
     }
+    
     public function checkout()
     {
         return Inertia::render('Category/Checkout');

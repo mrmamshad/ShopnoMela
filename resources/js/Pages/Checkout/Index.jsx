@@ -56,6 +56,29 @@ const Checkout = () => {
         });
     };
 
+    const handlePayment = () => {
+        post(route("pay"), {
+            data: {
+                amount: totalAmount,
+                cus_name: shippingDetails.name,
+                cus_phone: shippingDetails.phone,
+                ship_name: shippingDetails.name,
+                ship_add: shippingDetails.address,
+                ship_city: shippingDetails.city,
+                ship_state: shippingDetails.state,
+                product_name: product.title,
+                quantity: quantity,
+                color: selectedColor,
+                size: selectedSize,
+            },
+            onSuccess: (response) => {
+                if (response.redirect_url) {
+                    window.location.href = response.redirect_url;
+                }
+            },
+        });
+    };
+
     return (
         <>
             <Header />
@@ -63,19 +86,20 @@ const Checkout = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Left Section - Shipping Details */}
                     <div className="md:col-span-2">
-                        <Card>
+                        <Card className="">
                             <CardHeader>
                                 <CardTitle>Shipping & Billing</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="border rounded-lg p-4">
+                                <div className="border-0 rounded-lg p-4">
                                     <h2 className="text-lg font-semibold">
-                                        {shippingDetails.name}
+                                        Name: {shippingDetails.name}
                                     </h2>
                                     <p className="text-gray-500">
-                                        {shippingDetails.phone}
+                                        Mobile: {shippingDetails.phone}
                                     </p>
                                     <div className="flex gap-4 ">
+                                        <span>Shipping Address:</span>
                                         <p className="text-gray-500">
                                             {shippingDetails.address} -{" "}
                                         </p>
@@ -310,8 +334,15 @@ const Checkout = () => {
                             </CardHeader>
                             <CardContent>
                                 <div className="flex justify-between text-sm">
-                                    <span>Items Total (1 Item)</span>
-                                    <span>৳ {price * quantity}</span>
+                                    <span>
+                                        Items Total (<span>{quantity}</span>{" "}
+                                        Item)
+                                    </span>
+                                    <span>৳ {price}</span>
+                                </div>
+                                <div className="flex justify-between text-sm mt-2">
+                                    <span>Quantity</span>
+                                    <span> {quantity}</span>
                                 </div>
                                 <div className="flex justify-between text-sm mt-2">
                                     <span>Delivery Fee</span>
@@ -322,7 +353,10 @@ const Checkout = () => {
                                     <span>Total:</span>
                                     <span>৳ {totalAmount}</span>
                                 </div>
-                                <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white mt-4">
+                                <Button
+                                    className="w-full bg-green-500 hover:bg-green-600 text-white mt-4"
+                                    onClick={handlePayment}
+                                >
                                     Proceed to Pay
                                 </Button>
                             </CardContent>
