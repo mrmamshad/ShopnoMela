@@ -230,20 +230,24 @@ const ProductDetails = ({
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
-            <Alert className=" max-w-7xl  sm:mx-auto   bg-orange-100 border-l-4 border-orange-500 text-orange-900 p-4 rounded-lg">
-                <div className="flex items-center space-x-2">
-                    <Info className="h-5 w-5 text-orange-600" />
-                    <AlertTitle className="text-lg font-semibold">
-                        গুরুত্বপূর্ণ নির্দেশনা
-                    </AlertTitle>
-                </div>
-                <AlertDescription className="mt-2 text-sm">
-                    <span className="font-medium">1 . প্রথমে লগইন করুন।</span>{" "}
-                    <br />
-                    2. প্রোডাক্ট উইশলিস্টে যোগ করতে চাইলে প্রথমে{" "}
-                    <span className="font-medium">"Add to Cart"</span> করুন।
-                </AlertDescription>
-            </Alert>
+<Alert className="max-w-7xl sm:mx-auto bg-orange-100 border-l-4 border-orange-500 text-orange-900 p-4 rounded-lg">
+    <div className="flex items-center space-x-2">
+        <Info className="h-5 w-5 text-orange-600" />
+        <AlertTitle className="text-lg font-semibold">
+            গুরুত্বপূর্ণ নির্দেশনা
+        </AlertTitle>
+    </div>
+    <AlertDescription className="mt-2 text-sm">
+        <span className="font-medium">1. প্রথমে লগইন করুন।</span> <br />
+         2. লগইন ছাড়া আপনি <span className="font-medium">প্রোডাক্ট ক্রয়</span>,  
+        <span className="font-medium"> উইশলিস্টে যোগ</span> অথবা  
+        <span className="font-medium"> কার্টে সংযুক্ত</span> করতে পারবেন না। <br />
+        3. প্রোডাক্ট উইশলিস্টে যোগ করতে চাইলে প্রথমে{" "}
+        <span className="font-medium">"Add to Cart"</span> করুন। 
+       
+    </AlertDescription>
+</Alert>
+
 
             <main className="max-w-5xl mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -28,8 +28,17 @@ const Checkout = () => {
         shippingFee,
         totalAmount,
     } = usePage().props;
+    console.log("Product details:", product);
+    // console.log("Shipping details:", shippingDetails);
+    // console.log("Shipping fee:", shippingFee);
+    // console.log("Total amount:", totalAmount);
+    // console.log("Quantity:", quantity);
+    // console.log("Price:", price);
+    // console.log("Selected color:", selectedColor);
+    // console.log("Selected size:", selectedSize);
+
     const [openDrawer, setOpenDrawer] = useState(false);
-    console.log("Shipping details:", shippingDetails);
+    // console.log("Shipping details:", shippingDetails);
 
     // Form handling using useForm, now only with the new table columns
     const { data, setData, post, processing } = useForm({
@@ -56,25 +65,48 @@ const Checkout = () => {
         });
     };
 
+    const form = useForm({
+        product_id: "",
+        amount: "",
+        cus_name: "",
+        cus_phone: "",
+        ship_name: "",
+        ship_add: "",
+        ship_city: "",
+        ship_state: "",
+        product_name: "",
+        quantity: "",
+        color: "",
+        size: "",
+    });
+
     const handlePayment = () => {
-        post(route("pay"), {
-            data: {
-                amount: totalAmount,
-                cus_name: shippingDetails.name,
-                cus_phone: shippingDetails.phone,
-                ship_name: shippingDetails.name,
-                ship_add: shippingDetails.address,
-                ship_city: shippingDetails.city,
-                ship_state: shippingDetails.state,
-                product_name: product.title,
-                quantity: quantity,
-                color: selectedColor,
-                size: selectedSize,
-            },
-            onSuccess: (response) => {
-                if (response.redirect_url) {
-                    window.location.href = response.redirect_url;
-                }
+        form.transform((data) => ({
+            ...data,
+            product_id: product.id,
+            amount: totalAmount,
+            cus_name: shippingDetails.name,
+            cus_phone: shippingDetails.phone,
+            ship_name: shippingDetails.name,
+            ship_add: shippingDetails.address,
+            ship_city: shippingDetails.city,
+            ship_state: shippingDetails.state,
+            product_name: product.title,
+            quantity: quantity,
+            color: selectedColor,
+            size: selectedSize,
+        }));
+
+        console.log(form.data); // Debugging to ensure data is correct
+
+        form.post(route('sslcommerz.index'), {
+           onSuccess: () => {
+               
+                toast({
+                    title: "Success",
+                    description: "Order placed successfully!",
+                    variant: "default",
+                });
             },
         });
     };
@@ -120,7 +152,7 @@ const Checkout = () => {
                                             onOpenChange={setOpenDrawer}
                                         >
                                             <DrawerTrigger asChild>
-                                                <Button className="mt-3 bg-blue-500 text-white">
+                                                <Button className="mt-3 bg-green-500 text-white">
                                                     Add Shipping Address
                                                 </Button>
                                             </DrawerTrigger>

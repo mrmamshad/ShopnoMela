@@ -5,21 +5,29 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up(): void
-    {
-        Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->nullable();
-            $table->string('email', 30)->nullable();
-            $table->string('phone', 20)->nullable();
-            $table->double('amount')->nullable();
-            $table->text('address')->nullable();
-            $table->string('status', 10)->nullable();
-            $table->string('transaction_id')->nullable();
-            $table->string('currency', 20)->nullable();
-            $table->timestamps();
-        });
-    }
+   public function up(): void
+{
+    Schema::create('orders', function (Blueprint $table) {
+        $table->id();
+        $table->unsignedBigInteger('product_id'); // Added product_id
+        $table->string('name')->nullable();
+        $table->string('email', 50)->nullable();
+        $table->string('phone', 20)->nullable();
+        $table->double('amount')->nullable();
+        $table->text('address')->nullable();
+        $table->string('status', 20)->default('Pending');
+        $table->string('transaction_id', 50)->unique();
+        $table->string('currency', 20)->nullable();
+        $table->string('product_name')->nullable();
+        $table->integer('quantity')->nullable();
+        $table->string('color')->nullable();
+        $table->string('size')->nullable();
+        $table->timestamps();
+
+        // Foreign key constraint (if products table exists)
+        $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+    });
+}
 
     public function down(): void
     {

@@ -46,6 +46,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $merchant = auth()->user();
     
         $validated = $request->validate([

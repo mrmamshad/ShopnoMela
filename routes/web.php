@@ -148,11 +148,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 
 
-// SSLCOMMERZ payment Gateway Routes -  Start
+// SSLCOMMERZ Start
 Route::get('/example1', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);
 Route::get('/example2', [SslCommerzPaymentController::class, 'exampleHostedCheckout']);
 
-Route::post('/pay', [SslCommerzPaymentController::class, 'index'])->name('pay');
+Route::post('/pay', [SslCommerzPaymentController::class, 'index'])->name('sslcommerz.index');
 Route::post('/pay-via-ajax', [SslCommerzPaymentController::class, 'payViaAjax']);
 
 Route::post('/success', [SslCommerzPaymentController::class, 'success']);
@@ -160,6 +160,20 @@ Route::post('/fail', [SslCommerzPaymentController::class, 'fail']);
 Route::post('/cancel', [SslCommerzPaymentController::class, 'cancel']);
 
 Route::post('/ipn', [SslCommerzPaymentController::class, 'ipn']);
+//SSLCOMMERZ END
+
+
+    // Route::get('/sslcommerz/example1', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);
+    // Route::get('/sslcommerz/example2', [SslCommerzPaymentController::class, 'exampleHostedCheckout']);
+
+    // Route::post('/sslcommerz/pay', [SslCommerzPaymentController::class, 'index']);
+    // Route::post('/sslcommerz/pay-via-ajax', [SslCommerzPaymentController::class, 'payViaAjax']);
+
+    // Route::post('/sslcommerz/success', [SslCommerzPaymentController::class, 'success']);
+    // Route::post('/sslcommerz/fail', [SslCommerzPaymentController::class, 'fail']);
+    // Route::post('/sslcommerz/cancel', [SslCommerzPaymentController::class, 'cancel']);
+
+    // Route::post('/sslcommerz/ipn', [SslCommerzPaymentController::class, 'ipn']);
 
 
 // Route::get('/category-details', CategoryController::class , 'index')->name('category-details');
