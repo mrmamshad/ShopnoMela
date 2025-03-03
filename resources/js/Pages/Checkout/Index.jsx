@@ -80,36 +80,29 @@ const Checkout = () => {
         size: "",
     });
 
-    const handlePayment = () => {
-        form.transform((data) => ({
-            ...data,
-            product_id: product.id,
-            amount: totalAmount,
-            cus_name: shippingDetails.name,
-            cus_phone: shippingDetails.phone,
-            ship_name: shippingDetails.name,
-            ship_add: shippingDetails.address,
-            ship_city: shippingDetails.city,
-            ship_state: shippingDetails.state,
-            product_name: product.title,
-            quantity: quantity,
-            color: selectedColor,
-            size: selectedSize,
-        }));
-
-        console.log(form.data); // Debugging to ensure data is correct
-
-        form.post(route('sslcommerz.index'), {
-           onSuccess: () => {
-               
-                toast({
-                    title: "Success",
-                    description: "Order placed successfully!",
-                    variant: "default",
-                });
-            },
-        });
+const handlePayment = () => {
+    const paymentData = {
+        product_id: product.id,
+        amount: totalAmount,
+        cus_name: shippingDetails.name,
+        cus_phone: shippingDetails.phone,
+        ship_name: shippingDetails.name,
+        ship_add: shippingDetails.address,
+        ship_city: shippingDetails.city,
+        ship_state: shippingDetails.state,
+        product_name: product.title,
+        quantity: quantity,
+        color: selectedColor,
+        size: selectedSize,
     };
+
+    // Store data in sessionStorage
+    sessionStorage.setItem("payment_data", JSON.stringify(paymentData));
+
+    // Redirect to Blade payment page
+    window.location.replace(route("payment"));
+};
+
 
     return (
         <>
@@ -118,183 +111,6 @@ const Checkout = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Left Section - Shipping Details */}
                     <div className="md:col-span-2">
-                        <Card className="">
-                            <CardHeader>
-                                <CardTitle>Shipping & Billing</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="border-0 rounded-lg p-4">
-                                    <h2 className="text-lg font-semibold">
-                                        Name: {shippingDetails.name}
-                                    </h2>
-                                    <p className="text-gray-500">
-                                        Mobile: {shippingDetails.phone}
-                                    </p>
-                                    <div className="flex gap-4 ">
-                                        <span>Shipping Address:</span>
-                                        <p className="text-gray-500">
-                                            {shippingDetails.address} -{" "}
-                                        </p>
-                                        <p className="text-gray-500">
-                                            {shippingDetails.city}-
-                                        </p>
-                                        <p className="text-gray-500">
-                                            {shippingDetails.state}
-                                        </p>
-                                    </div>
-
-                                    {/* Show Add Address button if no address exists */}
-                                    {(!shippingDetails.ship_add ||
-                                        shippingDetails.ship_add ===
-                                            "No address available") && (
-                                        <Drawer
-                                            open={openDrawer}
-                                            onOpenChange={setOpenDrawer}
-                                        >
-                                            <DrawerTrigger asChild>
-                                                <Button className="mt-3 bg-green-500 text-white">
-                                                    Add Shipping Address
-                                                </Button>
-                                            </DrawerTrigger>
-                                            <DrawerContent>
-                                                <DrawerHeader>
-                                                    <DrawerTitle>
-                                                        Add Shipping Address
-                                                    </DrawerTitle>
-                                                </DrawerHeader>
-                                                <form
-                                                    onSubmit={handleSubmit}
-                                                    className="p-4 space-y-3"
-                                                >
-                                                    <div>
-                                                        <Label htmlFor="cus_name">
-                                                            Full Name
-                                                        </Label>
-                                                        <Input
-                                                            id="cus_name"
-                                                            value={
-                                                                data.cus_name
-                                                            }
-                                                            onChange={(e) =>
-                                                                setData(
-                                                                    "cus_name",
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <Label htmlFor="cus_phone">
-                                                            Phone
-                                                        </Label>
-                                                        <Input
-                                                            id="cus_phone"
-                                                            value={
-                                                                data.cus_phone
-                                                            }
-                                                            onChange={(e) =>
-                                                                setData(
-                                                                    "cus_phone",
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <Label htmlFor="ship_name">
-                                                            Shipping Name
-                                                        </Label>
-                                                        <Input
-                                                            id="ship_name"
-                                                            value={
-                                                                data.ship_name
-                                                            }
-                                                            onChange={(e) =>
-                                                                setData(
-                                                                    "ship_name",
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            placeholder="Product receiver name"
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <Label htmlFor="ship_add">
-                                                            Address
-                                                        </Label>
-                                                        <Input
-                                                            id="ship_add"
-                                                            value={
-                                                                data.ship_add
-                                                            }
-                                                            onChange={(e) =>
-                                                                setData(
-                                                                    "ship_add",
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <Label htmlFor="ship_city">
-                                                            City
-                                                        </Label>
-                                                        <Input
-                                                            id="ship_city"
-                                                            value={
-                                                                data.ship_city
-                                                            }
-                                                            onChange={(e) =>
-                                                                setData(
-                                                                    "ship_city",
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <Label htmlFor="ship_state">
-                                                            State
-                                                        </Label>
-                                                        <Input
-                                                            id="ship_state"
-                                                            value={
-                                                                data.ship_state
-                                                            }
-                                                            onChange={(e) =>
-                                                                setData(
-                                                                    "ship_state",
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <Button
-                                                        type="submit"
-                                                        className="w-full bg-green-500"
-                                                        disabled={processing}
-                                                    >
-                                                        Save Address
-                                                    </Button>
-                                                </form>
-                                            </DrawerContent>
-                                        </Drawer>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
 
                         {/* Package Details */}
                         <Card className="mt-4">

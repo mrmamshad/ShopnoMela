@@ -27,50 +27,72 @@
             }
         }
     </style>
+    {{-- <script>
+    window.location.href = route("payment"); // Reload to Blade page
+</script> --}}
+
 </head>
 <body class="bg-light">
 <div class="container">
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Get the stored payment data
+        const paymentData = JSON.parse(sessionStorage.getItem("payment_data"));
+
+        if (paymentData) {
+            document.getElementById("product_name").innerText = paymentData.product_name;
+            document.getElementById("quantity").innerText = paymentData.quantity;
+            document.getElementById("color").innerText = paymentData.color;
+            document.getElementById("size").innerText = paymentData.size;
+            document.getElementById("amount").innerText = paymentData.amount + " BDT";
+             // Update the hidden input field with the correct amount
+            document.getElementById("total_amount").value = paymentData.amount;
+        }
+    });
+</script>
     <div class="py-5 text-center">
-        <h2>Hosted Payment - SSLCommerz</h2>
+        <h2>Payment  Checkout Page </h2>
         <p class="lead">Below is an example form built entirely with Bootstrap’s form controls. We have provided this sample form for understanding Hosted Checkout Payment with SSLCommerz.</p>
     </div>
 
     <div class="row">
-        <div class="col-md-4 order-md-2 mb-4">
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted">Your cart</span>
-                <span class="badge badge-secondary badge-pill">3</span>
-            </h4>
-            <ul class="list-group mb-3">
-                <li class="list-group-item d-flex justify-content-between lh-condensed">
-                    <div>
-                        <h6 class="my-0">Product name</h6>
-                        <small class="text-muted">Brief description</small>
-                    </div>
-                    <span class="text-muted">1000</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between lh-condensed">
-                    <div>
-                        <h6 class="my-0">Second product</h6>
-                        <small class="text-muted">Brief description</small>
-                    </div>
-                    <span class="text-muted">50</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between lh-condensed">
-                    <div>
-                        <h6 class="my-0">Third item</h6>
-                        <small class="text-muted">Brief description</small>
-                    </div>
-                    <span class="text-muted">150</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                    <span>Total (BDT)</span>
-                    <strong>1200 TK</strong>
-                </li>
-            </ul>
-        </div>
+<div class="col-md-4 order-md-2 mb-4">
+    <h4 class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted">Your Order Summary</span>
+    </h4>
+    <ul class="list-group mb-3">
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+            <div>
+                <h6 class="my-0">Product Name</h6>
+                <small class="text-muted" id="product_name">Loading...</small>
+            </div>
+        </li>
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+            <div>
+                <h6 class="my-0">Quantity</h6>
+                <small class="text-muted" id="quantity">Loading...</small>
+            </div>
+        </li>
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+            <div>
+                <h6 class="my-0">Color</h6>
+                <small class="text-muted" id="color">Loading...</small>
+            </div>
+        </li>
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+            <div>
+                <h6 class="my-0">Size</h6>
+                <small class="text-muted" id="size">Loading...</small>
+            </div>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+            <span>Total (BDT)</span>
+            <strong id="amount">Loading...</strong>
+        </li>
+    </ul>
+</div>
         <div class="col-md-8 order-md-1">
-            <h4 class="mb-3">Billing address</h4>
+            <h4 class="mb-3">Shipping address</h4>
             <form action="{{ url('/pay') }}" method="POST" class="needs-validation">
                 <input type="hidden" value="{{ csrf_token() }}" name="_token" />
                 <div class="row">
@@ -109,8 +131,8 @@
 
                 <div class="mb-3">
                     <label for="address">Address</label>
-                    <input type="text" class="form-control" id="address" placeholder="1234 Main St"
-                           value="93 B, New Eskaton Road" required>
+                    <input type="text" class="form-control" name="customer_address" id="address" placeholder="1234 Main St"
+                           value="Public Hall Modon" required>
                     <div class="invalid-feedback">
                         Please enter your shipping address.
                     </div>
@@ -136,7 +158,7 @@
                         <label for="state">State</label>
                         <select class="custom-select d-block w-100" id="state" required>
                             <option value="">Choose...</option>
-                            <option value="Dhaka">Dhaka</option>
+                            <option value="Dhaka">Netrokona</option>
                         </select>
                         <div class="invalid-feedback">
                             Please provide a valid state.
@@ -144,7 +166,7 @@
                     </div>
                     <div class="col-md-3 mb-3">
                         <label for="zip">Zip</label>
-                        <input type="text" class="form-control" id="zip" placeholder="" required>
+                        <input type="text" class="form-control" id="zip" placeholder="" >
                         <div class="invalid-feedback">
                             Zip code required.
                         </div>
@@ -162,7 +184,7 @@
                     <label class="custom-control-label" for="save-info">Save this information for next time</label>
                 </div>
                 <hr class="mb-4">
-                <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout (Hosted)</button>
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout </button>
             </form>
         </div>
     </div>

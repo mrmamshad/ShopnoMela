@@ -150,7 +150,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 // SSLCOMMERZ Start
 Route::get('/example1', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);
-Route::get('/example2', [SslCommerzPaymentController::class, 'exampleHostedCheckout']);
+Route::get('/payment', [SslCommerzPaymentController::class, 'exampleHostedCheckout'])->name('payment');
+Route::post('/payment/prepare', [SslCommerzPaymentController::class, 'preparePayment'])->name('payment.prepare');
 
 Route::post('/pay', [SslCommerzPaymentController::class, 'index'])->name('sslcommerz.index');
 Route::post('/pay-via-ajax', [SslCommerzPaymentController::class, 'payViaAjax']);

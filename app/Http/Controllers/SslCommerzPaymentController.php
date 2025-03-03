@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Library\SslCommerz\SslCommerzNotification;
+use Inertia\Inertia;
 
 class SslCommerzPaymentController extends Controller
 {
@@ -13,11 +14,20 @@ class SslCommerzPaymentController extends Controller
     {
         return view('exampleEasycheckout');
     }
-
-    public function exampleHostedCheckout()
+        public function preparePayment(Request $request)
     {
-        return view('exampleHosted');
+       session(['payment_data' => $request->all()]); // Store data in session
+        return redirect()->route('payment'); // Redirect to the Blade view
     }
+
+    public function exampleHostedCheckout(Request $request)
+    {
+        // dd($request->all());
+       $paymentData = session('payment_data', []); // Retrieve data from session
+        return view('exampleHosted', compact('paymentData'));
+        // return Inertia::render('sslcommerz/PaymentInit');
+    }
+
 
     public function index(Request $request)
     {
@@ -25,37 +35,38 @@ class SslCommerzPaymentController extends Controller
         # Let's say, your oder transaction informations are saving in a table called "orders"
         # In "orders" table, order unique identity is "transaction_id". "status" field contain status of the transaction, "amount" is the order amount to be paid and "currency" is for storing Site Currency which will be checked with paid currency.
 
-        $post_data = array();
-        $post_data['total_amount'] = '500'; # You cant not pay less than 10
-        $post_data['currency'] = "BDT";
-        $post_data['tran_id'] = uniqid(); // tran_id must be unique
+           # Retrieve form data
+    $post_data = array();
+    $post_data['total_amount'] = $request->input('amount'); // Get amount from form
+    $post_data['currency'] = "BDT";
+    $post_data['tran_id'] = uniqid(); // Unique transaction ID
 
-        # CUSTOMER INFORMATION
-        $post_data['cus_name'] = 'Mamshad';
-        $post_data['cus_email'] = 'mamshad3106@gmail.com';
-        $post_data['cus_add1'] = 'Customer Address';
-        $post_data['cus_add2'] = "";
-        $post_data['cus_city'] = "";
-        $post_data['cus_state'] = "";
-        $post_data['cus_postcode'] = "";
-        $post_data['cus_country'] = "Bangladesh";
-        $post_data['cus_phone'] = '8801XXXXXXXXX';
-        $post_data['cus_fax'] = "";
+    # CUSTOMER INFORMATION
+    $post_data['cus_name'] = $request->input('customer_name');
+    $post_data['cus_email'] = $request->input('customer_email');
+    $post_data['cus_add1'] = $request->input('customer_address');
+    $post_data['cus_add2'] = $request->input('address2') ?? "";
+    $post_data['cus_city'] = "";
+    $post_data['cus_state'] = "";
+    $post_data['cus_postcode'] = $request->input('zip') ?? "";
+    $post_data['cus_country'] = "Bangladesh";
+    $post_data['cus_phone'] = "+88" . $request->input('customer_mobile');
+    $post_data['cus_fax'] = "";
 
-        # SHIPMENT INFORMATION
-        $post_data['ship_name'] = "Store Test";
-        $post_data['ship_add1'] = "Dhaka";
-        $post_data['ship_add2'] = "Dhaka";
-        $post_data['ship_city'] = "Dhaka";
-        $post_data['ship_state'] = "Dhaka";
-        $post_data['ship_postcode'] = "1000";
-        $post_data['ship_phone'] = "";
-        $post_data['ship_country'] = "Bangladesh";
+    # SHIPMENT INFORMATION (You can modify this if you have separate shipping details)
+    $post_data['ship_name'] = $request->input('customer_name');
+    $post_data['ship_add1'] = $request->input('customer_address');
+    $post_data['ship_add2'] = $request->input('address2') ?? "";
+    $post_data['ship_city'] = "";
+    $post_data['ship_state'] = "";
+    $post_data['ship_postcode'] = $request->input('zip') ?? "";
+    $post_data['ship_phone'] = "";
+    $post_data['ship_country'] = "Bangladesh";
 
-        $post_data['shipping_method'] = "NO";
-        $post_data['product_name'] = "Computer";
-        $post_data['product_category'] = "Goods";
-        $post_data['product_profile'] = "physical-goods";
+    $post_data['shipping_method'] = "NO";
+    $post_data['product_name'] = "Product Purchase";
+    $post_data['product_category'] = "Goods";
+    $post_data['product_profile'] = "physical-goods";
 
         # OPTIONAL PARAMETERS
         $post_data['value_a'] = "ref001";
