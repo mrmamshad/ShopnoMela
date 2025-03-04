@@ -21,6 +21,7 @@ use App\Http\Controllers\StoreController;
 use App\Http\Controllers\Admin\StoreApplicationController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Merchant\ProductController as MerchantProductController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Models\Category;
@@ -67,7 +68,7 @@ Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('w
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 
-
+Route::get('/orders', [OrderController::class , 'index'])->name('myorders');
 Route::post('/shipping/store', [CheckoutController::class, 'store'])->name('shipping.store');
 
 Route::get('/payments', [CategoryController::class, 'payments'])->name('payments');

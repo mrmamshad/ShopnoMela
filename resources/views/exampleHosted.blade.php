@@ -52,7 +52,7 @@
 </script>
     <div class="py-5 text-center">
         <h2>Payment  Checkout Page </h2>
-        <p class="lead">Below is an example form built entirely with Bootstrap’s form controls. We have provided this sample form for understanding Hosted Checkout Payment with SSLCommerz.</p>
+        <p class="lead mt-3 text-muted ">আপনার শিপিং ঠিকানা লিখুন এবং অর্ডার সারাংশ পরীক্ষা করুন।</p>  
     </div>
 
     <div class="row">
