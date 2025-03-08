@@ -40,6 +40,20 @@
         const paymentData = JSON.parse(sessionStorage.getItem("payment_data"));
 
         if (paymentData) {
+            let product_id = paymentData.product_id;
+            let quantity = paymentData.quantity;
+            let product_name = paymentData.product_name;
+            let color = paymentData.color;
+            let size = paymentData.size;
+            // console.log(product_name);
+            // console.log(color);
+            // console.log(size);
+            // console.log(quantity);
+            
+
+            // console.log(paymentData);
+        // add product_id also 
+            document.getElementById("product_id").innerText = paymentData.product_id;
             document.getElementById("product_name").innerText = paymentData.product_name;
             document.getElementById("quantity").innerText = paymentData.quantity;
             document.getElementById("color").innerText = paymentData.color;
@@ -47,6 +61,17 @@
             document.getElementById("amount").innerText = paymentData.amount + " BDT";
              // Update the hidden input field with the correct amount
             document.getElementById("total_amount").value = paymentData.amount;
+              // Update the hidden input fields inside the form
+ // Update hidden input fields
+        document.getElementById("hidden_product_name").value = product_name;
+        document.getElementById("hidden_quantity").value = quantity;
+        document.getElementById("hidden_color").value = color;
+        document.getElementById("hidden_size").value = size;
+        document.getElementById("product_id").value = product_id;
+         console.log("Product Name:", document.getElementById("product_name").value);
+    console.log("Quantity:", document.getElementById("quantity").value);
+    console.log("Color:", document.getElementById("color").value);
+    console.log("Size:", document.getElementById("size").value);
         }
     });
 </script>
@@ -94,7 +119,13 @@
         <div class="col-md-8 order-md-1">
             <h4 class="mb-3">Shipping address</h4>
             <form action="{{ url('/pay') }}" method="POST" class="needs-validation">
-                <input type="hidden" value="{{ csrf_token() }}" name="_token" />
+            @csrf
+                {{-- <input type="hidden" value="{{ csrf_token() }}" name="_token" /> --}}
+                <input type="hidden" value='' name="product_id" id="product_id" />
+                <input type="hidden" value='' name="product_name" id="hidden_product_name" />
+                <input type="hidden" value='' name="quantity" id="hidden_quantity" />
+                <input type="hidden" value='' name="color" id="hidden_color" />
+                <input type="hidden" value='' name="size" id="hidden_size" />
                 <div class="row">
                     <div class="col-md-12 mb-3">
                         <label for="firstName">Full name</label>
@@ -166,7 +197,7 @@
                     </div>
                     <div class="col-md-3 mb-3">
                         <label for="zip">Zip</label>
-                        <input type="text" class="form-control" id="zip" placeholder="" >
+                        <input type="text" class="form-control" id="zip" placeholder="2200" >
                         <div class="invalid-feedback">
                             Zip code required.
                         </div>

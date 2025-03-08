@@ -30,12 +30,14 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard', absolute: false));
+    
+        // Retrieve last visited page, fallback to dashboard
+        $redirectUrl = session('last_visited_url');
+    
+        return redirect()->intended($redirectUrl);
     }
-
+    
     /**
      * Destroy an authenticated session.
      */

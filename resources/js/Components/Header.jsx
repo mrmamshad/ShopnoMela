@@ -135,7 +135,7 @@ function Header() {
                                             </p>
                                             <hr className="mx-5 my-2 border-gray-400" />
                                             <Dropdown.Link
-                                                href={route("myorders")}
+                                                href={route("orders")}
                                             >
                                                 Orders
                                             </Dropdown.Link>

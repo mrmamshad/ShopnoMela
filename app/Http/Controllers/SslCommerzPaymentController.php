@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Library\SslCommerz\SslCommerzNotification;
 use Inertia\Inertia;
+use App\Models\PaymentHistory;
+use App\Models\Order;
+
 
 class SslCommerzPaymentController extends Controller
 {
@@ -36,6 +39,23 @@ class SslCommerzPaymentController extends Controller
         # In "orders" table, order unique identity is "transaction_id". "status" field contain status of the transaction, "amount" is the order amount to be paid and "currency" is for storing Site Currency which will be checked with paid currency.
 
            # Retrieve form data
+
+        //    dd($request->all());
+           $product_id = $request->input('product_id');
+        //    dd($product_id);
+           $product_name = $request->input('product_name');  
+        //    dd($product_name);
+           $product_quantity = $request->input('quantity');
+           $product_color = $request->input('color');
+           $product_size = $request->input('size');
+        //    dd([
+        //        'product_id' => $product_id,
+        //        'product_name' => $product_name,
+        //        'product_quantity' => $product_quantity,
+        //        'product_color' => $product_color,
+        //        'product_size' => $product_size
+        //    ]);
+  
     $post_data = array();
     $post_data['total_amount'] = $request->input('amount'); // Get amount from form
     $post_data['currency'] = "BDT";
@@ -79,13 +99,21 @@ class SslCommerzPaymentController extends Controller
             ->where('transaction_id', $post_data['tran_id'])
             ->updateOrInsert([
                 'name' => $post_data['cus_name'],
+                'user_id' => auth()->user()->id,
                 'email' => $post_data['cus_email'],
                 'phone' => $post_data['cus_phone'],
                 'amount' => $post_data['total_amount'],
                 'status' => 'Pending',
                 'address' => $post_data['cus_add1'],
                 'transaction_id' => $post_data['tran_id'],
-                'currency' => $post_data['currency']
+                'currency' => $post_data['currency'],
+                'product_id' => $product_id,
+                'product_name' => $product_name,
+                'product_quantity' => $product_quantity,
+                'product_color' => $product_color,
+                'product_size' => $product_size,
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
 
         $sslc = new SslCommerzNotification();
@@ -172,46 +200,57 @@ class SslCommerzPaymentController extends Controller
 
     public function success(Request $request)
     {
-        echo "Transaction is Successful";
-
         $tran_id = $request->input('tran_id');
         $amount = $request->input('amount');
         $currency = $request->input('currency');
-
+    
         $sslc = new SslCommerzNotification();
-
-        #Check order status in order tabel against the transaction id or order id.
-        $order_details = DB::table('orders')
-            ->where('transaction_id', $tran_id)
-            ->select('transaction_id', 'status', 'currency', 'amount')->first();
-
-        if ($order_details->status == 'Pending') {
-            $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $currency);
-
-            if ($validation) {
-                /*
-                That means IPN did not work or IPN URL was not set in your merchant panel. Here you need to update order status
-                in order table as Processing or Complete.
-                Here you can also sent sms or email for successfull transaction to customer
-                */
-                $update_product = DB::table('orders')
-                    ->where('transaction_id', $tran_id)
-                    ->update(['status' => 'Processing']);
-
-                echo "<br >Transaction is successfully Completed";
-            }
-        } else if ($order_details->status == 'Processing' || $order_details->status == 'Complete') {
-            /*
-             That means through IPN Order status already updated. Now you can just show the customer that transaction is completed. No need to udate database.
-             */
-            echo "Transaction is successfully Completed";
-        } else {
-            #That means something wrong happened. You can redirect customer to your product page.
-            echo "Invalid Transaction";
+    
+        # Check if the order exists
+        $order = Order::where('transaction_id', $tran_id)->first();
+    
+        if (!$order) {
+            return redirect()->route('orders')->with('error', 'Order not found!');
         }
-
-
+    
+        if ($order->status == 'Pending') {
+            $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $currency);
+    
+            if (!$validation) {
+                return redirect()->route('orders')->with('error', 'Payment validation failed!');
+            }
+    
+            // Update order status to 'Processing'
+            $order->update(['status' => 'Processing']);
+    
+            // Store or update payment history
+            PaymentHistory::updateOrInsert(
+                ['transaction_id' => $tran_id], // Prevent duplicate records
+                [
+                    'user_id' => $order->user_id,
+                    'order_id' => $order->id,
+                    'validation_id' => $request->input('val_id'),
+                    'amount' => $amount,
+                    'currency' => $currency,
+                    'status' => 'VALID',
+                    'payment_method' => $request->input('card_type') ?? 'Unknown',
+                    'bank_transaction_id' => $request->input('bank_tran_id'),
+                    'response_data' => json_encode($request->all()),
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+    
+            return redirect()->route('orders')->with('success', 'Order successfully created!');
+        }
+    
+        if ($order->status == 'Processing' || $order->status == 'Complete') {
+            return redirect()->route('orders')->with('success', 'Transaction already completed!');
+        }
+    
+        return redirect()->route('orders')->with('error', 'Invalid transaction!');
     }
+    
 
     public function fail(Request $request)
     {
@@ -231,6 +270,7 @@ class SslCommerzPaymentController extends Controller
         } else {
             echo "Transaction is Invalid";
         }
+         return redirect()->route('myorders');
 
     }
 
@@ -253,7 +293,7 @@ class SslCommerzPaymentController extends Controller
             echo "Transaction is Invalid";
         }
 
-
+       return redirect()->route('myorders');
     }
 
     public function ipn(Request $request)

@@ -18,10 +18,10 @@ return new class extends Migration {
         $table->string('status', 20)->default('Pending');
         $table->string('transaction_id', 50)->unique();
         $table->string('currency', 20)->nullable();
-        $table->string('product_name')->nullable();
-        $table->integer('quantity')->nullable();
-        $table->string('color')->nullable();
-        $table->string('size')->nullable();
+        $table->string('product_name')->nullable(); //new
+        $table->integer('quantity')->nullable();// new
+        $table->string('color')->nullable(); //new
+        $table->string('size')->nullable(); //new
         $table->timestamps();
 
         // Foreign key constraint (if products table exists)

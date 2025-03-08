@@ -16,6 +16,8 @@ export default function Login({ status, canResetPassword }) {
 
     const submit = (e) => {
         e.preventDefault();
+         // Store the last visited URL in localStorage
+        localStorage.setItem("last_visited_url", window.location.pathname);
 
         post(route("login"), {
             onFinish: () => reset("password"),

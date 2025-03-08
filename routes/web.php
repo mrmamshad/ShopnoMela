@@ -68,11 +68,14 @@ Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('w
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 
-Route::get('/orders', [OrderController::class , 'index'])->name('myorders');
+Route::get('/orders', [OrderController::class , 'index'])->name('orders');
+
 Route::post('/shipping/store', [CheckoutController::class, 'store'])->name('shipping.store');
 
 Route::get('/payments', [CategoryController::class, 'payments'])->name('payments');
 
+
+// Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
 
 
 // Admin only
@@ -135,9 +138,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/merchant/store', [StoreController::class, 'store'])->name('merchant.store');
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {});
+Route::middleware(['auth'])->group(function () {});
 
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth'])->group(function () {
 
 
 
@@ -147,38 +150,21 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 // Route::get('/offers', [OfferController::class, 'index'])->name('offers');
 
-
-
+    
 // SSLCOMMERZ Start
-Route::get('/example1', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);
-Route::get('/payment', [SslCommerzPaymentController::class, 'exampleHostedCheckout'])->name('payment');
-Route::post('/payment/prepare', [SslCommerzPaymentController::class, 'preparePayment'])->name('payment.prepare');
+// Route::get('/example1', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);
+Route::get('/example2', [SslCommerzPaymentController::class, 'exampleHostedCheckout'])->name('payment');
 
-Route::post('/pay', [SslCommerzPaymentController::class, 'index'])->name('sslcommerz.index');
+Route::post('/pay', [SslCommerzPaymentController::class, 'index']);
 Route::post('/pay-via-ajax', [SslCommerzPaymentController::class, 'payViaAjax']);
 
 Route::post('/success', [SslCommerzPaymentController::class, 'success']);
+
 Route::post('/fail', [SslCommerzPaymentController::class, 'fail']);
 Route::post('/cancel', [SslCommerzPaymentController::class, 'cancel']);
 
 Route::post('/ipn', [SslCommerzPaymentController::class, 'ipn']);
-//SSLCOMMERZ END
-
-
-    // Route::get('/sslcommerz/example1', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);
-    // Route::get('/sslcommerz/example2', [SslCommerzPaymentController::class, 'exampleHostedCheckout']);
-
-    // Route::post('/sslcommerz/pay', [SslCommerzPaymentController::class, 'index']);
-    // Route::post('/sslcommerz/pay-via-ajax', [SslCommerzPaymentController::class, 'payViaAjax']);
-
-    // Route::post('/sslcommerz/success', [SslCommerzPaymentController::class, 'success']);
-    // Route::post('/sslcommerz/fail', [SslCommerzPaymentController::class, 'fail']);
-    // Route::post('/sslcommerz/cancel', [SslCommerzPaymentController::class, 'cancel']);
-
-    // Route::post('/sslcommerz/ipn', [SslCommerzPaymentController::class, 'ipn']);
-
-
-// Route::get('/category-details', CategoryController::class , 'index')->name('category-details');
+// SSLCOMMERZ END
 
 Route::get('google-login', [GoogleAuth::class, 'googleLogin'])->name('auth.google');
 Route::get('auth/google/callback', [GoogleAuth::class, 'googleLoginCallback'])->name('auth.google.callback');

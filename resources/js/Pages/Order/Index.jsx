@@ -1,144 +1,96 @@
-"use client"
+import { formatDate, formatCurrency } from "@/lib/utils";
+import { Button } from "@/Components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardContent, CardFooter } from "@/Components/ui/card";
+import Header from "@/Components/Header";
+import Footer from "@/Components/Footer";
 
-import { useState, useEffect } from "react"
-import { Head } from "@inertiajs/react"
+export default function OrderList({ orders }) {
+  const getStatusBadge = (status) => {
+    const badgeVariants = {
+      "Payment Pending": "warning",
+      "Processing": "blue",
+      "Shipped": "purple",
+      "Delivered": "green",
+      "Cancelled": "destructive",
+    };
+    return <Badge variant={badgeVariants[status] || "outline"}>{status}</Badge>;
+  };
 
-import OrderList from "@/Components/Orders/OrderList"
-import FilterBar from "@/Components/Orders/FilterBar"
-import Header from "@/Components/Header"
-import Footer from "@/Components/Footer"
-
-
-export default function Orders({ orders: initialOrders }) {
-  const [orders, setOrders] = useState(initialOrders || [])
-  const [filteredOrders, setFilteredOrders] = useState(initialOrders || [])
-  const [activeTab, setActiveTab] = useState("all")
-  const [filterOptions, setFilterOptions] = useState({
-    status: "all",
-    dateRange: "all",
-    sortBy: "date-desc",
-  })
-
-  useEffect(() => {
-    // Apply filters and sorting
-    let result = [...orders]
-
-    // Filter by tab/status
-    if (activeTab !== "all") {
-      result = result.filter((order) => {
-        if (activeTab === "to-pay") return order.status === "Payment Pending"
-        if (activeTab === "to-ship") return order.status === "Processing"
-        if (activeTab === "to-receive") return order.status === "Shipped"
-        if (activeTab === "to-review") return order.status === "Delivered"
-        return true
-      })
+  const getActionButton = (status, orderId) => {
+    switch (status) {
+      case "Payment Pending":
+        return <Button className="bg-orange-500 hover:bg-orange-600">Pay Now</Button>;
+      case "Shipped":
+        return <Button variant="outline">Track Order</Button>;
+      case "Delivered":
+        return <Button variant="outline">Write Review</Button>;
+      default:
+        return null;
     }
+  };
 
-    // Apply additional filters
-    if (filterOptions.status !== "all") {
-      result = result.filter((order) => order.status === filterOptions.status)
-    }
-
-    // Apply date range filter
-    if (filterOptions.dateRange !== "all") {
-      const now = new Date()
-      const pastDate = new Date()
-
-      if (filterOptions.dateRange === "last-30-days") {
-        pastDate.setDate(now.getDate() - 30)
-      } else if (filterOptions.dateRange === "last-6-months") {
-        pastDate.setMonth(now.getMonth() - 6)
-      } else if (filterOptions.dateRange === "last-year") {
-        pastDate.setFullYear(now.getFullYear() - 1)
-      }
-
-      result = result.filter((order) => {
-        const orderDate = new Date(order.date)
-        return orderDate >= pastDate && orderDate <= now
-      })
-    }
-
-    // Apply sorting
-    result.sort((a, b) => {
-      if (filterOptions.sortBy === "date-desc") {
-        return new Date(b.date) - new Date(a.date)
-      } else if (filterOptions.sortBy === "date-asc") {
-        return new Date(a.date) - new Date(b.date)
-      } else if (filterOptions.sortBy === "amount-desc") {
-        return b.totalAmount - a.totalAmount
-      } else if (filterOptions.sortBy === "amount-asc") {
-        return a.totalAmount - b.totalAmount
-      }
-      return 0
-    })
-
-    setFilteredOrders(result)
-  }, [orders, activeTab, filterOptions])
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab)
-  }
-
-  const handleFilterChange = (newFilters) => {
-    setFilterOptions({ ...filterOptions, ...newFilters })
+  if (!orders || orders.length === 0) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-gray-500">No orders found</p>
+      </div>
+    );
   }
 
   return (
-   
-     <div>
-       <Head title="My Orders" />
-       <Header />
-      <div className="flex min-h-screen bg-gray-50">
-        <main className="flex-1 p-4 md:p-6">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6">My Orders</h1>
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="max-w-4xl mx-auto sm:mx-20 px-4 sm:px-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-start my-4 sm:my-6">🛍 Your Orders</h1>
 
-            <div className="bg-white rounded-lg shadow">
-              <div className="border-b">
-                <div className="flex overflow-x-auto">
-                  <button
-                    onClick={() => handleTabChange("all")}
-                    className={`px-4 py-3 text-sm font-medium whitespace-nowrap ${activeTab === "all" ? "text-primary border-b-2 border-primary" : "text-gray-600"}`}
-                  >
-                    All
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("to-pay")}
-                    className={`px-4 py-3 text-sm font-medium whitespace-nowrap ${activeTab === "to-pay" ? "text-primary border-b-2 border-primary" : "text-gray-600"}`}
-                  >
-                    To Pay
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("to-ship")}
-                    className={`px-4 py-3 text-sm font-medium whitespace-nowrap ${activeTab === "to-ship" ? "text-primary border-b-2 border-primary" : "text-gray-600"}`}
-                  >
-                    To Ship
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("to-receive")}
-                    className={`px-4 py-3 text-sm font-medium whitespace-nowrap ${activeTab === "to-receive" ? "text-primary border-b-2 border-primary" : "text-gray-600"}`}
-                  >
-                    To Receive
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("to-review")}
-                    className={`px-4 py-3 text-sm font-medium whitespace-nowrap ${activeTab === "to-review" ? "text-primary border-b-2 border-primary" : "text-gray-600"}`}
-                  >
-                    To Review
-                  </button>
+        <div className="space-y-8  mb-10">
+          {orders.map((order) => (
+            <Card key={order.id} className="shadow-md">
+              <CardHeader className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap bg-gray-100 rounded-t-lg px-3 sm:px-4 py-2 sm:py-3 relative items-center">
+                {/* Product Image & Details (Left) */}
+                <div className="flex items-center gap-2 sm:gap-3 flex-1">
+                  <img
+                    src={order.image || "/images/placeholder.png"}
+                    alt={order.product_name}
+                    className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border object-contain"
+                  />
+                  <div>
+                    <h3 className="font-medium text-sm sm:text-base">{order.product_name}</h3>
+                    <p className="text-xs sm:text-sm text-gray-500">
+                      Color: {order.product_color} | Size: {order.product_size}
+                    </p>
+                  </div>
                 </div>
-              </div>
+                {/* Status Badge (Right, Moves Below on Mobile) */}
+                <div className="absolute right-3 top-2 sm:static">{getStatusBadge(order.status)}</div>
+              </CardHeader>
 
-              <FilterBar onFilterChange={handleFilterChange} />
+              <CardContent className="px-3 sm:px-4 py-2 sm:py-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 items-center">
+                  <div className="text-gray-700 text-sm sm:text-base">
+                    Order ID: <span className="font-medium">{order.id}</span>
+                    <span className="mx-1 sm:mx-2">•</span>
+                    Placed on: <span className="font-medium">{formatDate(order.created_at)}</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-sm sm:text-base">{formatCurrency(order.price)}</p>
+                    <p className="text-xs sm:text-sm text-gray-500">Qty: {order.product_quantity}</p>
+                  </div>
+                </div>
+              </CardContent>
 
-              <OrderList orders={filteredOrders} />
-            </div>
-          </div>
-        </main>
+              <CardFooter className="flex flex-wrap justify-between items-center px-3 sm:px-4 py-2 sm:py-3 border-t">
+                <div className="text-sm sm:text-lg font-semibold">
+                  Total: {formatCurrency(order.amount)}
+                </div>
+                <div className="mt-2 sm:mt-0">{getActionButton(order.status, order.id)}</div>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
       </div>
       <Footer />
-     </div>
-  
-  )
+    </div>
+  );
 }
-
