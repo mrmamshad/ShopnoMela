@@ -63,9 +63,9 @@ export default function CreateProduct({ category, brands }) {
 
     return (
         <MarchantDashboardLayout>
-            <Card className="mx-auto max-w-4xl">
+            <Card className="mx-auto max-w-6xl">
                 <CardHeader>
-                    <CardTitle>Create Product</CardTitle>
+                    <CardTitle className="text-2xl font-semibold  text-center " >Create Product</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">

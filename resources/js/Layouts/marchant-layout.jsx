@@ -37,6 +37,7 @@ export default function MarchantDashboardLayout({ children, marchantuser }) {
                 { name: "Add Product", href: route("merchant.products.create") },
             ],
         },
+        { name: "Orders", href: route("merchant.orders"), icon: ShoppingCart, current: false },
         { name: "Reports", href: "#", icon: MdReport, current: false },
         { name: "Reviews", href: "#", icon: MdOutlineRateReview, current: false },
         { name: "Help", href: "#", icon: HelpCircle, current: false },

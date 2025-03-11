@@ -270,7 +270,7 @@ class SslCommerzPaymentController extends Controller
         } else {
             echo "Transaction is Invalid";
         }
-         return redirect()->route('myorders');
+         return redirect()->route('orders');
 
     }
 
@@ -293,7 +293,7 @@ class SslCommerzPaymentController extends Controller
             echo "Transaction is Invalid";
         }
 
-       return redirect()->route('myorders');
+       return redirect()->route('orders');
     }
 
     public function ipn(Request $request)

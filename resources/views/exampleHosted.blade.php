@@ -162,8 +162,9 @@
 
                 <div class="mb-3">
                     <label for="address">Address</label>
-                    <input type="text" class="form-control" name="customer_address" id="address" placeholder="1234 Main St"
-                           value="Public Hall Modon" required>
+                    <input type="text" class="form-control" name="customer_address" id="address" 
+       placeholder="আপনার ঠিকানা বিস্তারিত লিখুন" value="" required>
+
                     <div class="invalid-feedback">
                         Please enter your shipping address.
                     </div>

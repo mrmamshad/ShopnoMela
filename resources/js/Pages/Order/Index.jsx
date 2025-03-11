@@ -71,8 +71,10 @@ export default function OrderList({ orders }) {
                   <div className="text-gray-700 text-sm sm:text-base">
                     Order ID: <span className="font-medium">{order.id}</span>
                     <span className="mx-1 sm:mx-2">•</span>
-                    Placed on: <span className="font-medium">{formatDate(order.created_at)}</span>
+                    Placed on: <span className="font-medium">{formatDate(order.created_at)}</span> <br className="my-2" />
+                    Address : <span className="font-medium">{order.address}</span>
                   </div>
+                  
                   <div className="text-right">
                     <p className="font-semibold text-sm sm:text-base">{formatCurrency(order.price)}</p>
                     <p className="text-xs sm:text-sm text-gray-500">Qty: {order.product_quantity}</p>
@@ -85,6 +87,7 @@ export default function OrderList({ orders }) {
                   Total: {formatCurrency(order.amount)}
                 </div>
                 <div className="mt-2 sm:mt-0">{getActionButton(order.status, order.id)}</div>
+                
               </CardFooter>
             </Card>
           ))}

@@ -28,7 +28,7 @@ class ProductController extends Controller
 
         // Fetch products and pass to Inertia view
         return Inertia::render('Marchant/Products/Index', [
-            'products' => $products // Assuming a merchant-user relationship
+            'products' => $products, // Assuming a merchant-user relationship
         ]);
     }
 
@@ -40,7 +40,7 @@ class ProductController extends Controller
         // dd($categories);
         return Inertia::render('Marchant/Products/Create', [
             'category' => $categories,
-            'brands' => $brands
+            'brands' => $brands,
         ]);
     }
 
@@ -48,7 +48,7 @@ class ProductController extends Controller
     {
         // dd($request->all());
         $merchant = auth()->user();
-    
+
         $validated = $request->validate([
             'title' => 'required|string',
             'short_des' => 'required|string',
@@ -67,11 +67,11 @@ class ProductController extends Controller
             'img3' => 'nullable|image',
             'img4' => 'nullable|image',
         ]);
-    
+
         // ✅ Move image to `public/product_images`
         $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
         $request->file('image')->move(public_path('product_images'), $imageName);
-    
+
         // ✅ Store the product with correct image path
         $product = Product::create([
             'title' => $validated['title'],
@@ -85,11 +85,11 @@ class ProductController extends Controller
             'brand_id' => $validated['brand_id'],
             'user_id' => $merchant->id, // ✅ Ensure merchant is assigned
         ]);
-    
+
         // ✅ Handle additional product images
         $productDetailImages = ['img1', 'img2', 'img3', 'img4'];
         $storedImages = [];
-    
+
         foreach ($productDetailImages as $imgField) {
             if ($request->hasFile($imgField)) {
                 $imgName = time() . '_' . $request->file($imgField)->getClientOriginalName();
@@ -99,7 +99,7 @@ class ProductController extends Controller
                 $storedImages[$imgField] = null;
             }
         }
-    
+
         // ✅ Store product details
         ProductDetail::create([
             'product_id' => $product->id,
@@ -111,13 +111,19 @@ class ProductController extends Controller
             'img3' => $storedImages['img3'],
             'img4' => $storedImages['img4'],
         ]);
-    
+
         return redirect()->route('merchant.products.index')->with('success', 'Product created successfully!');
     }
-    
+    public function orders()
+    {
+        return Inertia::render('Marchant/Products/Orders');
+    }
+
     public function destroy($id)
     {
-        $product = Product::where('id', $id)->where('user_id', auth()->id())->first();
+        $product = Product::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->first();
 
         if (!$product) {
             return back()->with('error', 'Product not found or unauthorized.');

@@ -125,7 +125,8 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,
      Route::post('/marchant/profile', [StoreController::class, 'update'])->name('merchant.store.update');
      Route::get('/marchant/products', [MerchantProductController::class, 'index'])->name('merchant.products.index');
      Route::get('/marchant/product/create', [MerchantProductController::class, 'create'])->name('merchant.products.create');
-     Route::post('/marchant/product/store', [MerchantProductController::class, 'store'])->name('merchant.products.store'); // ⬅ Added this
+     Route::post('/marchant/product/store', [MerchantProductController::class, 'store'])->name('merchant.products.store'); 
+     Route::get('/marchant/orders',[MerchantProductController::class, 'orders'])->name('merchant.orders');
      Route::delete('/merchant/products/{id}', [MerchantProductController::class, 'destroy'])
     ->name('merchant.products.destroy')
     ;
