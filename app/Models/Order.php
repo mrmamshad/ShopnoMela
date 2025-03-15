@@ -28,6 +28,10 @@ public function products()
     return $this->hasMany(Product::class);  // Or a belongsToMany if it's a many-to-many relationship
 }
 
+  public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
 
     // Order has many payment histories
     public function payments()

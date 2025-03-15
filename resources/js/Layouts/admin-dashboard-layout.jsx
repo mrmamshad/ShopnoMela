@@ -45,6 +45,12 @@ export default function AdminDashboardLayout({ children }) {
             icon: LayoutDashboard,
             current: true,
         },
+        {
+           name: "Marchant Orders News",
+            href: route("admin.merchant.orders.news"),
+            icon: Bell,
+            current: false,
+        },
         { name: "Users", href: route("userlist"), icon: Users, current: false },
         {
             name: "Merchant Applications",

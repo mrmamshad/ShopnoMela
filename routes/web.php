@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MerchantOrderUpdateController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CartController;
@@ -16,11 +17,11 @@ use App\Http\Controllers\SslCommerzPaymentController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductReviewController;
-
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\Admin\StoreApplicationController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Merchant\ProductController as MerchantProductController;
+use App\Http\Controllers\MerchantOrderController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Middleware\RoleMiddleware;
@@ -105,8 +106,10 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
     Route::post('/admin/users/{id}/take-over', [AdminController::class, 'takeOverMerchantRole'])
 
         ->name('admin.takeOverMerchant');
+     Route::get('/admin/merchant-orders-update', [MerchantOrderUpdateController::class, 'index'])
+        ->name('admin.merchant.orders.news');
 
-    //marchant applications     
+    //marchant applications         
 
     Route::get('/merchant-applications', [StoreApplicationController::class, 'index'])->name('merchant.applications.index');
     Route::post('/merchant-applications/{store}/approve', [StoreApplicationController::class, 'approve'])
@@ -115,6 +118,8 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
     Route::post('/merchant-applications/{store}/reject', [StoreApplicationController::class, 'reject'])
         ->name('merchant.applications.reject');
 });
+    Route::post('/merchant/orders/{id}/ship', [MerchantOrderController::class, 'sendForShipping'])
+    ->name('merchant.orders.ship');
 
 // Admin and Merchant
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,merchant'])->group(function () {
@@ -127,6 +132,8 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,
      Route::get('/marchant/product/create', [MerchantProductController::class, 'create'])->name('merchant.products.create');
      Route::post('/marchant/product/store', [MerchantProductController::class, 'store'])->name('merchant.products.store'); 
      Route::get('/marchant/orders',[MerchantProductController::class, 'orders'])->name('merchant.orders');
+     Route::post('/merchant/orders/confirm/{id}', [MerchantOrderController::class, 'confirmOrder'])->name('merchant.orders.confirm');
+     Route::delete('/merchant/orders/delete/{id}', [MerchantOrderController::class, 'deleteOrder'])->name('merchant.orders.delete');
      Route::delete('/merchant/products/{id}', [MerchantProductController::class, 'destroy'])
     ->name('merchant.products.destroy')
     ;

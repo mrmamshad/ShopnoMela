@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Merchant;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -77,7 +79,7 @@ class ProductController extends Controller
             'title' => $validated['title'],
             'short_des' => $validated['short_des'],
             'price' => $validated['price'],
-            'discount' => $validated['discount'] ?? 0,
+            'discount' => $request->discount ,
             'image' => 'product_images/' . $imageName, // ✅ Save relative path
             'star' => $validated['star'],
             'status' => $validated['status'],
@@ -116,7 +118,19 @@ class ProductController extends Controller
     }
     public function orders()
     {
-        return Inertia::render('Marchant/Products/Orders');
+        $merchantId = Auth::id(); // Get logged-in merchant ID
+
+        $orders = Order::whereIn('product_id', function ($query) use ($merchantId) {
+            $query->select('id')->from('products')->where('user_id', $merchantId);
+        })
+            ->with(['product', 'user']) // Load product and customer details
+            ->get();
+
+        // dd($orders);
+
+        return Inertia::render('Marchant/Products/Orders', [
+            'orders' => $orders,
+        ]);
     }
 
     public function destroy($id)
