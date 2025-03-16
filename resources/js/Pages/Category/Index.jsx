@@ -21,45 +21,7 @@ const CategoryPage = () => {
     const brands = ["Metcusys", "Nico", "TRIS", "MIKROTIK", "Remax", "Xiaomi"];
     const promotions = ["Flash Sale", "Free Delivery", "Best Price Guaranteed"];
 
-    const products = [
-        {
-            id: 1,
-            name: "USB Win Receiver V2 with Wi-Fi Hotspot LTE",
-            price: 1049,
-            sold: 509,
-            rating: 4.9,
-            reviews: 52,
-            brand: "Metcusys",
-        },
-        {
-            id: 2,
-            name: "TPL Link TL WIRBZON (V2) 500 Mbps Multi-Mode Wi-Fi Router",
-            price: 1205,
-            sold: 5100,
-            rating: 4.7,
-            reviews: 376,
-            brand: "TP-Link",
-        },
-        {
-            id: 3,
-            name: "TPL Link TL WIRBZON (V2) 500 Mbps Multi-Mode Wi-Fi Router",
-            price: 1205,
-            sold: 5100,
-            rating: 4.7,
-            reviews: 376,
-            brand: "TP-Link",
-        },
-        {
-            id: 4,
-            name: "TPL Link TL WIRBZON (V2) 500 Mbps Multi-Mode Wi-Fi Router",
-            price: 1205,
-            sold: 5100,
-            rating: 4.7,
-            reviews: 376,
-            brand: "TP-Link",
-        },
-        // Add more products as needed
-    ];
+
 
     return (
         <div className="min-h-screen bg-gray-50">

@@ -11,7 +11,6 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-
     public function categoryProducts($id)
     {
         $category = Category::findOrFail($id);
@@ -19,7 +18,7 @@ class ProductController extends Controller
 
         return Inertia::render('Category/AllProducts', [
             'category' => $category,
-            'products' => $products
+            'products' => $products,
         ]);
     }
 
@@ -42,16 +41,46 @@ class ProductController extends Controller
             ->get();
         // Fetch reviews with customer details
         $reviews = ProductReview::where('product_id', $id)
-        ->with(['user', 'product']) // Eager loading
-        ->latest()
-        ->get();
-    
-    //    dd($reviews);
+            ->with(['user', 'product']) // Eager loading
+            ->latest()
+            ->get();
+
+        //    dd($reviews);
         return Inertia::render('Category/Product', [
             'singleproduct' => $product,
             'productdetails' => $productdetails,
             'relatedproducts' => $relatedProducts,
-            'reviews' => $reviews
+            'reviews' => $reviews,
         ]);
+    }
+    public function search(Request $request)
+    {
+        $query = strtolower(trim($request->input('query')));
+
+        $products = Product::whereRaw('LOWER(title) LIKE ?', ["%{$query}%"])
+            ->orWhereRaw('SOUNDEX(title) = SOUNDEX(?)', [$query]) // Approximate matching
+            ->take(50)
+            ->get();
+
+        return Inertia::render('Productsearch/index', [
+            'products' => $products,
+            'query' => $request->input('query'),
+        ]);
+    }
+    public function mobilesearch(Request $request)
+    {
+$query = strtolower(trim($request->input('query')));
+
+    if (empty($query)) {
+        return response()->json([]);
+    }
+
+    $products = Product::select('id', 'title')
+        ->whereRaw('LOWER(title) LIKE ?', ["%{$query}%"])
+        ->orderByRaw("CHAR_LENGTH(title)") // Shorter matches appear first
+        ->limit(10)
+        ->get();
+
+    return response()->json($products);
     }
 }

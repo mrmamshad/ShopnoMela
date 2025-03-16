@@ -75,6 +75,9 @@ Route::post('/shipping/store', [CheckoutController::class, 'store'])->name('ship
 
 Route::get('/payments', [CategoryController::class, 'payments'])->name('payments');
 
+Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
+Route::get('/products/mobilesearch', [ProductController::class, 'mobilesearch'])->name('products.mobilesearch');
+
 
 // Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
 

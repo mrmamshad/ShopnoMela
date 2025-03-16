@@ -23,6 +23,10 @@ function Header() {
     const [openModal, setOpenModal] = useState(false);
     const { toast } = useToast();
 
+
+    // 🛠️ Separate useForm for Search
+    const searchForm = useForm({ query: "" });
+
     // console.log("user", user);
     const { data, setData, post, processing, reset, errors } = useForm({
         store_name: "",
@@ -38,6 +42,17 @@ function Header() {
 
     const handleFileChange = (field, e) => {
         setData(field, e.target.files[0]);
+    };
+
+
+    const { get } = useForm();
+
+    // Handle Search Submit
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchForm.data.query.trim() !== "") {
+            searchForm.get(route("products.search"));
+        }
     };
 
     const handleSubmit = (e) => {
@@ -80,13 +95,19 @@ function Header() {
             
             {/* Search Bar (hidden on mobile) */}
             <div className="hidden sm:flex items-center w-[75%]">
-                <input
-                    type="text"
-                    placeholder="Search products..."
-                    className="w-full px-4 py-2 rounded-full text-gray-800"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                 {/* 🔍 Fixed Search Form */}
+                            <form onSubmit={handleSearch} className="flex items-center w-full">
+                                <input
+                                    type="text"
+                                    placeholder="Search products..."
+                                    className="w-full px-4 py-2 rounded-full text-gray-800 border border-gray-300 focus:ring-2 focus:ring-green-400"
+                                    value={searchForm.data.query}
+                                    onChange={(e) => searchForm.setData("query", e.target.value)}
+                                />
+                                <button type="submit" className="ml-2 px-4 py-2 bg-green-600 text-white rounded-full">
+                                    🔍
+                                </button>
+                            </form> 
                 <Link href={route("cart")} className="ml-3">
                     <GiShoppingCart className="text-4xl" />
                 </Link>
