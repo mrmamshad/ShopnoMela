@@ -58,131 +58,87 @@ function Header() {
 
     return (
         <>
-            <header className="bg-green-500 text-white py-4">
-                <div className="container mx-auto px-4 flex items-center justify-between">
-                    <motion.h1
-                        className="text-3xl whitespace-nowrap sm:px-8 font-bold"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <Link href="/">
-                            স্বপ্ন{" "}
-                            <span className="text-2xl font-semibold">Mela</span>
-                        </Link>
-                    </motion.h1>
+<header className="bg-green-500 text-white py-4">
+    <div className="container mx-auto px-4 flex items-center justify-between">
+        
+        {/* Left Section: Logo + Name */}
+        <div className="flex items-center  justify-start  sm:space-x-3">
+            <Link href="/" className="flex  items-center justify-start  space-x-0">
+                <img src="/logo/logo.png" alt="Logo" className="w-20 h-[60px] rounded-full" />
+                <span className="text-transparent ml-2 bg-clip-text bg-gradient-to-r from-yellow-400 to-green-500 text-4xl font-extrabold drop-shadow-lg">
+                    স্বপ্ন{" "}
+                    <span className="text-3xl text-white font-semibold">
+                        Mela
+                    </span>
+                </span>
+            </Link>
+        </div>
+        
 
-                    <div className="hidden sm:flex items-center flex-1 mx-4">
-                        <input
-                            type="text"
-                            placeholder="Search products..."
-                            className="w-full sm:w-[50%] px-4 ml-5 py-2 rounded-full text-gray-800"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <Link href={route("cart")}>
-                            <GiShoppingCart className="text-4xl" />
-                        </Link>
-                    </div>
+        {/* Right Section: Search + User Dropdown */}
+        <div className="flex items-center justify-end space-x-6">
+            
+            {/* Search Bar (hidden on mobile) */}
+            <div className="hidden sm:flex items-center w-[75%]">
+                <input
+                    type="text"
+                    placeholder="Search products..."
+                    className="w-full px-4 py-2 rounded-full text-gray-800"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Link href={route("cart")} className="ml-3">
+                    <GiShoppingCart className="text-4xl" />
+                </Link>
+            </div>
 
-                    <div className="flex items-center space-x-4">
-                        {user &&
-                            user.roles.includes("customer") &&
-                            !user.roles.includes("admin") &&
-                            !user.roles.includes("merchant") && (
-                                <Button
-                                    variant="outline"
-                                    onClick={() => setOpenModal(true)}
-                                    className="text-black"
-                                >
-                                    Become a Seller
-                                </Button>
-                            )}
+            {/* User Dropdown / Login Links */}
+            <div className="flex items-center space-x-4">
+                {user && user.roles.includes("customer") &&
+                    !user.roles.includes("admin") &&
+                    !user.roles.includes("merchant") && (
+                        <Button
+                            variant="outline"
+                            onClick={() => setOpenModal(true)}
+                            className="text-black"
+                        >
+                            Become a Seller
+                        </Button>
+                    )
+                }
 
-                        {user ? (
-                            <div className="sm:ms-6 sm:flex sm:items-center">
-                                <div className="relative ms-3">
-                                    <Dropdown>
-                                        <Dropdown.Trigger>
-                                            <span className="inline-flex rounded-md">
-                                                <button
-                                                    type="button"
-                                                    className="inline-flex items-center rounded-md border border-transparent text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                                >
-                                                    <img
-                                                        src={user.image}
-                                                        alt={user.name}
-                                                        className="h-8 w-8 rounded-full"
-                                                    />
-                                                    <svg
-                                                        className="-me-0.5 ms-2 h-4 w-4"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        viewBox="0 0 20 20"
-                                                        fill="currentColor"
-                                                    >
-                                                        <path
-                                                            fillRule="evenodd"
-                                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                            clipRule="evenodd"
-                                                        />
-                                                    </svg>
-                                                </button>
-                                            </span>
-                                        </Dropdown.Trigger>
-                                        <Dropdown.Content>
-                                            <p className="text-center text-black my-3 text-sm">
-                                                {user.name}
-                                            </p>
-                                            <hr className="mx-5 my-2 border-gray-400" />
-                                            <Dropdown.Link
-                                                href={route("orders")}
-                                            >
-                                                Orders
-                                            </Dropdown.Link>
-                                            <Dropdown.Link href={route("cart")}>
-                                                My cart
-                                            </Dropdown.Link>
-                                            <Dropdown.Link
-                                                href={route("wishlist")}
-                                            >
-                                                Wishlist
-                                            </Dropdown.Link>
-                                            <Dropdown.Link
-                                                href={route("logout")}
-                                                method="post"
-                                                as="button"
-                                            >
-                                                Log Out
-                                            </Dropdown.Link>
-                                        </Dropdown.Content>
-                                    </Dropdown>
-                                </div>
-                            </div>
-                        ) : (
-                            <nav>
-                                <ul className="flex space-x-4">
-                                    <li>
-                                        <Link
-                                            href={route("login")}
-                                            className="hover:underline"
-                                        >
-                                            Login
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            href={route("register")}
-                                            className="hover:underline"
-                                        >
-                                            Sign Up
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </nav>
-                        )}
-                    </div>
-                </div>
-            </header>
+                {user ? (
+                    <Dropdown>
+                        <Dropdown.Trigger>
+                            <button className="flex items-center border border-transparent rounded-md text-gray-500 hover:text-gray-700">
+                                <img src={user.image} alt={user.name} className="h-8 w-8 rounded-full" />
+                                <svg className="ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd"/>
+                                </svg>
+                            </button>
+                        </Dropdown.Trigger>
+                        <Dropdown.Content>
+                            <p className="text-center text-black my-3 text-sm">{user.name}</p>
+                            <hr className="mx-5 my-2 border-gray-400" />
+                            <Dropdown.Link href={route("orders")}>Orders</Dropdown.Link>
+                            <Dropdown.Link href={route("cart")}>My cart</Dropdown.Link>
+                            <Dropdown.Link href={route("wishlist")}>Wishlist</Dropdown.Link>
+                            <Dropdown.Link href={route("logout")} method="post" as="button">Log Out</Dropdown.Link>
+                        </Dropdown.Content>
+                    </Dropdown>
+                ) : (
+                    <nav>
+                        <ul className="flex space-x-4">
+                            <li><Link href={route("login")} className="hover:underline">Login</Link></li>
+                            <li><Link href={route("register")} className="hover:underline">Sign Up</Link></li>
+                        </ul>
+                    </nav>
+                )}
+            </div>
+        </div>
+    </div>
+</header>
+
 
             {/* Become a Seller Modal */}
             <Dialog open={openModal} onOpenChange={setOpenModal}>

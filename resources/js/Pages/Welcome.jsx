@@ -43,7 +43,7 @@ export default function Welcome({
                     transition={{ duration: 0.5 }}
                 >
                     <ActionSearchBar />
-                    <div className="w-full">
+                    <div className="w-full mt-2">
                         <OfferSlider offers={offers} />
                     </div>
                     <div className="w-full">
