@@ -36,7 +36,7 @@ class CheckoutController extends Controller
           
         //  dd($shippingDetails);
         // Shipping Cost (Flat Rate)
-        $shippingFee = 50;
+        $shippingFee = 150;
 
         // Calculate total price
         $quantity = $request->query('quantity', 1);

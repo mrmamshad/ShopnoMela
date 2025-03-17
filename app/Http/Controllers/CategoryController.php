@@ -21,7 +21,7 @@ class CategoryController extends Controller
 
     public function cart()
     {
-        $cartItems = ProductCart::with('product')->where('user_id', auth()->id())->get();
+        $cartItems = ProductCart::with('product')->orderBy('created_at', 'desc')->where('user_id', auth()->id())->get();
         // dd($cartItems);
         return Inertia::render('Category/Cart', ['cartItems' => $cartItems]);
     }

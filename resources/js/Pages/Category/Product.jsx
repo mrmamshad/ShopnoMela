@@ -484,7 +484,7 @@ const ProductDetails = ({
                             >
                                 {cartForm.processing
                                     ? "Adding..."
-                                    : "Add to Cart"}
+                                    : "Add to Cart  "}
                             </button>
                         </div>
                     </div>
