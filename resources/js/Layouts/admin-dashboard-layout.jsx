@@ -46,6 +46,12 @@ export default function AdminDashboardLayout({ children }) {
             current: true,
         },
         {
+            name: "All Orders",
+            href: route("admin.allorders"),
+            icon: ShoppingCart,
+            current: false,
+        },
+        {
            name: "Marchant Orders News",
             href: route("admin.merchant.orders.news"),
             icon: Bell,

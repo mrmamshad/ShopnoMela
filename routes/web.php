@@ -107,11 +107,12 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
         ->name('admin.assign-merchant');
     //  to take back marchant role from a user and give them normal customer role
     Route::post('/admin/users/{id}/take-over', [AdminController::class, 'takeOverMerchantRole'])
-
         ->name('admin.takeOverMerchant');
-     Route::get('/admin/merchant-orders-update', [MerchantOrderUpdateController::class, 'index'])
-        ->name('admin.merchant.orders.news');
 
+    Route::get('/admin/merchant-orders-update', [MerchantOrderUpdateController::class, 'index'])
+        ->name('admin.merchant.orders.news');
+        
+    Route::get('/admin/allorders', [AdminController::class, 'allorders'])->name('admin.allorders');  
     //marchant applications         
 
     Route::get('/merchant-applications', [StoreApplicationController::class, 'index'])->name('merchant.applications.index');

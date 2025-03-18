@@ -207,6 +207,12 @@ const handlePayment = () => {
                                 >
                                     Proceed to Pay
                                 </Button>
+                                                             <Button
+                                    className="w-full bg-blue-500 hover:bg-blue-600 text-white mt-4"
+                                   
+                                >
+                                    Cash on Delivery
+                                </Button>
                             </CardContent>
                         </Card>
                     </div>

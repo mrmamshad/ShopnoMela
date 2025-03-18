@@ -12,7 +12,7 @@ class Order extends Model
     protected $fillable = [
         'user_id', 'name', 'email', 'phone', 'amount', 'status', 'address',
         'transaction_id', 'currency', 'product_id', 'product_name',
-        'product_quantity', 'product_color', 'product_size'
+        'product_quantity', 'product_color', 'product_size', 'payment_method'
     ];
 
     // Order belongs to a user

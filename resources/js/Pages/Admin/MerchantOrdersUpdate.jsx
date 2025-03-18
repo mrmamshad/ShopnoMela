@@ -1,4 +1,4 @@
-import AdminLayout from "@/Layouts/marchant-layout";
+import AdminLayout from "@/Layouts/admin-dashboard-layout";
 import { Card, CardContent } from '@/components/ui/card';
 import { usePage } from '@inertiajs/react';
 

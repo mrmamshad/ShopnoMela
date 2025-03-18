@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -58,5 +59,15 @@ class AdminController extends Controller
         $user->syncRoles(['customer']);
 
         return back()->with('success', 'Merchant role removed, user is now a customer.');
+    }
+    public function allorders()
+    { $orders = Order::with(['product.merchant'])
+        ->latest()
+        ->get();
+      
+    //   dd($orders);
+    return Inertia::render('Admin/AllOrders', [
+        'orders' => $orders
+    ]);
     }
 }

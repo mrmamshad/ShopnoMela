@@ -108,9 +108,9 @@ export default function Index({ products, query }) {
                                         <p className="text-lg font-bold">
                                             ৳ {product.price.toLocaleString()}
                                         </p>
-                                        <Button as={Link} href={route("product.show", product.id)} variant="outline">
+                                        <Link className="border shadow-sm border-gray-300 hover:bg-gray-100 text-gray-800 py-2 px-4 rounded" href={route("product.show", product.id)} variant="outline">
                                             View Details
-                                        </Button>
+                                        </Link>
                                     </div>
                                 </div>
                             </Card>
