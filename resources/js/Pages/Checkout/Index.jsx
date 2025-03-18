@@ -18,39 +18,38 @@ import { useToast } from "@/hooks/use-toast";
 
 const Checkout = () => {
     const { toast } = useToast();
-    const {
-        product,
-        selectedColor,
-        selectedSize,
-        quantity,
-        price,
-        shippingDetails,
-        shippingFee,
-        totalAmount,
-    } = usePage().props;
-    console.log("Product details:", product);
-    // console.log("Shipping details:", shippingDetails);
-    // console.log("Shipping fee:", shippingFee);
-    // console.log("Total amount:", totalAmount);
-    // console.log("Quantity:", quantity);
-    // console.log("Price:", price);
-    // console.log("Selected color:", selectedColor);
-    // console.log("Selected size:", selectedSize);
+const {
+    product,
+    selectedColor,
+    selectedSize,
+    quantity,
+    price,
+    shippingFee,
+    totalAmount,
+    shippingDetails, // ✅ Add this line to receive it from props
+} = usePage().props;
+    // consolelog all props
+     console.log(product, selectedColor, selectedSize, quantity, price, shippingFee, totalAmount);        
+
 
     const [openDrawer, setOpenDrawer] = useState(false);
-    // console.log("Shipping details:", shippingDetails);
 
-    // Form handling using useForm, now only with the new table columns
+    // Form handling for shipping details
     const { data, setData, post, processing } = useForm({
         cus_name: "",
         cus_phone: "",
         ship_name: "",
         ship_add: "",
-        ship_city: "",
-        ship_state: "",
+        product_id: product.id,
+        product_name: product.title,
+        quantity: quantity,
+        color: selectedColor,
+        size: selectedSize,
+        amount: totalAmount,
+        payment_method: "Cash on Delivery",
     });
 
-    // Submit form
+     // Submit form
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route("shipping.store"), {
@@ -80,7 +79,21 @@ const Checkout = () => {
         size: "",
     });
 
-const handlePayment = () => {
+    // Submit Cash on Delivery order
+    const handleCODOrder = (e) => {
+        e.preventDefault();
+        post(route("order.cod"), {
+            onSuccess: () => {
+                setOpenDrawer(false);
+                toast({
+                    title: "Order Placed!",
+                    description: "Your Cash on Delivery order has been placed successfully.",
+                    variant: "default",
+                });
+            },
+        });
+    };
+    const handlePayment = () => {
     const paymentData = {
         product_id: product.id,
         amount: totalAmount,
@@ -111,8 +124,6 @@ const handlePayment = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Left Section - Shipping Details */}
                     <div className="md:col-span-2">
-
-                        {/* Package Details */}
                         <Card className="mt-4">
                             <CardHeader>
                                 <CardTitle>Package 1 of 1</CardTitle>
@@ -120,21 +131,10 @@ const handlePayment = () => {
                             <CardContent>
                                 <RadioGroup defaultValue="standard">
                                     <div className="flex items-center space-x-3 border p-3 rounded-lg">
-                                        <RadioGroupItem
-                                            value="standard"
-                                            id="standard"
-                                        />
-                                        <label
-                                            htmlFor="standard"
-                                            className="text-sm font-medium"
-                                        >
-                                            <p>
-                                                ৳ {shippingFee} Standard
-                                                Delivery
-                                            </p>
-                                            <p className="text-xs text-gray-500">
-                                                Get by 23-26 Feb
-                                            </p>
+                                        <RadioGroupItem value="standard" id="standard" />
+                                        <label htmlFor="standard" className="text-sm font-medium">
+                                            <p>৳ {shippingFee} Standard Delivery</p>
+                                            <p className="text-xs text-gray-500">Get by 23-26 Feb</p>
                                         </label>
                                     </div>
                                 </RadioGroup>
@@ -147,27 +147,12 @@ const handlePayment = () => {
                                         className="w-24 h-24 object-cover rounded"
                                     />
                                     <div>
-                                        <h2 className="text-sm font-semibold">
-                                            {product.title}
-                                        </h2>
-                                        <p className="text-xs text-gray-500">
-                                            {product.short_des}
-                                        </p>
-                                        <p className="text-xs">
-                                            <strong>Color:</strong>{" "}
-                                            {selectedColor || "Not Selected"}
-                                        </p>
-                                        <p className="text-xs">
-                                            <strong>Size:</strong>{" "}
-                                            {selectedSize || "Not Selected"}
-                                        </p>
-                                        <p className="text-xs">
-                                            <strong>Quantity:</strong>{" "}
-                                            {quantity}
-                                        </p>
-                                        <p className="text-sm font-semibold text-orange-600">
-                                            ৳ {price}
-                                        </p>
+                                        <h2 className="text-sm font-semibold">{product.title}</h2>
+                                        <p className="text-xs text-gray-500">{product.short_des}</p>
+                                        <p className="text-xs"><strong>Color:</strong> {selectedColor || "Not Selected"}</p>
+                                        <p className="text-xs"><strong>Size:</strong> {selectedSize || "Not Selected"}</p>
+                                        <p className="text-xs"><strong>Quantity:</strong> {quantity}</p>
+                                        <p className="text-sm font-semibold text-orange-600">৳ {price}</p>
                                     </div>
                                 </div>
                             </CardContent>
@@ -182,15 +167,8 @@ const handlePayment = () => {
                             </CardHeader>
                             <CardContent>
                                 <div className="flex justify-between text-sm">
-                                    <span>
-                                        Items Total (<span>{quantity}</span>{" "}
-                                        Item)
-                                    </span>
+                                    <span>Items Total ({quantity} Item)</span>
                                     <span>৳ {price}</span>
-                                </div>
-                                <div className="flex justify-between text-sm mt-2">
-                                    <span>Quantity</span>
-                                    <span> {quantity}</span>
                                 </div>
                                 <div className="flex justify-between text-sm mt-2">
                                     <span>Delivery Fee</span>
@@ -201,18 +179,61 @@ const handlePayment = () => {
                                     <span>Total:</span>
                                     <span>৳ {totalAmount}</span>
                                 </div>
-                                <Button
+                           <Button
                                     className="w-full bg-green-500 hover:bg-green-600 text-white mt-4"
                                     onClick={handlePayment}
                                 >
                                     Proceed to Pay
                                 </Button>
-                                                             <Button
-                                    className="w-full bg-blue-500 hover:bg-blue-600 text-white mt-4"
-                                   
-                                >
-                                    Cash on Delivery
-                                </Button>
+
+                                {/* Cash on Delivery Button */}
+                                <Drawer open={openDrawer} onOpenChange={setOpenDrawer}>
+                                    <DrawerTrigger asChild>
+                                        <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white mt-4">
+                                            Cash on Delivery
+                                        </Button>
+                                    </DrawerTrigger>
+                                    <DrawerContent>
+                                        <DrawerHeader>
+                                            <DrawerTitle>Enter Shipping Details</DrawerTitle>
+                                        </DrawerHeader>
+                                        <form onSubmit={handleCODOrder} className="p-4">
+                                            <Label htmlFor="cus_name">Full Name</Label>
+                                            <Input
+                                                id="cus_name"
+                                                type="text"
+                                                placeholder="Enter your name"
+                                                value={data.cus_name}
+                                                onChange={(e) => setData("cus_name", e.target.value)}
+                                                required
+                                            />
+
+                                            <Label htmlFor="cus_phone" className="mt-3">Phone Number</Label>
+                                            <Input
+                                                id="cus_phone"
+                                                type="text"
+                                                placeholder="Enter phone number"
+                                                value={data.cus_phone}
+                                                onChange={(e) => setData("cus_phone", e.target.value)}
+                                                required
+                                            />
+
+                                            <Label htmlFor="ship_add" className="mt-3">Shipping Address</Label>
+                                            <Input
+                                                id="ship_add"
+                                                type="text"
+                                                placeholder="Enter shipping address"
+                                                value={data.ship_add}
+                                                onChange={(e) => setData("ship_add", e.target.value)}
+                                                required
+                                            />
+
+                                            <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white mt-4">
+                                                Confirm Order
+                                            </Button>
+                                        </form>
+                                    </DrawerContent>
+                                </Drawer>
                             </CardContent>
                         </Card>
                     </div>

@@ -74,6 +74,8 @@ Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('w
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 
 Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+Route::post('/order/cod', [OrderController::class, 'storeCOD'])->name('order.cod');
+
 
 Route::post('/shipping/store', [CheckoutController::class, 'store'])->name('shipping.store');
 
