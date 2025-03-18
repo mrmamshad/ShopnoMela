@@ -198,58 +198,63 @@ class SslCommerzPaymentController extends Controller
 
     }
 
-    public function success(Request $request)
-    {
-        $tran_id = $request->input('tran_id');
-        $amount = $request->input('amount');
-        $currency = $request->input('currency');
-    
-        $sslc = new SslCommerzNotification();
-    
-        # Check if the order exists
-        $order = Order::where('transaction_id', $tran_id)->first();
-    
-        if (!$order) {
-            return redirect()->route('orders')->with('error', 'Order not found!');
-        }
-    
-        if ($order->status == 'Pending') {
-            $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $currency);
-    
-            if (!$validation) {
-                return redirect()->route('orders')->with('error', 'Payment validation failed!');
-            }
-    
-            // Update order status to 'Processing'
-            $order->update(['status' => 'Processing']);
-    
-            // Store or update payment history
-            PaymentHistory::updateOrInsert(
-                ['transaction_id' => $tran_id], // Prevent duplicate records
-                [
-                    'user_id' => $order->user_id,
-                    'order_id' => $order->id,
-                    'validation_id' => $request->input('val_id'),
-                    'amount' => $amount,
-                    'currency' => $currency,
-                    'status' => 'VALID',
-                    'payment_method' => $request->input('card_type') ?? 'Unknown',
-                    'bank_transaction_id' => $request->input('bank_tran_id'),
-                    'response_data' => json_encode($request->all()),
-                    'updated_at' => now(),
-                    'created_at' => now(),
-                ]
-            );
-    
-            return redirect()->route('orders')->with('success', 'Order successfully created!');
-        }
-    
-        if ($order->status == 'Processing' || $order->status == 'Complete') {
-            return redirect()->route('orders')->with('success', 'Transaction already completed!');
-        }
-    
-        return redirect()->route('orders')->with('error', 'Invalid transaction!');
+public function success(Request $request)
+{
+    $tran_id = $request->input('tran_id');
+    $amount = $request->input('amount');
+    $currency = $request->input('currency');
+
+    $sslc = new SslCommerzNotification();
+
+    // Check if the order exists
+    $order = Order::where('transaction_id', $tran_id)->first();
+
+    if (!$order) {
+        return redirect()->route('orders')->with('error', 'Order not found!');
     }
+
+    if ($order->status == 'Pending') {
+        $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $currency);
+
+        if (!$validation) {
+            return redirect()->route('orders')->with('error', 'Payment validation failed!');
+        }
+
+        // Update order with payment details
+        $order->update([
+            'status' => 'Processing', // Order is now being processed
+            'payment_method' => $request->input('card_type') ?? 'Unknown', // Bkash, Nagad, etc.
+            'payment_date' => $request->input('tran_date') ?? now(), // Payment timestamp
+        ]);
+
+        // Store or update payment history
+        PaymentHistory::updateOrInsert(
+            ['transaction_id' => $tran_id], // Prevent duplicate records
+            [
+                'user_id' => $order->user_id,
+                'order_id' => $order->id,
+                'validation_id' => $request->input('val_id'),
+                'amount' => $amount,
+                'currency' => $currency,
+                'status' => 'VALID',
+                'payment_method' => $request->input('card_type') ?? 'Unknown',
+                'bank_transaction_id' => $request->input('bank_tran_id'),
+                'response_data' => json_encode($request->all()),
+                'updated_at' => now(),
+                'created_at' => now(),
+            ]
+        );
+
+        return redirect()->route('orders')->with('success', 'Order successfully processed!');
+    }
+
+    if ($order->status == 'Processing' || $order->status == 'Complete') {
+        return redirect()->route('orders')->with('success', 'Transaction already completed!');
+    }
+
+    return redirect()->route('orders')->with('error', 'Invalid transaction!');
+}
+
     
 
     public function fail(Request $request)

@@ -35,7 +35,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::get('/contact-us', function () {
     return Inertia::render('ContactUs');
@@ -48,28 +50,30 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// category routes 
+// category routes
 Route::get('/category-details', [CategoryController::class, 'index'])->name('category');
 Route::get('/category/{id}', [ProductController::class, 'categoryProducts'])->name('category.products');
 
-// product-details route 
+// product-details route
 Route::get('/product-details', [CategoryController::class, 'product'])->name('product');
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
 
+Route::post('/reviews', [ProductReviewController::class, 'store'])
+    ->name('reviews.store')
+    ->middleware('auth');
 
-Route::post('/reviews', [ProductReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
-
-Route::get('/cart', [CategoryController::class, 'cart'])->name('cart')->middleware('auth');
+Route::get('/cart', [CategoryController::class, 'cart'])
+    ->name('cart')
+    ->middleware('auth');
 Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.store');
 
 Route::get('/wishlist', [CategoryController::class, 'wishlist'])->name('wishlist');
 Route::post('/wishlist/save', [WishlistController::class, 'saveToWishlist'])->name('wishlist.store');
 Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
 
-
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 
-Route::get('/orders', [OrderController::class , 'index'])->name('orders');
+Route::get('/orders', [OrderController::class, 'index'])->name('orders');
 
 Route::post('/shipping/store', [CheckoutController::class, 'store'])->name('shipping.store');
 
@@ -78,9 +82,7 @@ Route::get('/payments', [CategoryController::class, 'payments'])->name('payments
 Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/products/mobilesearch', [ProductController::class, 'mobilesearch'])->name('products.mobilesearch');
 
-
 // Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
-
 
 // Admin only
 Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function () {
@@ -92,7 +94,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
     Route::put('admin/offers/{offer}', [OfferController::class, 'update'])->name('offers.update');
     Route::delete('admin/offers/{offer}', [OfferController::class, 'destroy'])->name('offers.destroy');
 
-    // flash sale manage routes 
+    // flash sale manage routes
 
     Route::get('/admin/flash-sales', [FlashSaleController::class, 'index'])->name('flash-sales.index');
     Route::post('/admin/flash-sales', [FlashSaleController::class, 'store'])->name('flash-sales.store');
@@ -103,47 +105,37 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
     // all users manage routes
     Route::get('/admin/users', [AdminController::class, 'userlist'])->name('userlist');
     //  to give a user merchant role
-    Route::post('/admin/users/{id}/assign-merchant', [AdminController::class, 'assignMerchant'])
-        ->name('admin.assign-merchant');
+    Route::post('/admin/users/{id}/assign-merchant', [AdminController::class, 'assignMerchant'])->name('admin.assign-merchant');
     //  to take back marchant role from a user and give them normal customer role
-    Route::post('/admin/users/{id}/take-over', [AdminController::class, 'takeOverMerchantRole'])
-        ->name('admin.takeOverMerchant');
+    Route::post('/admin/users/{id}/take-over', [AdminController::class, 'takeOverMerchantRole'])->name('admin.takeOverMerchant');
 
-    Route::get('/admin/merchant-orders-update', [MerchantOrderUpdateController::class, 'index'])
-        ->name('admin.merchant.orders.news');
-        
-    Route::get('/admin/allorders', [AdminController::class, 'allorders'])->name('admin.allorders');  
-    //marchant applications         
+    Route::get('/admin/merchant-orders-update', [MerchantOrderUpdateController::class, 'index'])->name('admin.merchant.orders.news');
+
+    Route::get('/admin/allorders', [AdminController::class, 'allorders'])->name('admin.allorders');
+    //marchant applications
 
     Route::get('/merchant-applications', [StoreApplicationController::class, 'index'])->name('merchant.applications.index');
-    Route::post('/merchant-applications/{store}/approve', [StoreApplicationController::class, 'approve'])
-        ->name('merchant.applications.approve');
+    Route::post('/merchant-applications/{store}/approve', [StoreApplicationController::class, 'approve'])->name('merchant.applications.approve');
 
-    Route::post('/merchant-applications/{store}/reject', [StoreApplicationController::class, 'reject'])
-        ->name('merchant.applications.reject');
+    Route::post('/merchant-applications/{store}/reject', [StoreApplicationController::class, 'reject'])->name('merchant.applications.reject');
 });
-    Route::post('/merchant/orders/{id}/ship', [MerchantOrderController::class, 'sendForShipping'])
-    ->name('merchant.orders.ship');
+Route::post('/merchant/orders/{id}/ship', [MerchantOrderController::class, 'sendForShipping'])->name('merchant.orders.ship');
 
 // Admin and Merchant
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,merchant'])->group(function () {
     Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
-     // Show store profile
-     Route::get('/marchant/profile', [StoreController::class, 'edit'])->name('merchant.store.edit');
-     // Update store profile
-     Route::post('/marchant/profile', [StoreController::class, 'update'])->name('merchant.store.update');
-     Route::get('/marchant/products', [MerchantProductController::class, 'index'])->name('merchant.products.index');
-     Route::get('/marchant/product/create', [MerchantProductController::class, 'create'])->name('merchant.products.create');
-     Route::post('/marchant/product/store', [MerchantProductController::class, 'store'])->name('merchant.products.store'); 
-     Route::get('/marchant/orders',[MerchantProductController::class, 'orders'])->name('merchant.orders');
-     Route::post('/merchant/orders/confirm/{id}', [MerchantOrderController::class, 'confirmOrder'])->name('merchant.orders.confirm');
-     Route::delete('/merchant/orders/delete/{id}', [MerchantOrderController::class, 'deleteOrder'])->name('merchant.orders.delete');
-     Route::delete('/merchant/products/{id}', [MerchantProductController::class, 'destroy'])
-    ->name('merchant.products.destroy')
-    ;
-
+    // Show store profile
+    Route::get('/marchant/profile', [StoreController::class, 'edit'])->name('merchant.store.edit');
+    // Update store profile
+    Route::post('/marchant/profile', [StoreController::class, 'update'])->name('merchant.store.update');
+    Route::get('/marchant/products', [MerchantProductController::class, 'index'])->name('merchant.products.index');
+    Route::get('/marchant/product/create', [MerchantProductController::class, 'create'])->name('merchant.products.create');
+    Route::post('/marchant/product/store', [MerchantProductController::class, 'store'])->name('merchant.products.store');
+    Route::get('/marchant/orders', [MerchantProductController::class, 'orders'])->name('merchant.orders');
+    Route::post('/merchant/orders/confirm/{id}', [MerchantOrderController::class, 'confirmOrder'])->name('merchant.orders.confirm');
+    Route::delete('/merchant/orders/delete/{id}', [MerchantOrderController::class, 'deleteOrder'])->name('merchant.orders.delete');
+    Route::delete('/merchant/products/{id}', [MerchantProductController::class, 'destroy'])->name('merchant.products.destroy');
 });
-
 
 Route::middleware('auth')->group(function () {
     // Become a Seller: store creation
@@ -153,16 +145,11 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->group(function () {});
 
 Route::middleware(['auth'])->group(function () {
-
-
-
     Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
 });
 
-
 // Route::get('/offers', [OfferController::class, 'index'])->name('offers');
 
-    
 // SSLCOMMERZ Start
 // Route::get('/example1', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);
 Route::get('/example2', [SslCommerzPaymentController::class, 'exampleHostedCheckout'])->name('payment');
@@ -180,7 +167,6 @@ Route::post('/ipn', [SslCommerzPaymentController::class, 'ipn']);
 
 Route::get('google-login', [GoogleAuth::class, 'googleLogin'])->name('auth.google');
 Route::get('auth/google/callback', [GoogleAuth::class, 'googleLoginCallback'])->name('auth.google.callback');
-
 
 Route::get('/offers', [OfferController::class, 'index']);
 Route::post('/offers', [OfferController::class, 'store']);
