@@ -20,6 +20,7 @@ class CheckoutController extends Controller
 
         // Retrieve product details
         $product = Product::findOrFail($request->query('product_id'));
+        // dd($product);
 
         // If no address is found, use default values
         $shippingDetails = $customerProfile ? [
@@ -36,12 +37,23 @@ class CheckoutController extends Controller
           
         //  dd($shippingDetails);
         // Shipping Cost (Flat Rate)
-        $shippingFee = 150;
+$shippingFee = 150;
 
-        // Calculate total price
-        $quantity = $request->query('quantity', 1);
-        $productPrice = $request->query('price', $product->price);
-        $totalAmount = ($productPrice * $quantity) + $shippingFee;
+// Get quantity and product price from request
+$quantity = $request->query('quantity', 1);
+$productPrice = $request->query('price', $product->price);
+$discount = $product->discount;
+
+// Apply discount only if it's greater than 0
+if ($discount > 0) {
+    $discountedPrice = $productPrice - ($productPrice * ($discount / 100));
+} else {
+    $discountedPrice = $productPrice;
+}
+
+// Calculate total amount
+$totalAmount = ($discountedPrice * $quantity) + $shippingFee;
+
 
         return Inertia::render('Checkout/Index', [
             'product' => $product,
@@ -49,6 +61,7 @@ class CheckoutController extends Controller
             'selectedSize' => $request->query('size'),
             'quantity' => $quantity,
             'price' => $productPrice,
+            'discount' => $discount,
             'shippingDetails' => $shippingDetails,
             'shippingFee' => $shippingFee,
             'totalAmount' => $totalAmount,

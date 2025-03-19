@@ -3,6 +3,10 @@ import { usePage } from "@inertiajs/react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import moment from "moment";
+import { GrDocumentDownload } from "react-icons/gr";
+import {  PDFDownloadLink } from "@react-pdf/renderer";
+import OrderProofPDF from "@/Components/OrderProofPDF";
+import { Button } from "@/components/ui/button";
 
 export default function AllOrders() {    
     const { orders } = usePage().props;
@@ -30,6 +34,7 @@ export default function AllOrders() {
                                 <TableHead className="w-24">Amount</TableHead>
                                 <TableHead className="w-24">Status</TableHead>
                                 <TableHead className="min-w-32">Order Time</TableHead>
+                                <TableHead className="min-w-32">Order Proof</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -53,6 +58,21 @@ export default function AllOrders() {
                                         </span>
                                     </TableCell>
                                     <TableCell className="text-gray-500">{moment(order.created_at).format("MMM DD, YYYY hh:mm A")}</TableCell>
+                                                                            <TableCell>
+                                    <PDFDownloadLink document={<OrderProofPDF order={order} />} fileName={`Order_Proof_${order.id}.pdf`}>
+                                        {({ loading }) =>
+                                            loading ? (
+                                                <Button size="sm" variant="outline" disabled>
+                                                    Generating...
+                                                </Button>
+                                            ) : (
+                                                <Button size="sm" variant="outline">
+                                                    Download <GrDocumentDownload size={16} />
+                                                </Button>
+                                            )
+                                        }
+                                    </PDFDownloadLink>
+                                        </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

@@ -7,8 +7,11 @@
   import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
   import Header from "@/Components/Header";
   import Footer from "@/Components/Footer";
+  import { PDFDownloadLink } from "@react-pdf/renderer";
+import OrderProofPDF from "@/Components/OrderProofPDF";
 
   export default function OrderList({ orders }) {
+    console.log("orders", orders);
     const [expandedOrder, setExpandedOrder] = useState(null);
     
     const getStatusBadge = (status) => {
@@ -33,6 +36,7 @@
       setExpandedOrder(expandedOrder === orderId ? null : orderId);
     };
 
+
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
@@ -48,11 +52,11 @@
                   <CardHeader className="flex  flex-row bg-gray-100 rounded-t-lg px-4 py-3 relative items-center">
                     <div className="flex items-center gap-3 flex-1">
                       <img
-                        src={order.image || "/images/placeholder.png"}
+                        src={order.product?.image || "/images/placeholder.png"}
                         alt={order.product_name}
                         className="w-16 h-16 rounded-lg border object-contain"
                       />
-                      <div>
+                      <div> 
                         <h3 className="font-medium text-base">{order.product_name}</h3>
                         <p className="text-sm text-gray-500">
                           Color: {order.product_color} | Size: {order.product_size}
@@ -71,8 +75,10 @@
                         Address: <span className="font-medium">{order.address}</span>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-base">{formatCurrency(order.price)}</p>
+                        <p className="font-semibold text-base">{formatCurrency(order.product.price)}</p>
                         <p className="text-sm text-gray-500">Qty: {order.product_quantity}</p>
+                 <p className="text-sm text-gray-500">Discount: {order.product?.discount}%</p>
+
                       </div>
                     </div>
                   </CardContent>
@@ -81,9 +87,24 @@
                     <div className="text-lg font-semibold">
                       Total: {formatCurrency(order.amount)}
                     </div>
-                    <Button size="sm" variant="outline" onClick={() => toggleOrderTimeline(order.id)}>
+                   <div>
+                     <Button size="sm" variant="outline" onClick={() => toggleOrderTimeline(order.id)}>
                       {expandedOrder === order.id ? "Hide Tracking" : "Track Order"}
                     </Button>
+                                    <PDFDownloadLink document={<OrderProofPDF order={order} />} fileName={`Order_Proof_${order.id}.pdf`}>
+                                        {({ loading }) =>
+                                            loading ? (
+                                                <Button size="sm" variant="outline" disabled>
+                                                    Generating...
+                                                </Button>
+                                            ) : (
+                                                <Button size="sm" variant="outline">
+                                                    Download Order Proof
+                                                </Button>
+                                            )
+                                        }
+                                    </PDFDownloadLink>
+                   </div>
                   </CardFooter>
 
                   <Drawer  open={expandedOrder === order.id} onClose={() => setExpandedOrder(null)}>

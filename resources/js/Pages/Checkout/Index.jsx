@@ -25,6 +25,7 @@ const {
     quantity,
     price,
     shippingFee,
+    discount,
     totalAmount,
     shippingDetails, // ✅ Add this line to receive it from props
 } = usePage().props;
@@ -173,6 +174,10 @@ const {
                                 <div className="flex justify-between text-sm mt-2">
                                     <span>Delivery Fee</span>
                                     <span>৳ {shippingFee}</span>
+                                </div>
+                                <div className="flex justify-between text-sm mt-2">
+                                    <span>Discount</span>
+                                    <span> {discount}%</span>
                                 </div>
                                 <hr className="my-3" />
                                 <div className="flex justify-between text-lg font-bold">

@@ -14,6 +14,9 @@ import { useForm } from "@inertiajs/react";
 import { Check, CheckCheck, Trash2, X } from "lucide-react";
 import moment from "moment";
 const audioSrc = "/audio/notification.wav";
+import { GrDocumentDownload } from "react-icons/gr";
+import {  PDFDownloadLink } from "@react-pdf/renderer";
+import OrderProofPDF from "@/Components/OrderProofPDF";
 
 export default function MarchantOrders({ orders }) {
     const [prevOrderCount, setPrevOrderCount] = useState(orders.length);
@@ -76,6 +79,7 @@ export default function MarchantOrders({ orders }) {
                                 <TableHead>Payment Method</TableHead>
                                 <TableHead>Order Time</TableHead>
                                 <TableHead>Status</TableHead>
+                                <TableHead>Order Proof</TableHead>
                                 <TableHead>Action</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -105,6 +109,21 @@ export default function MarchantOrders({ orders }) {
                                             )}
                                         </TableCell>
                                         <TableCell>{order.status}</TableCell>
+                                        <TableCell>
+                                    <PDFDownloadLink document={<OrderProofPDF order={order} />} fileName={`Order_Proof_${order.id}.pdf`}>
+                                        {({ loading }) =>
+                                            loading ? (
+                                                <Button size="sm" variant="outline" disabled>
+                                                    Generating...
+                                                </Button>
+                                            ) : (
+                                                <Button size="sm" variant="outline">
+                                                    Download <GrDocumentDownload size={16} />
+                                                </Button>
+                                            )
+                                        }
+                                    </PDFDownloadLink>
+                                        </TableCell>
                                         <TableCell className="flex gap-2">
                                             {/* Confirm Order Button */}
                                             <Button

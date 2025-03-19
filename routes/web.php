@@ -23,6 +23,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Merchant\ProductController as MerchantProductController;
 use App\Http\Controllers\MerchantOrderController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderPdfController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Models\Category;
@@ -75,6 +76,7 @@ Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.in
 
 Route::get('/orders', [OrderController::class, 'index'])->name('orders');
 Route::post('/order/cod', [OrderController::class, 'storeCOD'])->name('order.cod');
+Route::get('/order-proof/{orderId}', [OrderPdfController::class, 'generatePDF'])->name('order.proof');
 
 
 Route::post('/shipping/store', [CheckoutController::class, 'store'])->name('shipping.store');

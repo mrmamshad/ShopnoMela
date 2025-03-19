@@ -37,7 +37,7 @@ export default function MerchantOrdersUpdate() {
                                             </div>
 
                                             <p className="text-sm text-gray-600">
-                                                Order from <strong>{order.product.user.name}</strong>
+                                                Order for <strong>{order.product.user.name}</strong>
                                             </p>
                                             
                                             <p className="text-sm text-gray-600">
