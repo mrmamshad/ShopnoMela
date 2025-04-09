@@ -4,6 +4,8 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { useState } from 'react';
+import { FcGoogle } from "react-icons/fc";
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -100,6 +102,18 @@ export default function Register() {
                         message={errors.password_confirmation}
                         className="mt-2"
                     />
+                </div>
+                <div className="mt-4">
+                                        {/* Google Login Button */}
+                                        <a
+                                            href={route("auth.google")}
+                                            className="flex items-center justify-center w-full sm:w-auto gap-3 bg-green-500 text-white px-6 py-2 rounded-lg font-medium shadow-md hover:bg-red-600 transition-all duration-300 whitespace-nowrap"
+                                        >
+                                            <FcGoogle className="w-5 h-5" />
+                                            <span className="whitespace-nowrap">
+                                                Register  with Google
+                                            </span>
+                                        </a>
                 </div>
 
                 <div className="mt-4 flex items-center justify-end">

@@ -13,7 +13,7 @@ import Footer from "@/Components/Footer";
 import { Card } from "@/Components/ui/card";
 
 export default function Index({ products, query }) {
-    console.log("query", query);
+    console.log("Filtering for type:", query);
     const [sortBy, setSortBy] = useState("price-high-low");
     const [viewMode, setViewMode] = useState("grid");
 
@@ -40,7 +40,8 @@ export default function Index({ products, query }) {
 
             <div className="container mx-auto px-4 py-8">
                 <h2 className="text-2xl font-bold mb-6">
-                    Search Results for "{query}"
+                    {/* Showing Products for Type: "{query}" */}
+                    Offer related Products
                 </h2>
 
                 {/* Sorting & View Mode */}

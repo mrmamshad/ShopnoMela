@@ -33,13 +33,13 @@ const FlashSale = ({ flashSales }) => {
             <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
                 🔥 Flash Sale
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 {flashSales.map((sale) => (
                     <Link
                         key={sale.id}
                         href={route("product.show", { id: sale.product_id })}
                     >
-                        <Card className="overflow-hidden shadow-lg relative">
+                        <Card className="overflow-hidden shadow-lg w-full relative">
                             {/* Discount Badge */}
                             <Badge className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 text-xs rounded-md">
                                 {sale.discount_percentage}% OFF

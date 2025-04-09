@@ -25,6 +25,7 @@ class OfferController extends Controller
             'title' => 'required|string|max:255',
             'image' => 'required|url',
             'discount' => 'required|numeric|min:0|max:100',
+            'types' => 'required|string',
             'valid_until' => 'required|date',
         ]);
 
@@ -32,6 +33,7 @@ class OfferController extends Controller
             'title' => $request->title,
             'image' => $request->image,
             'discount' => $request->discount,
+            'types' => $request->types,
             'valid_until' => $request->valid_until,
         ]);
 

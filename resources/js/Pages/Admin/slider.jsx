@@ -24,6 +24,7 @@ export default function Slider() {
     image: "",
     discount: "",
     valid_until: "",
+    types: "",
   });
 
   const [editData, setEditData] = useState(null);
@@ -71,6 +72,7 @@ export default function Slider() {
               <TableHead>Title</TableHead>
               <TableHead>Image</TableHead>
               <TableHead>Discount</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Valid Until</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -83,6 +85,7 @@ export default function Slider() {
                   <img src={offer.image} alt={offer.title} className="w-16 h-16 object-cover rounded" />
                 </TableCell>
                 <TableCell>{offer.discount}%</TableCell>
+                <TableCell>{offer.types}</TableCell>
                 <TableCell>{offer.valid_until}</TableCell>
                 <TableCell className="flex gap-2">
                   
@@ -198,6 +201,10 @@ export default function Slider() {
               onChange={(e) => setData("discount", e.target.value)}
               required
             />
+          </div>
+            <div>
+            <Label>Product Type</Label>
+            <Input type="text" value={data.types} onChange={(e) => setData("types", e.target.value)} required />
           </div>
           <div>
             <Label>Valid Until</Label>

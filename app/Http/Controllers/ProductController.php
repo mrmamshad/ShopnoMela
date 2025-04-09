@@ -83,4 +83,19 @@ $query = strtolower(trim($request->input('query')));
 
     return response()->json($products);
     }
+     public function filterByType(Request $request)
+    {
+         $type = $request->query('types'); // Get the 'types' query param
+
+        // Fetch products where the 'type' column matches the given type
+           $products = Product::whereRaw('LOWER(title) LIKE ?', ["%{$type}%"])
+            ->orWhereRaw('SOUNDEX(title) = SOUNDEX(?)', [$type]) // Approximate matching
+            ->take(50)
+            ->get();
+
+        return Inertia::render('Productsearch/filter', [
+            'products' => $products,
+            'query' => $type,
+        ]);
+    }
 }

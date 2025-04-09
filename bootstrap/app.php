@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
         $middleware->validateCsrfTokens(except: [
-            '/pay-via-ajax', '/success','/cancel','/fail','/ipn'
+            '/pay-via-ajax', '/success','/cancel','/fail','/ipn' 
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

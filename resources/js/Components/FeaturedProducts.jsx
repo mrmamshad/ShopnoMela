@@ -27,7 +27,7 @@ function FeaturedProducts({ randomProducts }) {
                 <CardTitle className="text-lg">{product.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                {console.log("product.price",product.price)}
+                {/* {console.log("product.price",product.price)} */}
                 <p className="text-gray-600">
   ${parseFloat(product.price).toFixed(2)}
 </p>
