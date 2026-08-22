@@ -1,0 +1,54 @@
+image: alpine:latest # Required fallback by Bitbucket syntax, ignored by self-hosted runner execution
+
+pipelines:
+  branches:
+    # =====================================================
+    # PRODUCTION DEPLOYMENT (main branch)
+    # =====================================================
+    main: 
+      - step:
+          name: Deploy Production - tajimbd.com
+          runs-on: ['self.hosted', 'linux.shell', 'ovh.vps.1']
+          script:
+            - set -e
+            - echo "🚀 DEPLOYING PRODUCTION tajimbd.com"
+
+            # Navigate directly to the production web directory
+            - cd /www/wwwroot/tajimbd.com
+
+            - echo "🔧 Maintenance ON"
+            - php artisan down || true
+
+            - echo "📥 Updating source code"
+            - git fetch --all
+            - git reset --hard origin/main
+            - git clean -fd
+
+            - echo "📦 Installing PHP dependencies"
+            - COMPOSER_HOME=/tmp/composer composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+
+            - echo "🧹 Clearing Laravel caches"
+            - php artisan optimize:clear
+
+            - echo "⚙️ Installing Node dependencies"
+            - export HOME=/tmp/npm_home
+            - "[ -f package-lock.json ] && npm install --prefer-offline || npm ci"
+            
+            - echo "🏗 Building frontend assets"
+            - npm run build
+
+            - echo "🗄 Running database migrations"
+            - php artisan migrate --force
+
+            - echo "⚡ Rebuilding Laravel cache"
+            - php artisan config:cache
+            - php artisan route:cache
+            - php artisan view:cache
+
+            - echo "🔄 Restarting queue workers"
+            - php artisan queue:restart || true
+
+            - echo "🟢 Maintenance OFF"
+            - php artisan up || true
+            - echo "✅ tajimbd.com PRODUCTION DEPLOY COMPLETE"
+
