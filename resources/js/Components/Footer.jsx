@@ -1,5 +1,5 @@
 import React from "react";
-import { Facebook, Twitter, Youtube, Instagram } from "lucide-react";
+import { Facebook, Twitter, Youtube, Instagram, Phone, MapPin } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useForm, usePage } from "@inertiajs/react";
@@ -95,6 +95,31 @@ const Footer = () => {
                                 <a href="#" className="hover:text-black">
                                     Track Your Order
                                 </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Contact Info */}
+                    <div>
+                        <h3 className="text-lg font-semibold mb-3">
+                            Contact Us
+                        </h3>
+                        <ul className="space-y-2 text-gray-600">
+                            <li className="flex items-center gap-2">
+                                <Phone className="w-4 h-4" />
+                                <a
+                                    href="tel:01838891448"
+                                    className="hover:text-black"
+                                >
+                                    01838891448
+                                </a>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <MapPin className="w-4 h-4 mt-1" />
+                                <span>
+                                    মুক্তিনগর, সানারপাড়, সিদ্ধিরগঞ্জ,
+                                    নারায়ণগঞ্জ
+                                </span>
                             </li>
                         </ul>
                     </div>
@@ -228,7 +253,7 @@ const Footer = () => {
 
                 {/* Copyright */}
                 <div className="text-center text-gray-600 border-t border-gray-200 pt-6">
-                    <p>&copy; 2025 ShopnoMela. All rights reserved.</p>
+                    <p>&copy; 2025 Tajim Foods Products. All rights reserved.</p>
                 </div>
             </div>
 

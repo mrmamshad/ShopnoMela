@@ -24,16 +24,16 @@ function Header() {
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 shrink-0">
                     <img
-                        src="/logo/logo.webp"
-                        alt="ShopnoMela"
-                        className="w-11 h-11 rounded-full object-cover"
+                        src="/logo/logo.png"
+                        alt="Tajim Foods Products"
+                        className="h-11 w-auto object-contain"
                     />
                     <div className="flex flex-col leading-tight">
-                        <h1 className="text-2xl font-extrabold tracking-tight">
-                            স্বপ্ন<span className="text-yellow-300">মেলা</span>
+                        <h1 className="text-lg sm:text-xl font-extrabold tracking-tight">
+                            Tajim <span className="text-yellow-300">Foods</span> Products
                         </h1>
                         <span className="text-[11px] text-green-100 hidden sm:block">
-                            যেখানে স্বপ্নের বাজার
+                            মুক্তিনগর, সিদ্ধিরগঞ্জ, নারায়ণগঞ্জ
                         </span>
                     </div>
                 </Link>

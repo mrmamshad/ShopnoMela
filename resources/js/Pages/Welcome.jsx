@@ -43,11 +43,11 @@ export default function Welcome({
     return (
         <div className="min-h-screen bg-gray-100">
             <Head>
-                <title>স্বপ্নমেলা - যেখানে স্বপ্নের বাজার</title>
+                <title>Tajim Foods Products</title>
                 <meta
                     head-key="description"
                     name="description"
-                    content="স্বপ্নমেলা - বাংলাদেশের বিশ্বস্ত অনলাইন শপিং প্ল্যাটফর্ম। মোবাইল, ল্যাপটপ, ইলেকট্রনিক্স, ফ্যাশন সহ সব পণ্য সেরা দামে।"
+                    content="Tajim Foods Products - মুক্তিনগর, সানারপাড়, সিদ্ধিরগঞ্জ, নারায়ণগঞ্জ। যোগাযোগ: 01838891448"
                 />
                 <link rel="preconnect" href="https://picsum.photos" />
                 <link rel="preconnect" href="https://img.lazcdn.com" />

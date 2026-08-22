@@ -1,6 +1,6 @@
 import Footer from "@/Components/Footer"
 import Header from "@/Components/Header"
-import { Package, RefreshCw, XCircle, Search, MessageCircle } from "lucide-react"
+import { Package, RefreshCw, XCircle, Search, MessageCircle, Phone, MapPin } from "lucide-react"
 
 const ContactPage = () => {
   const helpCards = [
@@ -76,12 +76,23 @@ const ContactPage = () => {
             <div>
               <h3 className="text-xl mb-4">Can't find the answer you are looking for?</h3>
               <p className="text-gray-600 mb-6">
-                <span className="font-medium">Daz</span>, your friendly automated chat assistant is here to assist you{" "}
+                <span className="font-medium">Tajim Foods Products</span> is here to assist you{" "}
                 <span className="text-green-500">24 hours</span> a day!
               </p>
-              <p className="text-gray-600 mb-6">
-                Live Chat Service is available from <span className="text-green-500">9:00 AM to 6:00 PM</span>
-              </p>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center gap-3 text-gray-700">
+                  <Phone className="w-5 h-5 text-green-600" />
+                  <a href="tel:01838891448" className="hover:text-green-600">
+                    01838891448
+                  </a>
+                </div>
+                <div className="flex items-start gap-3 text-gray-700">
+                  <MapPin className="w-5 h-5 text-green-600 mt-0.5" />
+                  <span>
+                    মুক্তিনগর, সানারপাড়, সিদ্ধিরগঞ্জ, নারায়ণগঞ্জ
+                  </span>
+                </div>
+              </div>
               <button className="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 flex items-center">
                 <MessageCircle className="w-5 h-5 mr-2" />
                 Chat With Us
