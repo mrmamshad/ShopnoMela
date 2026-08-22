@@ -64,8 +64,7 @@ Route::post('/reviews', [ProductReviewController::class, 'store'])
     ->middleware('auth');
 
 Route::get('/cart', [CategoryController::class, 'cart'])
-    ->name('cart')
-    ->middleware('auth');
+    ->name('cart');
 Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.store');
 
 Route::get('/wishlist', [CategoryController::class, 'wishlist'])->name('wishlist');
@@ -74,8 +73,11 @@ Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('w
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 
-Route::get('/orders', [OrderController::class, 'index'])->name('orders');
-Route::post('/order/cod', [OrderController::class, 'storeCOD'])->name('order.cod');
+Route::get('/orders', [OrderController::class, 'index'])
+    ->middleware('auth')
+    ->name('orders');
+Route::post('/order/cod', [OrderController::class, 'storeCOD'])
+    ->name('order.cod');
 Route::get('/order-proof/{orderId}', [OrderPdfController::class, 'generatePDF'])->name('order.proof');
 
 
@@ -99,6 +101,11 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
     Route::post('/admin/offers', [OfferController::class, 'store'])->name('offers.store');
     Route::put('admin/offers/{offer}', [OfferController::class, 'update'])->name('offers.update');
     Route::delete('admin/offers/{offer}', [OfferController::class, 'destroy'])->name('offers.destroy');
+
+    // category manage routes (admin)
+    Route::get('/admin/categories', [AdminController::class, 'categories'])->name('admin.categories');
+    Route::post('/admin/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
+    Route::delete('/admin/categories/{category}', [AdminController::class, 'destroyCategory'])->name('admin.categories.destroy');
 
     // flash sale manage routes
 
@@ -137,8 +144,12 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,
     Route::get('/marchant/products', [MerchantProductController::class, 'index'])->name('merchant.products.index');
     Route::get('/marchant/product/create', [MerchantProductController::class, 'create'])->name('merchant.products.create');
     Route::post('/marchant/product/store', [MerchantProductController::class, 'store'])->name('merchant.products.store');
+    Route::post('/marchant/brands', [MerchantProductController::class, 'storeBrand'])->name('merchant.brands.store');
+    Route::get('/marchant/brands', [MerchantProductController::class, 'brands'])->name('merchant.brands.index');
+    Route::delete('/marchant/brands/{id}', [MerchantProductController::class, 'deleteBrand'])->name('merchant.brands.destroy');
     Route::get('/marchant/orders', [MerchantProductController::class, 'orders'])->name('merchant.orders');
     Route::post('/merchant/orders/confirm/{id}', [MerchantOrderController::class, 'confirmOrder'])->name('merchant.orders.confirm');
+    Route::post('/merchant/orders/delivered/{id}', [MerchantOrderController::class, 'markAsDelivered'])->name('merchant.orders.delivered');
     Route::delete('/merchant/orders/delete/{id}', [MerchantOrderController::class, 'deleteOrder'])->name('merchant.orders.delete');
     Route::delete('/merchant/products/{id}', [MerchantProductController::class, 'destroy'])->name('merchant.products.destroy');
 });
@@ -150,9 +161,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth'])->group(function () {});
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
-});
+Route::middleware(['auth'])->group(function () {});
 
 // Route::get('/offers', [OfferController::class, 'index'])->name('offers');
 

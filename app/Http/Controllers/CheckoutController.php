@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Product;
+use App\Models\ProductCart; // Import ProductCart model
 use App\Models\CustomerProfile; // Import CustomerProfile model
 use Illuminate\Support\Facades\Auth;
 
@@ -12,58 +13,50 @@ class CheckoutController extends Controller
 {
     public function index(Request $request)
     {
-        // dd($request->all());
-        $user = Auth::user(); // Get the logged-in user
+        $user = Auth::user();
 
-        // Fetch customer's shipping details
-        $customerProfile = CustomerProfile::where('user_id', $user->id)->first();
+        // Load the whole cart (all items with their products) — user or guest session
+        $query = ProductCart::with('product');
+        if ($user) {
+            $query->where('user_id', $user->id);
+        } else {
+            $query->where('session_id', session()->getId());
+        }
+        $cartItems = $query->get();
 
-        // Retrieve product details
-        $product = Product::findOrFail($request->query('product_id'));
-        // dd($product);
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart')->with('error', 'Your cart is empty. Please add products first.');
+        }
 
-        // If no address is found, use default values
+        $customerProfile = $user ? CustomerProfile::where('user_id', $user->id)->first() : null;
+
         $shippingDetails = $customerProfile ? [
             'name' => $customerProfile->cus_name,
             'phone' => $customerProfile->cus_phone,
-            'address' => $customerProfile->ship_add, 
+            'address' => $customerProfile->ship_add,
             'city' => $customerProfile->ship_city,
             'state' => $customerProfile->ship_state,
         ] : [
-            'name' => $user->name,
-            'phone' => 'Not provided',
+            'name' => $user?->name ?? '',
+            'phone' => $user?->phone ?? 'Not provided',
             'address' => 'No address available',
+            'city' => null,
+            'state' => null,
         ];
-          
-        //  dd($shippingDetails);
-        // Shipping Cost (Flat Rate)
-$shippingFee = 150;
 
-// Get quantity and product price from request
-$quantity = $request->query('quantity', 1);
-$productPrice = $request->query('price', $product->price);
-$discount = $product->discount;
+        $shippingFee = 150;
 
-// Apply discount only if it's greater than 0
-if ($discount > 0) {
-    $discountedPrice = $productPrice - ($productPrice * ($discount / 100));
-} else {
-    $discountedPrice = $productPrice;
-}
+        $subtotal = $cartItems->sum(function ($item) {
+            return $item->price * $item->qty;
+        });
 
-// Calculate total amount
-$totalAmount = ($discountedPrice * $quantity) + $shippingFee;
-
+        $totalAmount = $subtotal + $shippingFee;
 
         return Inertia::render('Checkout/Index', [
-            'product' => $product,
-            'selectedColor' => $request->query('color'),
-            'selectedSize' => $request->query('size'),
-            'quantity' => $quantity,
-            'price' => $productPrice,
-            'discount' => $discount,
+            'cartItems' => $cartItems,
             'shippingDetails' => $shippingDetails,
             'shippingFee' => $shippingFee,
+            'subtotal' => $subtotal,
             'totalAmount' => $totalAmount,
         ]);
     }

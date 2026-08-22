@@ -1,15 +1,24 @@
 import { Head } from "@inertiajs/react";
-import { motion } from "framer-motion";
-import CategoryMenu from "@/Components/CategoryMenu";
-import FeaturedProducts from "@/Components/FeaturedProducts";
-import Footer from "@/Components/Footer";
-import Header from "@/Components/Header";
-import OfferSlider from "@/Components/OfferSlider";
-import FlashSale from "@/Components/FlashSale";
-import ActionSearchBar from "@/Components/ActionSearchBar";
+import { Suspense, lazy, useEffect } from "react";
 import { usePage } from "@inertiajs/react";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+import Header from "@/Components/Header";
+import Footer from "@/Components/Footer";
+import ActionSearchBar from "@/Components/ActionSearchBar";
+
+// Below-the-fold sections are loaded lazily so the home page
+// paints the hero area first and only fetches the rest on demand.
+const OfferSlider = lazy(() => import("@/Components/OfferSlider"));
+const FlashSale = lazy(() => import("@/Components/FlashSale"));
+const CategoryMenu = lazy(() => import("@/Components/CategoryMenu"));
+const LatestProducts = lazy(() => import("@/Components/LatestProducts"));
+const FeaturedProducts = lazy(() => import("@/Components/FeaturedProducts"));
+
+function SectionLoader() {
+    return (
+        <div className="w-full animate-pulse rounded-xl bg-gray-200 h-64 mt-2" />
+    );
+}
 
 export default function Welcome({
     user,
@@ -17,6 +26,7 @@ export default function Welcome({
     offers,
     flashSales,
     randomProducts,
+    latestProducts,
 }) {
     const { flash } = usePage().props;
     const { toast } = useToast();
@@ -33,26 +43,38 @@ export default function Welcome({
     return (
         <div className="min-h-screen bg-gray-100">
             <Head>
-                <title>Home</title>
+                <title>স্বপ্নমেলা - যেখানে স্বপ্নের বাজার</title>
+                <meta
+                    head-key="description"
+                    name="description"
+                    content="স্বপ্নমেলা - বাংলাদেশের বিশ্বস্ত অনলাইন শপিং প্ল্যাটফর্ম। মোবাইল, ল্যাপটপ, ইলেকট্রনিক্স, ফ্যাশন সহ সব পণ্য সেরা দামে।"
+                />
+                <link rel="preconnect" href="https://picsum.photos" />
+                <link rel="preconnect" href="https://img.lazcdn.com" />
             </Head>
             <Header user={user} />
-            <main className="container mx-auto px-4 py-8">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <ActionSearchBar />
-                    <div className="w-full mt-2">
-                        <OfferSlider offers={offers} />
-                    </div>
-                    <div className="w-full">
-                        <FlashSale flashSales={flashSales} />
-                    </div>
+            <main className="container mx-auto px-4 py-6">
+                <ActionSearchBar />
 
+                <div className="w-full mt-2">
+                    <OfferSlider offers={offers} />
+                </div>
+
+                <Suspense fallback={<SectionLoader />}>
+                    <FlashSale flashSales={flashSales} />
+                </Suspense>
+
+                <Suspense fallback={<SectionLoader />}>
                     <CategoryMenu category={category} />
+                </Suspense>
+
+                <Suspense fallback={<SectionLoader />}>
+                    <LatestProducts latestProducts={latestProducts} />
+                </Suspense>
+
+                <Suspense fallback={<SectionLoader />}>
                     <FeaturedProducts randomProducts={randomProducts} />
-                </motion.div>
+                </Suspense>
             </main>
             <Footer />
         </div>

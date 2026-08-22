@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Models\Category;
@@ -14,20 +13,24 @@ use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
-    
     public function index()
     {
         $offers = Offer::where('valid_until', '>=', now())
-        ->orderBy('created_at', 'desc') // Sort by newest first
-        ->get();
-    
-        $flashSales = FlashSale::with('product')->latest()->get();
-        // dd($flashSales);
-        //    dd($offers);
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        $flashSales = FlashSale::with('product')
+            ->where('end_time', '>', now())
+            ->latest()
+            ->limit(6)
+            ->get();
+
+        $latestProducts = Product::latest()->limit(8)->get();
+
         $userId = auth()->id();
 
         if ($userId) {
-
             $excludedProductIds = DB::table('product_wishes')
                 ->where('user_id', $userId)
                 ->pluck('product_id')
@@ -38,16 +41,16 @@ class HomeController extends Controller
 
             $randomProducts = Product::whereNotIn('id', $excludedProductIds)
                 ->inRandomOrder()
-                ->limit(10)
+                ->limit(12)
                 ->get();
         } else {
-
             $randomCategories = Category::inRandomOrder()->limit(3)->pluck('id');
             $randomProducts = Product::whereIn('category_id', $randomCategories)
                 ->inRandomOrder()
-                ->limit(10)
+                ->limit(12)
                 ->get();
         }
+
         return Inertia::render('Welcome', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
@@ -57,7 +60,8 @@ class HomeController extends Controller
             'category' => Category::all(),
             'offers' => $offers,
             'flashSales' => $flashSales,
-            'randomProducts' => $randomProducts
+            'randomProducts' => $randomProducts,
+            'latestProducts' => $latestProducts,
         ]);
     }
 }

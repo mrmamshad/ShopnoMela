@@ -15,6 +15,7 @@ export default {
     	extend: {
     		fontFamily: {
     			sans: [
+    				'Noto Sans Bengali',
     				'Figtree',
                     ...defaultTheme.fontFamily.sans
                 ]

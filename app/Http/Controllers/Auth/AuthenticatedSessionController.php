@@ -31,11 +31,8 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
-    
-        // Retrieve last visited page, fallback to dashboard
-        $redirectUrl = session('last_visited_url');
-    
-        return redirect()->intended($redirectUrl);
+
+        return redirect()->intended(Auth::user()->homeRoute());
     }
     
     /**

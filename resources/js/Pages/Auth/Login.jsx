@@ -16,8 +16,6 @@ export default function Login({ status, canResetPassword }) {
 
     const submit = (e) => {
         e.preventDefault();
-         // Store the last visited URL in localStorage
-        localStorage.setItem("last_visited_url", window.location.pathname);
 
         post(route("login"), {
             onFinish: () => reset("password"),
@@ -36,12 +34,13 @@ export default function Login({ status, canResetPassword }) {
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value="Email or Phone" />
 
                     <TextInput
                         id="email"
-                        type="email"
+                        type="text"
                         name="email"
+                        placeholder="you@example.com or 01XXXXXXXXX"
                         value={data.email}
                         className="mt-1 block w-full"
                         autoComplete="username"

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\ProductCart;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -40,6 +41,9 @@ class HandleInertiaRequests extends Middleware
                     'roles' => $request->user()->roles->pluck('name'), // Get only role names
                 ] : null,
             ],
+            'cartCount' => $request->user()
+                ? ProductCart::where('user_id', $request->user()->id)->count()
+                : ProductCart::where('session_id', session()->getId())->count(),
             'flash' => function () {
             return [
                 'notification' => session('notification'),

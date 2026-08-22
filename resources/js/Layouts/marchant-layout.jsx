@@ -18,6 +18,7 @@ import { MdStorefront } from "react-icons/md";
 import { RiProductHuntFill } from "react-icons/ri";
 import { MdReport } from "react-icons/md";
 import { MdOutlineRateReview } from "react-icons/md";
+import { MdBrandingWatermark } from "react-icons/md";
 import { Link } from "@inertiajs/react";
 
 export default function MarchantDashboardLayout({ children, marchantuser }) {
@@ -38,6 +39,7 @@ export default function MarchantDashboardLayout({ children, marchantuser }) {
             ],
         },
         { name: "Orders", href: route("merchant.orders"), icon: ShoppingCart, current: false },
+        { name: "Brands", href: route("merchant.brands.index"), icon: MdBrandingWatermark, current: false },
         { name: "Reports", href: "#", icon: MdReport, current: false },
         { name: "Reviews", href: "#", icon: MdOutlineRateReview, current: false },
         { name: "Help", href: "#", icon: HelpCircle, current: false },

@@ -12,6 +12,7 @@ import {
     ChevronDown,
     ChevronUp,
     Home,
+    FolderTree,
     AlertTriangle, // Dangerous icon
     Info, // Details icon
 } from "lucide-react";
@@ -58,6 +59,12 @@ export default function AdminDashboardLayout({ children }) {
             current: false,
         },
         { name: "Users", href: route("userlist"), icon: Users, current: false },
+        {
+            name: "Categories",
+            href: route("admin.categories"),
+            icon: FolderTree,
+            current: false,
+        },
         {
             name: "Merchant Applications",
             href: route("merchant.applications.index"),

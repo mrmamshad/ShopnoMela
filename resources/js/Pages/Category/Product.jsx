@@ -55,8 +55,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 // import { ToastAction } from "@/components/ui/toast"
 import { router } from "@inertiajs/react";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Info } from "lucide-react";
+import { imageSrc, imageFallback, formatCurrency } from "@/lib/utils";
 
 const ProductDetails = ({
     productdetails,
@@ -73,22 +72,14 @@ const ProductDetails = ({
 
     const { auth } = usePage().props;
 
-    // console.log("auth", auth);
-
-    // Extract images into an array
-    const productImages = [
-        `${productdetails.img1}`,
-        `${productdetails.img2}`,
-        `${productdetails.img3}`,
-        `${productdetails.img4}`,
-    ].filter(Boolean); // Remove any undefined/null values
-
+    // Extract available images (skip null / empty values)
     const images = [
         productdetails.img1,
         productdetails.img2,
         productdetails.img3,
         productdetails.img4,
-    ];
+    ].filter(Boolean);
+
     const [currentIndex, setCurrentIndex] = useState(0);
 
     // Previous Image
@@ -230,71 +221,61 @@ const ProductDetails = ({
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
-<Alert className="max-w-7xl sm:mx-auto bg-orange-100 border-l-4 border-orange-500 text-orange-900 p-4 rounded-lg">
-    <div className="flex items-center space-x-2">
-        <Info className="h-5 w-5 text-orange-600" />
-        <AlertTitle className="text-lg font-semibold">
-            গুরুত্বপূর্ণ নির্দেশনা
-        </AlertTitle>
-    </div>
-    <AlertDescription className="mt-2 text-sm">
-        <span className="font-medium">1. প্রথমে লগইন করুন।</span> <br />
-         2. লগইন ছাড়া আপনি <span className="font-medium">প্রোডাক্ট ক্রয়</span>,  
-        <span className="font-medium"> উইশলিস্টে যোগ</span> অথবা  
-        <span className="font-medium"> কার্টে সংযুক্ত</span> করতে পারবেন না। <br />
-        3. প্রোডাক্ট উইশলিস্টে যোগ করতে চাইলে প্রথমে{" "}
-        <span className="font-medium">"Add to Cart"</span> করুন। 
-       
-    </AlertDescription>
-</Alert>
-
 
             <main className="max-w-5xl mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Product Images */}
                     <div className="space-y-4">
                         {/* Main Image Viewer */}
-                        <div className="relative flex justify-center items-center">
-                            <button
-                                onClick={prevImage}
-                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
-                            >
-                                <ArrowLeft className="h-5 w-5" />
-                            </button>
+                        <div className="relative flex justify-center items-center bg-white rounded-xl shadow-sm">
+                            {images.length > 1 && (
+                                <button
+                                    onClick={prevImage}
+                                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow hover:bg-white z-10"
+                                >
+                                    <ArrowLeft className="h-5 w-5" />
+                                </button>
+                            )}
 
                             <img
-                                src={`/${images[currentIndex]}`}
+                                src={imageSrc(images[currentIndex]) || "/placeholder.jpg"}
                                 alt="Product"
-                                className="w-64 h-64 object-cover rounded shadow-lg transition-all duration-300"
+                                className="w-full h-[320px] sm:h-[450px] object-contain rounded-lg p-4 transition-all duration-300"
+                                onError={imageFallback}
                             />
 
-                            <button
-                                onClick={nextImage}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow"
-                            >
-                                <ArrowRight className="h-5 w-5" />
-                            </button>
+                            {images.length > 1 && (
+                                <button
+                                    onClick={nextImage}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow hover:bg-white z-10"
+                                >
+                                    <ArrowRight className="h-5 w-5" />
+                                </button>
+                            )}
                         </div>
 
-                        <div className="flex space-x-2 overflow-x-auto mt-4 p-2">
-                            {images.map((img, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setCurrentIndex(index)} // Fix: Use setCurrentIndex instead of setCurrentImage
-                                    className={`flex-shrink-0 border-2 rounded-lg transition-all duration-300 ${
-                                        currentIndex === index
-                                            ? "ring-2 ring-orange-500"
-                                            : ""
-                                    }`}
-                                >
-                                    <img
-                                        src={`/${img}`}
-                                        alt={`Product ${index + 1}`}
-                                        className="w-20 h-20 object-cover rounded"
-                                    />
-                                </button>
-                            ))}
-                        </div>
+                        {images.length > 1 && (
+                            <div className="flex space-x-2 overflow-x-auto mt-4 p-2">
+                                {images.map((img, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setCurrentIndex(index)}
+                                        className={`flex-shrink-0 border-2 rounded-lg transition-all duration-300 ${
+                                            currentIndex === index
+                                                ? "ring-2 ring-orange-500"
+                                                : ""
+                                        }`}
+                                    >
+                                        <img
+                                            src={imageSrc(img)}
+                                            alt={`Product ${index + 1}`}
+                                            className="w-24 h-24 object-cover rounded"
+                                            onError={imageFallback}
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Product Info */}
@@ -465,17 +446,15 @@ const ProductDetails = ({
                         <div className="flex space-x-4">
                             <button
                                 onClick={() => {
-                                    router.get("/checkout", {
-                                        product_id: singleproduct.id, // Product ID
-                                        quantity: cartForm.data.qty, // Quantity from cartForm
-                                        size: selectedSize, // Selected size
-                                        color: selectedColor, // Selected color
-                                        price: singleproduct.price, // Product price
+                                    cartForm.post(route("cart.store"), {
+                                        onSuccess: () => {
+                                            window.location.href = route("payment");
+                                        },
                                     });
                                 }}
                                 className="flex-1 text-center bg-green-500 text-white py-3 rounded-md hover:bg-green-600"
                             >
-                                Buy Now
+                                {cartForm.processing ? "Adding..." : "Buy Now"}
                             </button>
                             <button
                                 onClick={addToCart}
@@ -521,7 +500,6 @@ const ProductDetails = ({
                             className="flex gap-2 sm:gap-4"
                         >
                             <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
-                                <AvatarImage src="/placeholder.svg" />
                                 <AvatarFallback>UN</AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
@@ -606,10 +584,9 @@ const ProductDetails = ({
                                                         comment.image.avatar
                                                             ? comment.image
                                                                   .avatar
-                                                            : `/placeholder.svg`
+                                                            : undefined
                                                     }
                                                 />
-
                                                 <AvatarFallback>
                                                     {comment.user.name
                                                         .split(" ")
@@ -636,12 +613,12 @@ const ProductDetails = ({
                                         </p>
 
                                         {/* Display Uploaded Image (if exists) */}
-                                        {/* {console.log(comment.image)} */}
                                         {comment.image && (
                                             <img
-                                                src={`/${comment.image}`}
+                                                src={imageSrc(comment.image)}
                                                 alt="Review"
                                                 className="w-32 h-32 object-cover rounded-lg mb-2"
+                                                onError={imageFallback}
                                             />
                                         )}
 
@@ -681,47 +658,47 @@ const ProductDetails = ({
                 <h2 className="text-2xl font-bold mb-6">Related Products</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  gap-4">
                     {relatedproducts.map((product) => (
-                        <Card key={product.id} className="flex flex-col">
-                            {console.log(product.id)}
-                            <CardHeader className="p-0">
-                                <img
-                                    src={product.image || "/placeholder.svg"}
-                                    alt={product.name}
-                                    className="w-full h-[200px] object-cover rounded-t-lg"
-                                />
-                            </CardHeader>
-                            <CardContent className="p-4 flex-grow">
-                                <CardTitle className="text-sm font-medium line-clamp-1">
-                                    {product.name}
-                                </CardTitle>
-                                <p className="text-sm text-gray-600 mt-1">
-                                    ${parseFloat(product.price).toFixed(2)}
-                                </p>
-                            </CardContent>
-                            <CardFooter className="p-4 pt-0 flex flex-col gap-2">
-                                <Button
-                                    onClick={() => addToCart(product)}
-                                    className="w-full"
-                                    size="sm"
-                                >
-                                    <ShoppingCart className="mr-2 h-4 w-4" />{" "}
-                                    Add to Cart
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    className="w-full"
-                                    size="sm"
-                                >
-                                    <Eye className="mr-2 h-4 w-4" />
-                                    <Link
-                                        href={route("product.show", product.id)}
+                        <div
+                            key={product.id}
+                            onClick={() => router.visit(route("product.show", product.id))}
+                            className="cursor-pointer"
+                        >
+                            <Card className="flex flex-col h-full">
+                                <CardHeader className="p-0">
+                                    <img
+                                        src={imageSrc(product.image) || "/product_images/demo/cat-1.png"}
+                                        alt={product.title}
+                                        className="w-full h-[200px] object-cover rounded-t-lg"
+                                        onError={imageFallback}
+                                    />
+                                </CardHeader>
+                                <CardContent className="p-4 flex-grow">
+                                    <CardTitle className="text-sm font-medium line-clamp-1">
+                                        {product.title}
+                                    </CardTitle>
+                                    <p className="text-sm text-gray-600 mt-1">
+                                        {formatCurrency(product.price)}
+                                    </p>
+                                </CardContent>
+                                <CardFooter className="p-4 pt-0">
+                                    <Button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            router.get("/checkout", {
+                                                product_id: product.id,
+                                                quantity: 1,
+                                                price: product.price,
+                                            });
+                                        }}
+                                        className="w-full"
+                                        size="sm"
                                     >
-                                        {" "}
-                                        View Details
-                                    </Link>
-                                </Button>
-                            </CardFooter>
-                        </Card>
+                                        <ShoppingCart className="mr-2 h-4 w-4" />
+                                        Add to Cart
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        </div>
                     ))}
                 </div>
             </section>

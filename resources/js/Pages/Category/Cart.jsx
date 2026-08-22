@@ -254,13 +254,7 @@ return (
 
                     <button className="w-full bg-black text-white rounded-lg py-3 mt-6 hover:bg-gray-800" onClick={()=>
                         {
-                        router.get("/checkout", {
-                        product_id: selectedProduct?.product?.id, // ✅ Corrected
-                        quantity: selectedProduct?.qty, // ✅ Get quantity
-                        size: selectedProduct?.size, // ✅ Get size
-                        color: selectedProduct?.color, // ✅ Get color
-                        price: total, // ✅ Get price
-                        });
+                        router.get("/checkout");
                         }}>
                         Proceed to Checkout
                     </button>

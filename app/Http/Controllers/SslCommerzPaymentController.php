@@ -8,6 +8,10 @@ use App\Library\SslCommerz\SslCommerzNotification;
 use Inertia\Inertia;
 use App\Models\PaymentHistory;
 use App\Models\Order;
+use App\Models\ProductCart;
+use App\Models\User;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 
 class SslCommerzPaymentController extends Controller
@@ -25,10 +29,49 @@ class SslCommerzPaymentController extends Controller
 
     public function exampleHostedCheckout(Request $request)
     {
-        // dd($request->all());
-       $paymentData = session('payment_data', []); // Retrieve data from session
-        return view('exampleHosted', compact('paymentData'));
-        // return Inertia::render('sslcommerz/PaymentInit');
+        $paymentData = session('payment_data', []);
+        $cartItems = $this->cartItems();
+        $customerProfile = \App\Models\CustomerProfile::where('user_id', auth()->id())->first();
+
+        return view('exampleHosted', compact('paymentData', 'cartItems', 'customerProfile'));
+    }
+
+    // Load cart for logged-in user or guest session
+    protected function cartItems()
+    {
+        $query = ProductCart::with('product');
+        if (auth()->check()) {
+            $query->where('user_id', auth()->id());
+        } else {
+            $query->where('session_id', session()->getId());
+        }
+        return $query->get();
+    }
+
+    // Find existing user by email, otherwise create one with the checkout details
+    protected function findOrCreateUser($email, $name, $phone = null, $password = null)
+    {
+        $email = $email ?: 'guest@shopnomela.com';
+        $phone = $phone ? preg_replace('/\D+/', '', $phone) : null;
+
+        $user = User::firstOrCreate(
+            ['email' => $email],
+            [
+                'name' => $name ?: 'ShopnoMela User',
+                'phone' => $phone,
+                'password' => Hash::make($password ?: Str::random(16)),
+            ]
+        );
+
+        if ($user->phone !== $phone) {
+            $user->update(['phone' => $phone]);
+        }
+
+        if (!$user->hasAnyRole(['customer', 'merchant', 'admin'])) {
+            $user->assignRole('customer');
+        }
+
+        return $user;
     }
 
 
@@ -38,55 +81,45 @@ class SslCommerzPaymentController extends Controller
         # Let's say, your oder transaction informations are saving in a table called "orders"
         # In "orders" table, order unique identity is "transaction_id". "status" field contain status of the transaction, "amount" is the order amount to be paid and "currency" is for storing Site Currency which will be checked with paid currency.
 
-           # Retrieve form data
+        $user = auth()->user();
 
-        //    dd($request->all());
-           $product_id = $request->input('product_id');
-        //    dd($product_id);
-           $product_name = $request->input('product_name');  
-        //    dd($product_name);
-           $product_quantity = $request->input('quantity');
-           $product_color = $request->input('color');
-           $product_size = $request->input('size');
-        //    dd([
-        //        'product_id' => $product_id,
-        //        'product_name' => $product_name,
-        //        'product_quantity' => $product_quantity,
-        //        'product_color' => $product_color,
-        //        'product_size' => $product_size
-        //    ]);
-  
-    $post_data = array();
-    $post_data['total_amount'] = $request->input('amount'); // Get amount from form
-    $post_data['currency'] = "BDT";
-    $post_data['tran_id'] = uniqid(); // Unique transaction ID
+        $cartItems = $this->cartItems();
 
-    # CUSTOMER INFORMATION
-    $post_data['cus_name'] = $request->input('customer_name');
-    $post_data['cus_email'] = $request->input('customer_email');
-    $post_data['cus_add1'] = $request->input('customer_address');
-    $post_data['cus_add2'] = $request->input('address2') ?? "";
-    $post_data['cus_city'] = "";
-    $post_data['cus_state'] = "";
-    $post_data['cus_postcode'] = $request->input('zip') ?? "";
-    $post_data['cus_country'] = "Bangladesh";
-    $post_data['cus_phone'] = "+88" . $request->input('customer_mobile');
-    $post_data['cus_fax'] = "";
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart')->with('error', 'Your cart is empty. Please add products first.');
+        }
 
-    # SHIPMENT INFORMATION (You can modify this if you have separate shipping details)
-    $post_data['ship_name'] = $request->input('customer_name');
-    $post_data['ship_add1'] = $request->input('customer_address');
-    $post_data['ship_add2'] = $request->input('address2') ?? "";
-    $post_data['ship_city'] = "";
-    $post_data['ship_state'] = "";
-    $post_data['ship_postcode'] = $request->input('zip') ?? "";
-    $post_data['ship_phone'] = "";
-    $post_data['ship_country'] = "Bangladesh";
+        $post_data = array();
+        $post_data['total_amount'] = $request->input('amount'); // Get amount from form
+        $post_data['currency'] = "BDT";
+        $post_data['tran_id'] = uniqid(); // Unique transaction ID
 
-    $post_data['shipping_method'] = "NO";
-    $post_data['product_name'] = "Product Purchase";
-    $post_data['product_category'] = "Goods";
-    $post_data['product_profile'] = "physical-goods";
+        # CUSTOMER INFORMATION
+        $post_data['cus_name'] = $request->input('customer_name') ?? $user->name;
+        $post_data['cus_email'] = $request->input('customer_email') ?? $user->email;
+        $post_data['cus_add1'] = $request->input('customer_address') ?? "N/A";
+        $post_data['cus_add2'] = $request->input('address2') ?? "";
+        $post_data['cus_city'] = "";
+        $post_data['cus_state'] = "";
+        $post_data['cus_postcode'] = $request->input('zip') ?? "";
+        $post_data['cus_country'] = "Bangladesh";
+        $post_data['cus_phone'] = "+88" . ltrim($request->input('customer_mobile'), "+");
+        $post_data['cus_fax'] = "";
+
+        # SHIPMENT INFORMATION (You can modify this if you have separate shipping details)
+        $post_data['ship_name'] = $post_data['cus_name'];
+        $post_data['ship_add1'] = $post_data['cus_add1'];
+        $post_data['ship_add2'] = $post_data['cus_add2'];
+        $post_data['ship_city'] = "";
+        $post_data['ship_state'] = "";
+        $post_data['ship_postcode'] = $post_data['cus_postcode'];
+        $post_data['ship_phone'] = $post_data['cus_phone'];
+        $post_data['ship_country'] = "Bangladesh";
+
+        $post_data['shipping_method'] = "NO";
+        $post_data['product_name'] = "Product Purchase";
+        $post_data['product_category'] = "Goods";
+        $post_data['product_profile'] = "physical-goods";
 
         # OPTIONAL PARAMETERS
         $post_data['value_a'] = "ref001";
@@ -94,37 +127,75 @@ class SslCommerzPaymentController extends Controller
         $post_data['value_c'] = "ref003";
         $post_data['value_d'] = "ref004";
 
-        #Before  going to initiate the payment order status need to insert or update as Pending.
-        $update_product = DB::table('orders')
-            ->where('transaction_id', $post_data['tran_id'])
-            ->updateOrInsert([
-                'name' => $post_data['cus_name'],
-                'user_id' => auth()->user()->id,
-                'email' => $post_data['cus_email'],
-                'phone' => $post_data['cus_phone'],
-                'amount' => $post_data['total_amount'],
+        # Auto-create the user from the checkout details if they are not logged in
+        $userId = $user?->id;
+        if (!$userId) {
+            $newUser = $this->findOrCreateUser(
+                $post_data['cus_email'],
+                $post_data['cus_name'],
+                $request->input('customer_mobile'),
+                $request->input('customer_password') // optional password set by the user
+            );
+            $userId = $newUser->id;
+            \Illuminate\Support\Facades\Auth::login($newUser);
+        }
+
+        # Create one order per cart item (all share the same transaction id),
+        # then clear the cart before redirecting to the gateway.
+        foreach ($cartItems as $item) {
+            Order::create([
+                'user_id' => $userId,
+                'product_id' => $item->product_id,
+                'product_name' => $item->product->title,
+                'product_quantity' => $item->qty,
+                'product_color' => $item->color,
+                'product_size' => $item->size,
+                'amount' => $item->price * $item->qty,
+                'payment_method' => 'Online Payment',
                 'status' => 'Pending',
+                'name' => $post_data['cus_name'],
+                'phone' => $post_data['cus_phone'],
                 'address' => $post_data['cus_add1'],
                 'transaction_id' => $post_data['tran_id'],
                 'currency' => $post_data['currency'],
-                'product_id' => $product_id,
-                'product_name' => $product_name,
-                'product_quantity' => $product_quantity,
-                'product_color' => $product_color,
-                'product_size' => $product_size,
-                'created_at' => now(),
-                'updated_at' => now()
+                'email' => $post_data['cus_email'],
             ]);
-
-        $sslc = new SslCommerzNotification();
-        # initiate(Transaction Data , false: Redirect to SSLCOMMERZ gateway/ true: Show all the Payement gateway here )
-        $payment_options = $sslc->makePayment($post_data, 'hosted');
-
-        if (!is_array($payment_options)) {
-            print_r($payment_options);
-            $payment_options = array();
         }
 
+        // Clear the cart for this user or guest session
+        if ($user) {
+            ProductCart::where('user_id', $user->id)->delete();
+        } else {
+            ProductCart::where('session_id', session()->getId())->delete();
+        }
+
+        // Save shipping profile so the fields are pre-filled on next checkout
+        if (auth()->check()) {
+            \App\Models\CustomerProfile::updateOrCreate(
+                ['user_id' => auth()->id()],
+                [
+                    'cus_name' => $post_data['cus_name'],
+                    'cus_phone' => $request->input('customer_mobile'),
+                    'ship_name' => $post_data['cus_name'],
+                    'ship_add' => $post_data['cus_add1'],
+                    'ship_city' => 'Dhaka',
+                    'ship_state' => 'Dhaka',
+                ]
+            );
+        }
+
+        // Get the gateway URL without the library's internal exit() call
+        // (which would skip Laravel's session-save middleware)
+        $sslc = new SslCommerzNotification();
+        $result = $sslc->makePayment($post_data, 'checkout', 'json');
+        $parsed = json_decode($result, true);
+
+        if (is_array($parsed) && in_array($parsed['status'] ?? '', ['success', 'SUCCESS']) && !empty($parsed['data'])) {
+            return redirect()->away($parsed['data']);
+        }
+
+        $error = $parsed['message'] ?? 'Payment initiation failed.';
+        return redirect()->route('cart')->with('error', $error);
     }
 
     public function payViaAjax(Request $request)
@@ -206,12 +277,14 @@ public function success(Request $request)
 
     $sslc = new SslCommerzNotification();
 
-    // Check if the order exists
-    $order = Order::where('transaction_id', $tran_id)->first();
+    // Check if the order exists (a payment can cover multiple order rows)
+    $orders = Order::where('transaction_id', $tran_id)->get();
 
-    if (!$order) {
+    if ($orders->isEmpty()) {
         return redirect()->route('orders')->with('error', 'Order not found!');
     }
+
+    $order = $orders->first();
 
     if ($order->status == 'Pending') {
         $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $currency);
@@ -220,8 +293,8 @@ public function success(Request $request)
             return redirect()->route('orders')->with('error', 'Payment validation failed!');
         }
 
-        // Update order with payment details
-        $order->update([
+        // Update all orders sharing this transaction id
+        Order::where('transaction_id', $tran_id)->update([
             'status' => 'Processing', // Order is now being processed
             'payment_method' => $request->input('card_type') ?? 'Unknown', // Bkash, Nagad, etc.
             'payment_date' => $request->input('tran_date') ?? now(), // Payment timestamp

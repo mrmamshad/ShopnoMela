@@ -47,4 +47,18 @@ class MerchantOrderController extends Controller
 
     return redirect()->back()->with('success', 'Order marked as Shipped.');
 }
+
+    // Mark Order as Delivered
+    public function markAsDelivered($id)
+    {
+        $merchantId = Auth::id();
+
+        $order = Order::whereHas('product', function ($query) use ($merchantId) {
+            $query->where('user_id', $merchantId);
+        })->findOrFail($id);
+
+        $order->update(['status' => 'Delivered']);
+
+        return Redirect::back()->with('success', 'Order marked as Delivered.');
+    }
 }

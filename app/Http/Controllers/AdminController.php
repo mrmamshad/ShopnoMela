@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\User;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -69,5 +70,44 @@ class AdminController extends Controller
     return Inertia::render('Admin/AllOrders', [
         'orders' => $orders
     ]);
+    }
+
+    // Category management (admin)
+    public function categories()
+    {
+        return Inertia::render('Admin/Categories', [
+            'categories' => Category::latest()->get(),
+        ]);
+    }
+
+    public function storeCategory(Request $request)
+    {
+        $request->validate([
+            'categoryName' => 'required|string|max:255',
+            'categoryImg' => $request->hasFile('categoryImg')
+                ? 'nullable|image|mimes:jpeg,jpg,png,webp|max:1024'
+                : 'nullable|string|max:500',
+        ]);
+
+        $imagePath = $request->input('categoryImg');
+        if ($request->hasFile('categoryImg')) {
+            $file = $request->file('categoryImg');
+            $name = 'category_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('categories'), $name);
+            $imagePath = 'categories/' . $name;
+        }
+
+        Category::create([
+            'categoryName' => $request->categoryName,
+            'categoryImg' => $imagePath,
+        ]);
+
+        return redirect()->back()->with('success', 'Category added successfully.');
+    }
+
+    public function destroyCategory(Category $category)
+    {
+        $category->delete();
+        return redirect()->back()->with('success', 'Category deleted successfully.');
     }
 }

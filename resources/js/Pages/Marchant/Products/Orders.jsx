@@ -7,38 +7,44 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@inertiajs/react";
-import { Check, CheckCheck, Trash2, X } from "lucide-react";
+import {
+    CheckCheck,
+    Trash2,
+    MoreHorizontal,
+    Truck,
+    PackageCheck,
+    FileDown,
+} from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import moment from "moment";
-const audioSrc = "/audio/notification.wav";
-import { GrDocumentDownload } from "react-icons/gr";
-import {  PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import OrderProofPDF from "@/Components/OrderProofPDF";
+import { formatCurrency } from "@/lib/utils";
+const audioSrc = "/audio/notification.wav";
 
 export default function MarchantOrders({ orders }) {
     const [prevOrderCount, setPrevOrderCount] = useState(orders.length);
-    console.log("orderslength", orders.length);
     const { post, delete: destroy } = useForm();
+
     useEffect(() => {
-        // play notification sound when new order is added
         if (orders.length > prevOrderCount) {
             playNotificationSound();
             setPrevOrderCount(orders.length);
         }
-        // const audio = new Audio(audioSrc);
-        // audio.play().catch((error) => console.error("Audio play failed:", error));
     }, [orders.length]);
 
     const playNotificationSound = () => {
-        const audio = new Audio(audioSrc);
-        audio
-            .play()
-            .catch((error) => console.error("Audio play failed:", error));
-    };
-    const playsound = () => {
         const audio = new Audio(audioSrc);
         audio
             .play()
@@ -49,14 +55,18 @@ export default function MarchantOrders({ orders }) {
         post(route("merchant.orders.ship", { id: orderId }));
     };
 
-    // Handle Order Confirmation
     const handleConfirm = (orderId) => {
         post(route("merchant.orders.confirm", { id: orderId }));
     };
 
-    // Handle Order Deletion
+    const handleDeliver = (orderId) => {
+        post(route("merchant.orders.delivered", { id: orderId }));
+    };
+
     const handleDelete = (orderId) => {
-        destroy(route("merchant.orders.delete", { id: orderId }));
+        if (confirm("Are you sure you want to delete this order?")) {
+            destroy(route("merchant.orders.delete", { id: orderId }));
+        }
     };
 
     return (
@@ -79,8 +89,7 @@ export default function MarchantOrders({ orders }) {
                                 <TableHead>Payment Method</TableHead>
                                 <TableHead>Order Time</TableHead>
                                 <TableHead>Status</TableHead>
-                                <TableHead>Order Proof</TableHead>
-                                <TableHead>Action</TableHead>
+                                <TableHead className="text-right">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -99,96 +108,154 @@ export default function MarchantOrders({ orders }) {
                                         <TableCell>
                                             {order.product_quantity}
                                         </TableCell>
-                                        <TableCell>${order.amount}</TableCell>
+                                        <TableCell>
+                                            {formatCurrency(order.amount)}
+                                        </TableCell>
                                         <TableCell>
                                             {order.payment_method}
                                         </TableCell>
                                         <TableCell>
-                                            {moment(order.created_at).format(
-                                                "YYYY-MM-DD"
-                                            )}
+                                            {moment(
+                                                order.created_at
+                                            ).format("YYYY-MM-DD")}
                                         </TableCell>
-                                        <TableCell>{order.status}</TableCell>
                                         <TableCell>
-                                    <PDFDownloadLink document={<OrderProofPDF order={order} />} fileName={`Order_Proof_${order.id}.pdf`}>
-                                        {({ loading }) =>
-                                            loading ? (
-                                                <Button size="sm" variant="outline" disabled>
-                                                    Generating...
-                                                </Button>
-                                            ) : (
-                                                <Button size="sm" variant="outline">
-                                                    Download <GrDocumentDownload size={16} />
-                                                </Button>
-                                            )
-                                        }
-                                    </PDFDownloadLink>
+                                            <span
+                                                className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                                                    order.status ===
+                                                    "Delivered"
+                                                        ? "bg-green-100 text-green-700"
+                                                        : order.status ===
+                                                          "Shipped"
+                                                        ? "bg-blue-100 text-blue-700"
+                                                        : order.status ===
+                                                          "confirmed"
+                                                        ? "bg-yellow-100 text-yellow-700"
+                                                        : "bg-gray-100 text-gray-700"
+                                                }`}
+                                            >
+                                                {order.status}
+                                            </span>
                                         </TableCell>
-                                        <TableCell className="flex gap-2">
-                                            {/* Confirm Order Button */}
-                                            <Button
-                                                size="sm"
-                                                variant="success"
-                                                className="bg-green-500 hover:bg-green-600"
-                                                onClick={() =>
-                                                    handleConfirm(order.id)
-                                                }
-                                            >
-                                                <CheckCheck size={16} />
-                                            </Button>
-
-                                            {/* Delete Order Button */}
-                                            <Button
-                                                size="sm"
-                                                variant="destructive"
-                                                onClick={() =>
-                                                    handleDelete(order.id)
-                                                }
-                                            >
-                                                <Trash2 size={16} />
-                                            </Button>
-                                            {/* send for shipping */}
-                                            <Button
-                                                size="sm"
-                                                variant={
-                                                    order.status === "Shipped"
-                                                        ? "success"
-                                                        : "outline"
-                                                }
-                                                disabled={
-                                                    order.status === "Shipped"
-                                                }
-                                                onClick={() =>
-                                                    handleShipOrder(order.id)
-                                                }
-                                            >
-                                                {order.status === "Shipped"
-                                                    ? "Shipped"
-                                                    : "Send for Shipping"}
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant={
-                                                    order.status === "Delivered"
-                                                        ? "success"
-                                                        : "outline"
-                                                }
-                                                disabled={
-                                                    order.status === "Delivered"
-                                                }
-                                                onClick={() => playsound()}
-                                            >
-                                                {order.status === "Delivered"
-                                                    ? "Delivered"
-                                                    : "Mark as Delivered"}
-                                            </Button>
+                                        <TableCell className="text-right">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        aria-label="Order actions"
+                                                    >
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent
+                                                    align="end"
+                                                    className="w-64"
+                                                >
+                                                    <DropdownMenuLabel>
+                                                        Order Actions
+                                                    </DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        onClick={() =>
+                                                            handleConfirm(
+                                                                order.id
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            order.status ===
+                                                                "confirmed" ||
+                                                            order.status ===
+                                                                "Shipped" ||
+                                                            order.status ===
+                                                                "Delivered"
+                                                        }
+                                                    >
+                                                        <CheckCheck className="h-4 w-4 text-green-600" />
+                                                        Confirm Order
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() =>
+                                                            handleShipOrder(
+                                                                order.id
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            order.status ===
+                                                                "Shipped" ||
+                                                            order.status ===
+                                                                "Delivered"
+                                                        }
+                                                    >
+                                                        <Truck className="h-4 w-4 text-blue-600" />
+                                                        {order.status ===
+                                                        "Shipped"
+                                                            ? "Shipped"
+                                                            : "Send for Shipping"}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() =>
+                                                            handleDeliver(
+                                                                order.id
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            order.status ===
+                                                            "Delivered"
+                                                        }
+                                                    >
+                                                        <PackageCheck className="h-4 w-4 text-emerald-600" />
+                                                        {order.status ===
+                                                        "Delivered"
+                                                            ? "Delivered"
+                                                            : "Mark as Delivered"}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        asChild
+                                                        className="cursor-pointer"
+                                                    >
+                                                        <PDFDownloadLink
+                                                            document={
+                                                                <OrderProofPDF
+                                                                    order={
+                                                                        order
+                                                                    }
+                                                                />
+                                                            }
+                                                            fileName={`Order_Proof_${order.id}.pdf`}
+                                                        >
+                                                            {({ loading }) => (
+                                                                <>
+                                                                    <FileDown className="h-4 w-4 text-gray-600" />
+                                                                    {loading
+                                                                        ? "Generating..."
+                                                                        : "Download Order Proof"}
+                                                                </>
+                                                            )}
+                                                        </PDFDownloadLink>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                order.id
+                                                            )
+                                                        }
+                                                        className="text-red-600 focus:text-red-600"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                        Delete Order
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
                                     <TableCell
-                                        colSpan="7"
+                                        colSpan="9"
                                         className="text-center"
                                     >
                                         No orders found

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductDetail;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -37,58 +38,103 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::all();
-        $brands = DB::table('brands')->get();
-        // dd($brands);
-        // dd($categories);
+        $brands = Brand::where(function ($q) {
+            $q->where('user_id', auth()->id())->orWhereNull('user_id');
+        })->get();
+
         return Inertia::render('Marchant/Products/Create', [
             'category' => $categories,
             'brands' => $brands,
         ]);
     }
 
+    // Create a brand owned by the logged-in merchant
+    public function storeBrand(Request $request)
+    {
+        $request->validate([
+            'brandName' => 'required|string|max:255',
+            'brandImg' => $request->hasFile('brandImg')
+                ? 'nullable|image|mimes:jpeg,jpg,png,webp|max:1024'
+                : 'nullable|url',
+        ]);
+
+        $imagePath = $request->input('brandImg');
+        if ($request->hasFile('brandImg')) {
+            $file = $request->file('brandImg');
+            $name = 'brand_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('brands'), $name);
+            $imagePath = 'brands/' . $name;
+        }
+
+        Brand::create([
+            'brandName' => $request->brandName,
+            'brandImg' => $imagePath,
+            'user_id' => auth()->id(),
+        ]);
+
+        return redirect()->back()->with('success', 'Brand created successfully.');
+    }
+
+    // List brands owned by the logged-in merchant
+    public function brands()
+    {
+        $brands = Brand::where('user_id', auth()->id())->latest()->get();
+
+        return Inertia::render('Marchant/Brands', [
+            'brands' => $brands,
+        ]);
+    }
+
+    // Delete a brand owned by the logged-in merchant
+    public function deleteBrand($id)
+    {
+        $brand = Brand::where('user_id', auth()->id())->findOrFail($id);
+        $brand->delete();
+
+        return redirect()->back()->with('success', 'Brand deleted successfully.');
+    }
+
     public function store(Request $request)
     {
-        // dd($request->all());
         $merchant = auth()->user();
 
         $validated = $request->validate([
             'title' => 'required|string',
             'short_des' => 'required|string',
-            'price' => 'required|numeric',
-            'discount' => 'nullable|numeric',
-            'image' => 'required|image',
-            'star' => 'required|numeric|min:0|max:5',
+            'price' => 'required|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0|max:100',
+            'image' => 'required|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
+            'star' => 'nullable|numeric|min:0|max:5',
             'status' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'required|exists:brands,id',
             'des' => 'required|string',
             'color' => 'nullable|array',
             'size' => 'nullable|array',
-            'img1' => 'nullable|image',
-            'img2' => 'nullable|image',
-            'img3' => 'nullable|image',
-            'img4' => 'nullable|image',
+            'img1' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
+            'img2' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
+            'img3' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
+            'img4' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
         ]);
 
-        // ✅ Move image to `public/product_images`
+        // Move main image to `public/product_images`
         $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
         $request->file('image')->move(public_path('product_images'), $imageName);
 
-        // ✅ Store the product with correct image path
         $product = Product::create([
             'title' => $validated['title'],
             'short_des' => $validated['short_des'],
             'price' => $validated['price'],
-            'discount' => $request->discount ,
-            'image' => 'product_images/' . $imageName, // ✅ Save relative path
-            'star' => $validated['star'],
+            'discount' => $validated['discount'] ?? 0,
+            'image' => 'product_images/' . $imageName,
+            'star' => $validated['star'] ?? 0,
             'status' => $validated['status'],
             'category_id' => $validated['category_id'],
             'brand_id' => $validated['brand_id'],
-            'user_id' => $merchant->id, // ✅ Ensure merchant is assigned
+            'user_id' => $merchant->id,
         ]);
 
-        // ✅ Handle additional product images
+        // Handle additional product images
         $productDetailImages = ['img1', 'img2', 'img3', 'img4'];
         $storedImages = [];
 
@@ -102,7 +148,6 @@ class ProductController extends Controller
             }
         }
 
-        // ✅ Store product details
         ProductDetail::create([
             'product_id' => $product->id,
             'des' => $validated['des'],

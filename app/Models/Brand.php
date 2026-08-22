@@ -9,7 +9,7 @@ class Brand extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['brandName', 'brandimg'];
+    protected $fillable = ['brandName', 'brandImg', 'user_id'];
 
     // A brand has many products
     public function products()

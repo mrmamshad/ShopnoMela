@@ -20,18 +20,27 @@ class OfferController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'required|url',
             'discount' => 'required|numeric|min:0|max:100',
             'types' => 'required|string',
             'valid_until' => 'required|date',
+            'image' => $request->hasFile('image')
+                ? 'required|image|mimes:jpeg,jpg,png,webp|max:2048'
+                : 'required|url',
         ]);
+
+        $imagePath = $request->input('image');
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $name = 'offer_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('offers'), $name);
+            $imagePath = 'offers/' . $name;
+        }
 
         Offer::create([
             'title' => $request->title,
-            'image' => $request->image,
+            'image' => $imagePath,
             'discount' => $request->discount,
             'types' => $request->types,
             'valid_until' => $request->valid_until,
@@ -45,13 +54,24 @@ class OfferController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'required|url',
             'discount' => 'required|numeric|min:0|max:100',
             'valid_until' => 'required|date',
         ]);
-    
-        $offer->update($request->all());
-    
+
+        $data = $request->only(['title', 'discount', 'types', 'valid_until']);
+
+        if ($request->hasFile('image')) {
+            $request->validate(['image' => 'image|mimes:jpeg,jpg,png,webp|max:2048']);
+            $file = $request->file('image');
+            $name = 'offer_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('offers'), $name);
+            $data['image'] = 'offers/' . $name;
+        } elseif ($request->filled('image')) {
+            $data['image'] = $request->input('image');
+        }
+
+        $offer->update($data);
+
         return redirect()->back()->with('success', 'Offer updated successfully.');
     }
     

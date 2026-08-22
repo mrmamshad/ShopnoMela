@@ -1,167 +1,189 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Link, useForm, usePage } from "@inertiajs/react";
-import { GiShoppingCart } from "react-icons/gi";
+import { Search, ShoppingCart, Heart, User, LogOut } from "lucide-react";
 import Dropdown from "@/Components/Dropdown";
-import {
-Dialog,
-DialogContent,
-DialogHeader,
-DialogTitle,
-DialogDescription,
-DialogClose,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { imageSrc } from "@/lib/utils";
 
 function Header() {
-const { auth } = usePage().props;
-const user = auth.user;
-// console.log("user", user);
-const [searchTerm, setSearchTerm] = useState("");
-const [openModal, setOpenModal] = useState(false);
-const { toast } = useToast();
+    const { auth, cartCount } = usePage().props;
+    const user = auth.user;
+    const [searchTerm, setSearchTerm] = useState("");
 
+    const searchForm = useForm({ query: "" });
 
-// 🛠️ Separate useForm for Search
-const searchForm = useForm({ query: "" });
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchForm.data.query.trim() !== "") {
+            searchForm.get(route("products.search"));
+        }
+    };
 
-// console.log("user", user);
-const { data, setData, post, processing, reset, errors } = useForm({
-store_name: "",
-cover_photo: null,
-profile_photo: null,
-description: "",
-contact_email: "",
-contact_phone: "",
-facebook: "",
-instagram: "",
-twitter: "",
-});
-
-const handleFileChange = (field, e) => {
-setData(field, e.target.files[0]);
-};
-
-
-const { get } = useForm();
-
-// Handle Search Submit
-const handleSearch = (e) => {
-e.preventDefault();
-if (searchForm.data.query.trim() !== "") {
-searchForm.get(route("products.search"));
-}
-};
-
-const handleSubmit = (e) => {
-e.preventDefault();
-post(route("merchant.store"), {
-forceFormData: true,
-onSuccess: () => {
-reset();
-setOpenModal(false);
-toast({
-title: "Successfuly applied ",
-description: "Applied for merchant successfully!",
-variant: "default",
-});
-},
-});
-};
-
-return (
-<>
-    <header className="bg-green-500 text-white py-4">
-        <div className="container mx-0 sm:mx-auto px-4 flex items-center justify-evenly  md:justify-between">
-
-            {/* Left Section: Logo + Name + Slogan */}
-            <div className="flex items-start">
-                <Link href="/" className="flex items-start">
-                <img src="/logo/logo.png" alt="Logo" className="w-16 h-16 rounded-full" />
-                <div className="flex flex-col ml-0  ">
-                    <h1
-                        className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200 text-4xl font-extrabold drop-shadow-md">
-                        স্বপ্ন
-                        <span className="text-white font-bold">মেলা</span>
-                    </h1>
-                    <Badge variant="outline"
-                        className="mt-0 border-yellow-300 text-yellow-100 font-medium tracking-wide">
-                        যেখানে স্বপ্নের বাজার
-                    </Badge>
-                </div>
+    return (
+        <header className="bg-green-600 text-white sticky top-0 z-40 shadow-md">
+            <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+                {/* Logo */}
+                <Link href="/" className="flex items-center gap-2 shrink-0">
+                    <img
+                        src="/logo/logo.webp"
+                        alt="ShopnoMela"
+                        className="w-11 h-11 rounded-full object-cover"
+                    />
+                    <div className="flex flex-col leading-tight">
+                        <h1 className="text-2xl font-extrabold tracking-tight">
+                            স্বপ্ন<span className="text-yellow-300">মেলা</span>
+                        </h1>
+                        <span className="text-[11px] text-green-100 hidden sm:block">
+                            যেখানে স্বপ্নের বাজার
+                        </span>
+                    </div>
                 </Link>
-            </div>
 
-
-            {/* Right Section: Search + User Dropdown */}
-            <div className="flex items-center justify-end space-x-6">
-
-                {/* Search Bar (hidden on mobile) */}
-                <div className="hidden sm:flex items-center w-[75%]">
-                    {/* 🔍 Fixed Search Form */}
-                    <form onSubmit={handleSearch} className="flex items-center w-full">
-                        <input type="text" placeholder="Search products..."
-                            className="w-full px-4 py-2 rounded-full text-gray-800 border border-gray-300 focus:ring-2 focus:ring-green-400"
-                            value={searchForm.data.query} onChange={(e)=> searchForm.setData("query", e.target.value)}
+                {/* Desktop Search Bar */}
+                <div className="hidden md:flex items-center flex-1 max-w-xl">
+                    <form
+                        onSubmit={handleSearch}
+                        className="relative w-full"
+                    >
+                        <input
+                            type="text"
+                            placeholder="Search products..."
+                            value={searchForm.data.query}
+                            onChange={(e) =>
+                                searchForm.setData("query", e.target.value)
+                            }
+                            className="w-full px-4 py-2.5 pr-12 rounded-full text-gray-800 border border-transparent focus:ring-2 focus:ring-yellow-300 focus:border-transparent outline-none"
                         />
-                        <button type="submit" className="ml-2 px-4 py-2 bg-green-600 text-white rounded-full">
-                            🔍
+                        <button
+                            type="submit"
+                            aria-label="Search"
+                            className="absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 bg-green-700 text-white rounded-full flex items-center justify-center hover:bg-green-800 transition"
+                        >
+                            <Search className="w-4 h-4" />
                         </button>
                     </form>
-
                 </div>
 
-                {/* User Dropdown / Login Links */}
-                <div className="flex items-center space-x-4">
+                {/* Right Actions */}
+                <div className="flex items-center gap-2 sm:gap-3">
+                    {/* Cart — always visible (guests too) */}
+                    <Link
+                        href={route("cart")}
+                        className="relative p-2 rounded-full hover:bg-green-700 transition"
+                        aria-label="Cart"
+                    >
+                        <ShoppingCart className="w-6 h-6" />
+                        {cartCount > 0 && (
+                            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[11px] font-bold leading-none">
+                                {cartCount > 99 ? "99+" : cartCount}
+                            </span>
+                        )}
+                    </Link>
 
                     {user ? (
-                    <Dropdown>
-                        <Dropdown.Trigger>
-                            <button
-                                className="flex items-center border border-transparent rounded-md text-gray-500 hover:text-gray-700">
-                                <img src={user.image} alt={user.name} className="h-8 w-8 rounded-full" />
-                                <svg className="ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fillRule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                        clipRule="evenodd" />
-                                </svg>
-                            </button>
-                        </Dropdown.Trigger>
-                        <Dropdown.Content>
-                            <p className="text-center text-black my-3 text-sm">{user.name}</p>
-                            <hr className="mx-5 my-2 border-gray-400" />
-                            <Dropdown.Link href={route("orders")}>Orders</Dropdown.Link>
-                            <Dropdown.Link href={route("cart")}>My cart</Dropdown.Link>
-                            <Dropdown.Link href={route("wishlist")}>Wishlist</Dropdown.Link>
-                            <Dropdown.Link href={route("logout")} method="post" as="button">Log Out</Dropdown.Link>
-                        </Dropdown.Content>
-                    </Dropdown>
+                        <>
+                            <Link
+                                href={route("wishlist")}
+                                className="relative p-2 rounded-full hover:bg-green-700 transition"
+                                aria-label="Wishlist"
+                            >
+                                <Heart className="w-6 h-6" />
+                            </Link>
+                            <Dropdown>
+                                <Dropdown.Trigger>
+                                    <button className="flex items-center gap-2 border border-white/30 rounded-full pl-1 pr-3 py-1 hover:bg-green-700 transition">
+                                        <img
+                                            src={
+                                                imageSrc(user.image) ||
+                                                "https://ui-avatars.com/api/?name=" +
+                                                    encodeURIComponent(
+                                                        user.name || "U"
+                                                    )
+                                            }
+                                            alt={user.name}
+                                            className="h-8 w-8 rounded-full object-cover"
+                                        />
+                                        <span className="hidden sm:block text-sm max-w-[100px] truncate">
+                                            {user.name}
+                                        </span>
+                                    </button>
+                                </Dropdown.Trigger>
+                                <Dropdown.Content>
+                                    <p className="text-center text-black my-3 text-sm font-medium">
+                                        {user.name}
+                                    </p>
+                                    <hr className="mx-5 my-2 border-gray-400" />
+                                    <Dropdown.Link href={route("orders")}>
+                                        <span className="flex items-center gap-2">
+                                            <User className="w-4 h-4" /> Orders
+                                        </span>
+                                    </Dropdown.Link>
+                                    <Dropdown.Link href={route("cart")}>
+                                        <span className="flex items-center gap-2">
+                                            <ShoppingCart className="w-4 h-4" />{" "}
+                                            My Cart
+                                        </span>
+                                    </Dropdown.Link>
+                                    <Dropdown.Link href={route("wishlist")}>
+                                        <span className="flex items-center gap-2">
+                                            <Heart className="w-4 h-4" />{" "}
+                                            Wishlist
+                                        </span>
+                                    </Dropdown.Link>
+                                    <Dropdown.Link
+                                        href={route("logout")}
+                                        method="post"
+                                        as="button"
+                                    >
+                                        <span className="flex items-center gap-2 text-red-600">
+                                            <LogOut className="w-4 h-4" /> Log
+                                            Out
+                                        </span>
+                                    </Dropdown.Link>
+                                </Dropdown.Content>
+                            </Dropdown>
+                        </>
                     ) : (
-                    <nav>
-                        <ul className="flex flex-col align-center ">
-                            <li>
-                                <Link href={route("login")} className="hover:underline">Login</Link>
-                            </li>
-                            <li>
-                                <Link href={route("register")} className="hover:underline">Sign Up</Link>
-                            </li>
-                        </ul>
-                    </nav>
+                        <nav className="flex items-center gap-3">
+                            <Link
+                                href={route("login")}
+                                className="text-sm font-medium px-3 py-2 rounded-full hover:bg-green-700 transition"
+                            >
+                                Login
+                            </Link>
+                            <Link
+                                href={route("register")}
+                                className="text-sm font-semibold px-4 py-2 rounded-full bg-yellow-400 text-green-900 hover:bg-yellow-300 transition"
+                            >
+                                Sign Up
+                            </Link>
+                        </nav>
                     )}
                 </div>
             </div>
-        </div>
-    </header>
 
-
-
-</>
-);
+            {/* Mobile Search Bar */}
+            <div className="md:hidden container mx-auto px-4 pb-3">
+                <form onSubmit={handleSearch} className="relative w-full">
+                    <input
+                        type="text"
+                        placeholder="Search products..."
+                        value={searchForm.data.query}
+                        onChange={(e) =>
+                            searchForm.setData("query", e.target.value)
+                        }
+                        className="w-full px-4 py-2 pr-10 rounded-full text-gray-800 border border-transparent outline-none text-sm"
+                    />
+                    <button
+                        type="submit"
+                        aria-label="Search"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center text-gray-500"
+                    >
+                        <Search className="w-4 h-4" />
+                    </button>
+                </form>
+            </div>
+        </header>
+    );
 }
 
 export default Header;

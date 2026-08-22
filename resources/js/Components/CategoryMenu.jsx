@@ -1,27 +1,48 @@
 import { Link } from "@inertiajs/react";
 import { motion } from "framer-motion";
+import { imageSrc, imageFallback } from "@/lib/utils";
 
-const Categories = ({ category }) => {
+const CategoryMenu = ({ category }) => {
+    const categories = category || [];
+
+    if (categories.length === 0) {
+        return null;
+    }
+
     return (
         <div className="container mx-auto px-4 py-10">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                Categories
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">
+                    Categories
+                </h2>
+                <Link
+                    href={route("category")}
+                    className="text-sm font-medium text-green-600 hover:text-green-700 hover:underline"
+                >
+                    View All
+                </Link>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {category.map((category, index) => (
+                {categories.map((category) => (
                     <motion.div
-                        key={index}
-                        className="bg-white shadow-md p-4 rounded-lg text-center cursor-pointer hover:shadow-lg transition-all"
-                        whileHover={{ scale: 1.05 }}
+                        key={category.id}
+                        className="bg-white shadow-sm border border-gray-100 p-3 rounded-xl text-center cursor-pointer hover:shadow-lg transition-all"
+                        whileHover={{ y: -4 }}
                     >
-                        <Link href={route("category.products", { id: category.id })}>
+                        <Link
+                            href={route("category.products", {
+                                id: category.id,
+                            })}
+                        >
                             <img
-                                src={`${category.categoryImg}`}
-                                alt={category.name}
-                                className="w-full h-40 object-cover rounded-md"
+                                src={imageSrc(category.categoryImg)}
+                                alt={category.categoryName}
+                                loading="lazy"
+                                decoding="async"
+                                onError={imageFallback}
+                                className="w-full h-36 object-cover rounded-lg"
                             />
-
-                            <p className="text-gray-700 font-semibold mt-1 text-md">
+                            <p className="text-gray-700 font-semibold mt-2 text-sm line-clamp-1">
                                 {category.categoryName}
                             </p>
                         </Link>
@@ -32,4 +53,4 @@ const Categories = ({ category }) => {
     );
 };
 
-export default Categories;
+export default CategoryMenu;

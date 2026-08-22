@@ -17,7 +17,8 @@ class User extends Authenticatable
         'email',
         'password',
         'google_id',
-        'image'
+        'image',
+        'phone',
     ];
 
     protected $hidden = [
@@ -61,5 +62,17 @@ class User extends Authenticatable
     public function customerProfile()
     {
         return $this->hasMany(CustomerProfile::class);
+    }
+
+    /**
+     * Role-based destination after login.
+     */
+    public function homeRoute(): string
+    {
+        return match (true) {
+            $this->hasRole('admin')    => route('admin'),
+            $this->hasRole('merchant') => route('marchant'),
+            default                    => route('orders'),
+        };
     }
 }

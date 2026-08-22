@@ -10,30 +10,32 @@ class CartController extends Controller
 {
     public function addToCart(Request $request)
     {
-        // dd($request->all());
-        // Allow nullable values for color and size
+        $isGuest = !Auth::check();
+        $userId = Auth::id();
+        $sessionId = $isGuest ? session()->getId() : null;
+
         $cartData = [
-            'user_id' => Auth::id(),
+            'user_id' => $userId,
+            'session_id' => $sessionId,
             'product_id' => $request->product_id,
-            'qty' => $request->qty ?? 1, // Ensure qty is at least 1
+            'qty' => $request->qty ?? 1,
             'price' => $request->price,
         ];
-    
-        // Only add color and size if they exist
+
         if ($request->filled('color')) {
             $cartData['color'] = $request->color;
         }
         if ($request->filled('size')) {
             $cartData['size'] = $request->size;
         }
-    
-        // Create or update cart item
-        ProductCart::updateOrCreate(
-            ['user_id' => Auth::id(), 'product_id' => $request->product_id], // Matching condition (removed color & size)
-            $cartData
-        );
-    
+
+        // Match on user_id (logged in) or session_id (guest)
+        $match = $isGuest
+            ? ['session_id' => $sessionId, 'product_id' => $request->product_id]
+            : ['user_id' => $userId, 'product_id' => $request->product_id];
+
+        ProductCart::updateOrCreate($match, $cartData);
+
         return back()->with('success', 'Product added to cart.');
     }
-    
 }

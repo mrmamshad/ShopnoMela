@@ -11,30 +11,15 @@ import {
     DialogDescription,
     DialogClose,
 } from "@/components/ui/dialog";
-
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 const Footer = () => {
     const [openModal, setOpenModal] = useState(false);
     const { auth } = usePage().props;
     const user = auth.user;
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        post(route("merchant.store"), {
-            forceFormData: true,
-            onSuccess: () => {
-                reset();
-                setOpenModal(false);
-                toast({
-                    title: "Successfuly applied ",
-                    description: "Applied for merchant successfully!",
-                    variant: "default",
-                });
-            },
-        });
-    };
+    const { toast } = useToast();
 
     const { data, setData, post, processing, reset, errors } = useForm({
         store_name: "",
@@ -47,14 +32,30 @@ const Footer = () => {
         instagram: "",
         twitter: "",
     });
+
     const handleFileChange = (field, e) => {
         setData(field, e.target.files[0]);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        post(route("merchant.store"), {
+            forceFormData: true,
+            onSuccess: () => {
+                reset();
+                setOpenModal(false);
+                toast({
+                    title: "Successfully applied",
+                    description: "Applied for merchant successfully!",
+                    variant: "default",
+                });
+            },
+        });
     };
 
     return (
         <footer className="border-t border-gray-200 py-10 bg-gray-100">
             <div className="container mx-auto px-4">
-                {/* Footer Content */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mb-10">
                     {/* Customer Service */}
                     <div>
@@ -100,7 +101,9 @@ const Footer = () => {
 
                     {/* About Us */}
                     <div>
-                        <h3 className="text-lg font-semibold mb-3">About Us</h3>
+                        <h3 className="text-lg font-semibold mb-3">
+                            About Us
+                        </h3>
                         <ul className="space-y-2 text-gray-600">
                             <li>
                                 <a href="#" className="hover:text-black">
@@ -130,29 +133,31 @@ const Footer = () => {
                         <h3 className="text-lg font-semibold mb-3">
                             Payment Methods
                         </h3>
-                        <div className="flex gap-4">
+                        <div className="flex flex-wrap gap-3">
                             <img
                                 src="https://img.lazcdn.com/us/domino/dd7d3db1-047c-4e65-b89e-d710eb539976_BD-139-84.png"
                                 alt="Cash on Delivery"
-                                className="h-12"
+                                className="h-10"
+                                loading="lazy"
                             />
                             <img
                                 src="https://img.lazcdn.com/us/domino/395e474e-f67e-4a29-9521-5bc693ca53df_BD-144-84.png"
                                 alt="Nogod"
-                                className="h-12"
+                                className="h-10"
+                                loading="lazy"
                             />
                             <img
                                 src="https://img.lazcdn.com/us/domino/dbfdbbea-19ca-4be1-9b8f-ecb1fabdc6f7_BD-145-86.png"
                                 alt="Digital Payments"
-                                className="h-12"
+                                className="h-10"
+                                loading="lazy"
                             />
                         </div>
                     </div>
                 </div>
 
-                {/* Social Media & Download App */}
+                {/* Social Media & Download App + Role Links */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
-                    {/* Social Media */}
                     <div>
                         <h3 className="text-lg font-semibold mb-3">
                             Follow Us
@@ -173,7 +178,6 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Download App */}
                     <div>
                         <h3 className="text-lg font-semibold mb-3">
                             Download Our App
@@ -187,54 +191,50 @@ const Footer = () => {
                             </Button>
                         </div>
                     </div>
-                    {user &&
-                        user.roles.includes("customer") &&
-                        !user.roles.includes("admin") &&
-                        !user.roles.includes("merchant") && (
-                            <Button
-                                variant="outline"
-                                onClick={() => setOpenModal(true)}
-                                className="text-black"
-                            >
-                                Become a Seller
-                            </Button>
-                        )}
-                                          {user &&
-                        user.roles.includes("merchant") &&
-                        !user.roles.includes("admin") &&
-                         (
-                            <Link
-                                variant="outline"
-                                href={route("marchant")}
-                                className="text-black border border-gray-300 px-4 mx-auto py-2"
-                            >
-                              Marchant Dashboard
-                            </Link>
-                        )}
+
+                    <div className="flex flex-wrap gap-3 items-center">
                         {user &&
-                        user.roles.includes("admin") && (
+                            user.roles.includes("customer") &&
+                            !user.roles.includes("admin") &&
+                            !user.roles.includes("merchant") && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setOpenModal(true)}
+                                    className="text-black"
+                                >
+                                    Become a Seller
+                                </Button>
+                            )}
+                        {user &&
+                            user.roles.includes("merchant") &&
+                            !user.roles.includes("admin") && (
+                                <Link
+                                    href={route("marchant")}
+                                    className="text-black border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-200 transition"
+                                >
+                                    Merchant Dashboard
+                                </Link>
+                            )}
+                        {user && user.roles.includes("admin") && (
                             <Link
-                                variant="outline"
                                 href={route("admin")}
-                                className="text-black border border-gray-300 px-4 mx-auto py-2"
+                                className="text-black border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-200 transition"
                             >
                                 Admin Dashboard
                             </Link>
-                        )}  
+                        )}
+                    </div>
                 </div>
 
                 {/* Copyright */}
-                <div className="text-center text-gray-600">
+                <div className="text-center text-gray-600 border-t border-gray-200 pt-6">
                     <p>&copy; 2025 ShopnoMela. All rights reserved.</p>
                 </div>
             </div>
+
             {/* Become a Seller Modal */}
             <Dialog open={openModal} onOpenChange={setOpenModal}>
-                {/* 
-                    Added w-full and extra bottom padding. 
-                    This ensures the content can scroll and the buttons aren’t hidden.
-                */}
-                <DialogContent className="w-full sm:max-w-lg max-h-[70vh]  sm:max-h-[90vh]  overflow-y-auto">
+                <DialogContent className="w-full sm:max-w-lg max-h-[70vh] sm:max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Apply to Become a Seller</DialogTitle>
                         <DialogDescription>
@@ -244,7 +244,7 @@ const Footer = () => {
                     </DialogHeader>
                     <form
                         onSubmit={handleSubmit}
-                        className="space-y-4 pb-20" // extra bottom padding
+                        className="space-y-4 pb-20"
                     >
                         <div>
                             <Label>Store Name</Label>
@@ -406,7 +406,7 @@ const Footer = () => {
                             </Button>
                         </div>
                     </form>
-                    <DialogClose asChild></DialogClose>
+                    <DialogClose asChild />
                 </DialogContent>
             </Dialog>
         </footer>
