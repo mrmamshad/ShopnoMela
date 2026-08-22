@@ -58,7 +58,7 @@ const FlashSale = ({ flashSales }) => {
     return (
         <div className="container mx-auto py-6">
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
                     🔥 Flash Sale
                 </h2>
                 <span className="text-xs text-gray-500">

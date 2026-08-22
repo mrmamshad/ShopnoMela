@@ -38,9 +38,9 @@ function ActionSearchBar() {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto md:hidden">
+    <div className="w-full">
       <div className="relative">
-        <form onSubmit={handleSearchSubmit} className="w-full pt-3">
+        <form onSubmit={handleSearchSubmit} className="w-full">
           <div className="relative">
             <input
               type="text"

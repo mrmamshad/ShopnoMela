@@ -78,12 +78,30 @@
   }
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    overflow-x: clip;
   }
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
+    overflow-x: clip;
   }
   img {
     max-width: 100%;
+  }
+}
+
+@layer components {
+  /* Offer slider: hide arrows on mobile (touch swipe instead), keep dots */
+  @media (max-width: 767px) {
+    .offer-slider .slick-arrow {
+      display: none !important;
+    }
+    .offer-slider .slick-dots {
+      bottom: -22px;
+    }
+    .offer-slider .slick-dots li {
+      margin: 0;
+    }
   }
 }

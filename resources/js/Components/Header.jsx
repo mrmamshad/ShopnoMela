@@ -1,13 +1,12 @@
-import { useState } from "react";
 import { Link, useForm, usePage } from "@inertiajs/react";
 import { Search, ShoppingCart, Heart, User, LogOut } from "lucide-react";
 import Dropdown from "@/Components/Dropdown";
+import ActionSearchBar from "@/Components/ActionSearchBar";
 import { imageSrc } from "@/lib/utils";
 
 function Header() {
     const { auth, cartCount } = usePage().props;
     const user = auth.user;
-    const [searchTerm, setSearchTerm] = useState("");
 
     const searchForm = useForm({ query: "" });
 
@@ -22,17 +21,22 @@ function Header() {
         <header className="bg-green-600 text-white sticky top-0 z-40 shadow-md">
             <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 shrink-0">
+                <Link
+                    href="/"
+                    className="flex items-center gap-2 shrink-0 min-w-0"
+                >
                     <img
                         src="/logo/logo.png"
                         alt="Tajim Foods Products"
-                        className="h-11 w-auto object-contain"
+                        className="h-9 sm:h-11 w-auto object-contain shrink-0"
                     />
-                    <div className="flex flex-col leading-tight">
-                        <h1 className="text-lg sm:text-xl font-extrabold tracking-tight">
-                            Tajim <span className="text-yellow-300">Foods</span> Products
+                    <div className="hidden min-[480px]:flex flex-col leading-tight min-w-0">
+                        <h1 className="text-base sm:text-xl font-extrabold tracking-tight truncate">
+                            Tajim{" "}
+                            <span className="text-yellow-300">Foods</span>{" "}
+                            Products
                         </h1>
-                        <span className="text-[11px] text-green-100 hidden sm:block">
+                        <span className="text-[11px] text-green-100 hidden sm:block truncate">
                             মুক্তিনগর, সিদ্ধিরগঞ্জ, নারায়ণগঞ্জ
                         </span>
                     </div>
@@ -143,16 +147,16 @@ function Header() {
                             </Dropdown>
                         </>
                     ) : (
-                        <nav className="flex items-center gap-3">
+                        <nav className="flex items-center gap-1.5 sm:gap-3 shrink-0">
                             <Link
                                 href={route("login")}
-                                className="text-sm font-medium px-3 py-2 rounded-full hover:bg-green-700 transition"
+                                className="text-xs sm:text-sm font-medium px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full hover:bg-green-700 transition whitespace-nowrap"
                             >
                                 Login
                             </Link>
                             <Link
                                 href={route("register")}
-                                className="text-sm font-semibold px-4 py-2 rounded-full bg-yellow-400 text-green-900 hover:bg-yellow-300 transition"
+                                className="text-xs sm:text-sm font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-yellow-400 text-green-900 hover:bg-yellow-300 transition whitespace-nowrap"
                             >
                                 Sign Up
                             </Link>
@@ -161,26 +165,9 @@ function Header() {
                 </div>
             </div>
 
-            {/* Mobile Search Bar */}
+            {/* Mobile Search Bar (with auto suggestions) */}
             <div className="md:hidden container mx-auto px-4 pb-3">
-                <form onSubmit={handleSearch} className="relative w-full">
-                    <input
-                        type="text"
-                        placeholder="Search products..."
-                        value={searchForm.data.query}
-                        onChange={(e) =>
-                            searchForm.setData("query", e.target.value)
-                        }
-                        className="w-full px-4 py-2 pr-10 rounded-full text-gray-800 border border-transparent outline-none text-sm"
-                    />
-                    <button
-                        type="submit"
-                        aria-label="Search"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center text-gray-500"
-                    >
-                        <Search className="w-4 h-4" />
-                    </button>
-                </form>
+                <ActionSearchBar />
             </div>
         </header>
     );

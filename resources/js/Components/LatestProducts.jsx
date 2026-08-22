@@ -18,11 +18,11 @@ function LatestProducts({ latestProducts }) {
     return (
         <div className="container mx-auto py-6">
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
                     🆕 Latest Products
                 </h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                 {products.map((product, index) => (
                     <motion.div
                         key={product.id}
@@ -47,16 +47,16 @@ function LatestProducts({ latestProducts }) {
                                         loading="lazy"
                                         decoding="async"
                                         onError={imageFallback}
-                                        className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
-                                    />
-                                </div>
-                                <CardHeader className="pb-1">
-                                    <CardTitle className="text-base font-semibold line-clamp-2">
-                                        {product.title}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="pb-4 flex-1">
-                                    <p className="text-lg font-bold text-green-600">
+                                    className="w-full h-32 sm:h-44 lg:h-48 object-cover hover:scale-105 transition-transform duration-300"
+                                />
+                            </div>
+                            <CardHeader className="pb-1">
+                                <CardTitle className="text-sm md:text-base font-semibold line-clamp-2">
+                                    {product.title}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pb-4 flex-1">
+                                <p className="text-base md:text-lg font-bold text-green-600">
                                         {formatCurrency(product.price)}
                                     </p>
                                 </CardContent>

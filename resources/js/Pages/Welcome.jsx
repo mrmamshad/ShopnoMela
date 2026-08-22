@@ -4,7 +4,6 @@ import { usePage } from "@inertiajs/react";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/Components/Header";
 import Footer from "@/Components/Footer";
-import ActionSearchBar from "@/Components/ActionSearchBar";
 
 // Below-the-fold sections are loaded lazily so the home page
 // paints the hero area first and only fetches the rest on demand.
@@ -54,8 +53,6 @@ export default function Welcome({
             </Head>
             <Header user={user} />
             <main className="container mx-auto px-4 py-6">
-                <ActionSearchBar />
-
                 <div className="w-full mt-2">
                     <OfferSlider offers={offers} />
                 </div>
