@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -16,13 +18,64 @@ class MarchantController extends Controller
         $user = User::where('id', auth()->id())->whereHas('roles', function ($query) {
             $query->where('name', 'merchant');
         })->first();
-        // dd($user);
-        return Inertia::render(
-            'Marchant/Index',
-            [
-                'marchantuser' => $user
-            ]
-        );
+
+        $now = now();
+        $productIds = Product::where('user_id', auth()->id())->pluck('id');
+
+        $ordersQuery = Order::whereIn('product_id', $productIds)
+            ->whereNotIn('status', ['Cancelled', 'cancelled']);
+
+        $totalRevenue = (clone $ordersQuery)->sum('amount');
+        $lastMonthRevenue = (clone $ordersQuery)
+            ->whereBetween('created_at', [$now->copy()->subMonths(2), $now->copy()->subMonth()])
+            ->sum('amount');
+        $thisMonthRevenue = (clone $ordersQuery)
+            ->where('created_at', '>=', $now->copy()->subMonth())
+            ->sum('amount');
+
+        $totalProducts = $productIds->count();
+        $totalOrders = Order::whereIn('product_id', $productIds)->count();
+        $pendingOrders = Order::whereIn('product_id', $productIds)
+            ->whereIn('status', ['Pending', 'pending'])
+            ->count();
+
+        // Monthly sales for the last 6 months (chart)
+        $salesChart = collect(range(5, 0))->map(function ($i) use ($now, $productIds) {
+            $month = $now->copy()->subMonths($i);
+            $value = Order::whereIn('product_id', $productIds)
+                ->whereNotIn('status', ['Cancelled', 'cancelled'])
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->sum('amount');
+            return ['name' => $month->format('M'), 'value' => round($value, 2)];
+        })->values();
+
+        // Recent activity = latest orders for this merchant
+        $recentActivities = Order::whereIn('product_id', $productIds)
+            ->with('product')
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(fn($o) => [
+                'user' => $o->name ?: ($o->email ?: 'Guest'),
+                'action' => 'Ordered ' . ($o->product->title ?? $o->product_name ?? 'a product'),
+                'time' => $o->created_at?->diffForHumans(),
+            ]);
+
+        $pct = fn($cur, $prev) => $prev > 0 ? round((($cur - $prev) / $prev) * 100, 1) : ($cur > 0 ? 100 : 0);
+
+        return Inertia::render('Marchant/Index', [
+            'marchantuser' => $user,
+            'stats' => [
+                'totalRevenue' => round($totalRevenue, 2),
+                'revenueChange' => $pct($thisMonthRevenue, $lastMonthRevenue),
+                'totalProducts' => $totalProducts,
+                'totalOrders' => $totalOrders,
+                'pendingOrders' => $pendingOrders,
+            ],
+            'salesChart' => $salesChart,
+            'recentActivities' => $recentActivities,
+        ]);
     }
 
     /**

@@ -36,9 +36,6 @@ function Header() {
                             <span className="text-yellow-300">Foods</span>{" "}
                             Products
                         </h1>
-                        <span className="text-[11px] text-green-100 hidden sm:block truncate">
-                            মুক্তিনগর, সিদ্ধিরগঞ্জ, নারায়ণগঞ্জ
-                        </span>
                     </div>
                 </Link>
 

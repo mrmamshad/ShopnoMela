@@ -192,7 +192,45 @@ export default function CreateProduct({ category, brands }) {
         des: "",
         color: [],
         size: [],
+        attributes: [],
     });
+
+    // Dynamic variant attribute helpers
+    const addAttribute = () =>
+        setData("attributes", [
+            ...data.attributes,
+            { name: "", values: [] },
+        ]);
+
+    const removeAttribute = (index) =>
+        setData(
+            "attributes",
+            data.attributes.filter((_, i) => i !== index)
+        );
+
+    const updateAttributeName = (index, name) =>
+        setData(
+            "attributes",
+            data.attributes.map((attr, i) =>
+                i === index ? { ...attr, name } : attr
+            )
+        );
+
+    const updateAttributeValues = (index, valuesStr) =>
+        setData(
+            "attributes",
+            data.attributes.map((attr, i) =>
+                i === index
+                    ? {
+                          ...attr,
+                          values: valuesStr
+                              .split(",")
+                              .map((v) => v.trim())
+                              .filter(Boolean),
+                      }
+                    : attr
+            )
+        );
 
     const handleImageChange = (file, field) => {
         setData(field, file || null);
@@ -479,6 +517,89 @@ export default function CreateProduct({ category, brands }) {
                                             }
                                         />
                                     </Field>
+                                </div>
+
+                                {/* Custom / dynamic variants */}
+                                <div className="mt-6 space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h4 className="text-sm font-semibold text-gray-800">
+                                                Other Variants
+                                            </h4>
+                                            <p className="text-xs text-gray-500">
+                                                Color/Size optional. For other
+                                                products add your own variants —
+                                                e.g. RAM, Storage, Weight,
+                                                Flavor, Material.
+                                            </p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={addAttribute}
+                                            className="flex items-center gap-1 text-sm font-medium text-green-600 hover:text-green-700"
+                                        >
+                                            <Plus className="h-4 w-4" /> Add
+                                            Variant
+                                        </button>
+                                    </div>
+
+                                    {data.attributes.length === 0 && (
+                                        <p className="text-xs text-gray-400 italic">
+                                            No custom variants added.
+                                        </p>
+                                    )}
+
+                                    {data.attributes.map((attr, index) => (
+                                        <div
+                                            key={index}
+                                            className="grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-3 items-start rounded-lg border p-3 bg-gray-50"
+                                        >
+                                            <div>
+                                                <label className="text-xs text-gray-500 mb-1 block">
+                                                    Variant name
+                                                </label>
+                                                <Input
+                                                    type="text"
+                                                    placeholder="e.g. RAM"
+                                                    value={attr.name}
+                                                    onChange={(e) =>
+                                                        updateAttributeName(
+                                                            index,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs text-gray-500 mb-1 block">
+                                                    Options (comma separated)
+                                                </label>
+                                                <Input
+                                                    type="text"
+                                                    placeholder="e.g. 8GB, 12GB, 16GB"
+                                                    defaultValue={attr.values.join(
+                                                        ", "
+                                                    )}
+                                                    onChange={(e) =>
+                                                        updateAttributeValues(
+                                                            index,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    removeAttribute(index)
+                                                }
+                                                className="mt-6 p-2 text-red-500 hover:text-red-600"
+                                                aria-label="Remove variant"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
                             </Section>
 

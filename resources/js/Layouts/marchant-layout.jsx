@@ -1,16 +1,14 @@
 import { useState } from "react";
 import {
-    LayoutDashboard,
-    Users,
     ShoppingCart,
-    Settings,
     HelpCircle,
-    Bell,
     Search,
     Menu,
     X,
     ChevronDown,
     ChevronUp,
+    LogOut,
+    User as UserIcon,
 } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
@@ -19,11 +17,29 @@ import { RiProductHuntFill } from "react-icons/ri";
 import { MdReport } from "react-icons/md";
 import { MdOutlineRateReview } from "react-icons/md";
 import { MdBrandingWatermark } from "react-icons/md";
-import { Link } from "@inertiajs/react";
+import { Link, usePage, router } from "@inertiajs/react";
+import Dropdown from "@/Components/Dropdown";
 
 export default function MarchantDashboardLayout({ children, marchantuser }) {
+    const { auth } = usePage().props;
+    const user = auth?.user || marchantuser;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [productsDropdownOpen, setProductsDropdownOpen] = useState(false); // Dropdown state
+    const [search, setSearch] = useState("");
+
+    const { url } = usePage();
+    const isActive = (href) =>
+        href &&
+        href !== "#" &&
+        url.startsWith(new URL(href, window.location.origin).pathname);
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        const q = search.trim();
+        if (q) {
+            router.get(route("merchant.products.index"), { q });
+        }
+    };
 
     const navigation = [
         { name: "Store", href: route("merchant.store.edit"), icon: MdStorefront, current: true },
@@ -115,7 +131,7 @@ export default function MarchantDashboardLayout({ children, marchantuser }) {
                             ) : (
                                 <Link
                                     href={item.href}
-                                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-muted ${item.current ? "bg-muted" : ""}`}
+                                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-muted ${isActive(item.href) ? "bg-muted" : ""}`}
                                 >
                                     <item.icon className="h-5 w-5" />
                                     {item.name}
@@ -141,12 +157,17 @@ export default function MarchantDashboardLayout({ children, marchantuser }) {
                         </Button>
 
                         <div className="flex flex-1 items-center gap-4">
-                            <form className="flex-1 max-w-lg hidden md:block">
+                            <form
+                                onSubmit={handleSearch}
+                                className="flex-1 max-w-lg hidden md:block"
+                            >
                                 <div className="relative">
                                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                                     <Input
                                         type="search"
-                                        placeholder="Search..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        placeholder="Search your products..."
                                         className="pl-8 bg-background"
                                     />
                                 </div>
@@ -154,9 +175,53 @@ export default function MarchantDashboardLayout({ children, marchantuser }) {
                         </div>
 
                         <div className="flex mr-8 justify-end items-center gap-3">
-                            <Button variant="ghost" size="icon">
-                                <Bell className="h-5 w-5" />
-                            </Button>
+                            {/* User menu with logout */}
+                            <Dropdown>
+                                <Dropdown.Trigger>
+                                    <button className="flex items-center gap-2 rounded-full border pl-1 pr-3 py-1 hover:bg-muted transition">
+                                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">
+                                            {(user?.name || "M")
+                                                .charAt(0)
+                                                .toUpperCase()}
+                                        </span>
+                                        <span className="hidden sm:block max-w-[120px] truncate text-sm font-medium">
+                                            {user?.name || "Merchant"}
+                                        </span>
+                                    </button>
+                                </Dropdown.Trigger>
+                                <Dropdown.Content>
+                                    {user && (
+                                        <>
+                                            <div className="px-4 py-2">
+                                                <p className="text-sm font-medium text-gray-800 truncate">
+                                                    {user.name}
+                                                </p>
+                                                <p className="text-xs text-gray-500 truncate">
+                                                    {user.email}
+                                                </p>
+                                            </div>
+                                            <hr className="my-1" />
+                                        </>
+                                    )}
+                                    <Dropdown.Link
+                                        href={route("merchant.store.edit")}
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            <UserIcon className="h-4 w-4" /> Store
+                                            Profile
+                                        </span>
+                                    </Dropdown.Link>
+                                    <Dropdown.Link
+                                        href={route("logout")}
+                                        method="post"
+                                        as="button"
+                                    >
+                                        <span className="flex items-center gap-2 text-red-600">
+                                            <LogOut className="h-4 w-4" /> Log Out
+                                        </span>
+                                    </Dropdown.Link>
+                                </Dropdown.Content>
+                            </Dropdown>
                         </div>
                     </div>
                 </header>

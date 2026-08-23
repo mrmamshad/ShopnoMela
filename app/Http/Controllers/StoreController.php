@@ -56,10 +56,11 @@ class StoreController extends Controller
         // Get the store belonging to the logged-in user
         $store = Store::where('user_id', Auth::id())->first();
 
-        // If store doesn't exist, handle that case (redirect or create a new one)
+        // If store doesn't exist, send the merchant to their dashboard
+        // where they can create a store, instead of the generic dashboard.
         if (!$store) {
-            // Optionally redirect or create a new store record
-            return redirect()->route('dashboard')->with('error', 'Store not found!');
+            return redirect()->route('marchant')
+                ->with('error', 'You have not set up a store yet. Please create one first.');
         }
 
         return Inertia::render('Marchant/StoreProfile', [

@@ -82,6 +82,20 @@ const ProductDetails = ({
 
     const [currentIndex, setCurrentIndex] = useState(0);
 
+    // Image zoom-on-hover state (like applegadgetsbd)
+    const [isZooming, setIsZooming] = useState(false);
+    const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+
+    const handleZoomMove = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        setZoomPos({
+            x: Math.min(100, Math.max(0, x)),
+            y: Math.min(100, Math.max(0, y)),
+        });
+    };
+
     // Previous Image
     const prevImage = () => {
         setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -120,6 +134,19 @@ const ProductDetails = ({
     });
     const [selectedSize, setSelectedSize] = useState(null);
     const [selectedColor, setSelectedColor] = useState(null);
+
+    // Dynamic variant attributes (e.g. RAM, Storage) set by the merchant
+    const parsedAttributes = (() => {
+        const raw = productdetails.attributes;
+        if (!raw) return [];
+        try {
+            const arr = Array.isArray(raw) ? raw : JSON.parse(raw);
+            return Array.isArray(arr) ? arr : [];
+        } catch {
+            return [];
+        }
+    })();
+    const [selectedAttributes, setSelectedAttributes] = useState({});
 
     // {console.log("size",productdetails.size)}
     const cartForm = useForm({
@@ -237,12 +264,40 @@ const ProductDetails = ({
                                 </button>
                             )}
 
-                            <img
-                                src={imageSrc(images[currentIndex]) || "/placeholder.jpg"}
-                                alt="Product"
-                                className="w-full h-[320px] sm:h-[450px] object-contain rounded-lg p-4 transition-all duration-300"
-                                onError={imageFallback}
-                            />
+                            {/* Zoomable area */}
+                            <div
+                                className="relative w-full h-[320px] sm:h-[450px] overflow-hidden rounded-lg p-4 cursor-zoom-in group"
+                                onMouseEnter={() => setIsZooming(true)}
+                                onMouseLeave={() => setIsZooming(false)}
+                                onMouseMove={handleZoomMove}
+                            >
+                                <img
+                                    src={
+                                        imageSrc(images[currentIndex]) ||
+                                        "/placeholder.jpg"
+                                    }
+                                    alt="Product"
+                                    className={`w-full h-full object-contain transition-opacity duration-200 ${
+                                        isZooming ? "opacity-0" : "opacity-100"
+                                    }`}
+                                    onError={imageFallback}
+                                />
+
+                                {/* Zoomed layer */}
+                                <div
+                                    className={`pointer-events-none absolute inset-0 rounded-lg bg-no-repeat transition-opacity duration-200 ${
+                                        isZooming ? "opacity-100" : "opacity-0"
+                                    }`}
+                                    style={{
+                                        backgroundImage: `url(${
+                                            imageSrc(images[currentIndex]) ||
+                                            "/placeholder.jpg"
+                                        })`,
+                                        backgroundSize: "200%",
+                                        backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
+                                    }}
+                                />
+                            </div>
 
                             {images.length > 1 && (
                                 <button
@@ -401,6 +456,40 @@ const ProductDetails = ({
                                       )}
                             </RadioGroup>
                         </div>
+
+                        {/* Dynamic Variant Attributes (RAM, Storage, etc.) */}
+                        {parsedAttributes.map((attr, i) =>
+                            attr?.name && Array.isArray(attr.values) && attr.values.length ? (
+                                <div key={i} className="space-y-2">
+                                    <h3 className="font-medium">{attr.name}</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {attr.values.map((val, j) => (
+                                            <button
+                                                key={j}
+                                                type="button"
+                                                onClick={() =>
+                                                    setSelectedAttributes(
+                                                        (prev) => ({
+                                                            ...prev,
+                                                            [attr.name]: val,
+                                                        })
+                                                    )
+                                                }
+                                                className={`px-3 py-1 border rounded-lg text-sm font-medium transition ${
+                                                    selectedAttributes[
+                                                        attr.name
+                                                    ] === val
+                                                        ? "bg-orange-500 text-white border-orange-500"
+                                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                                }`}
+                                            >
+                                                {val}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : null
+                        )}
 
                         {/* Quantity */}
                         <div className="space-y-2">

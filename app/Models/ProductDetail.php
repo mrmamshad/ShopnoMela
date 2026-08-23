@@ -10,7 +10,13 @@ class ProductDetail extends Model
     use HasFactory;
 
     protected $fillable = [
-        'img1', 'img2', 'img3', 'img4', 'des', 'color', 'size', 'product_id'
+        'img1', 'img2', 'img3', 'img4', 'des', 'color', 'size', 'attributes', 'product_id'
+    ];
+
+    protected $casts = [
+        'color' => 'array',
+        'size' => 'array',
+        'attributes' => 'array',
     ];
 
     // Relationship: Product details belong to a product

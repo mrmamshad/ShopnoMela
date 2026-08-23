@@ -3,9 +3,6 @@ import {
     LayoutDashboard,
     Users,
     ShoppingCart,
-    Settings,
-    HelpCircle,
-    Bell,
     Search,
     Menu,
     X,
@@ -13,77 +10,77 @@ import {
     ChevronUp,
     Home,
     FolderTree,
-    AlertTriangle, // Dangerous icon
-    Info, // Details icon
+    AlertTriangle,
+    LogOut,
+    User as UserIcon,
 } from "lucide-react";
-
-// import a lucide-react icon for showing danger icon
 
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
-import { Link } from "@inertiajs/react";
+import { Link, usePage, router } from "@inertiajs/react";
+import Dropdown from "@/Components/Dropdown";
 
 export default function AdminDashboardLayout({ children }) {
+    const { auth } = usePage().props;
+    const user = auth?.user;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [homeDropdownOpen, setHomeDropdownOpen] = useState(false); // State for dropdown
+    const [search, setSearch] = useState("");
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        const q = search.trim();
+        if (q) {
+            router.get(route("marchantlist"), { q });
+        }
+    };
+
+    const { url } = usePage();
+    const isActive = (href) =>
+        href && href !== "#" && url.startsWith(new URL(href, window.location.origin).pathname);
 
     const navigation = [
         {
             name: "Home Page",
             href: "#",
             icon: Home,
-            current: false,
             hasDropdown: true,
             children: [
                 { name: "Slider", href: route("offers.index") },
                 { name: "Flash Sale", href: route("flash-sales.index") },
-                { name: "Section Manage", href: "#section-manage" },
             ],
         },
         {
             name: "All Merchants",
             href: route("marchantlist"),
             icon: LayoutDashboard,
-            current: true,
         },
         {
             name: "All Orders",
             href: route("admin.allorders"),
             icon: ShoppingCart,
-            current: false,
         },
         {
-           name: "Marchant Orders News",
+            name: "Merchant Orders News",
             href: route("admin.merchant.orders.news"),
-            icon: Bell,
-            current: false,
+            icon: FolderTree,
         },
-        { name: "Users", href: route("userlist"), icon: Users, current: false },
+        { name: "Users", href: route("userlist"), icon: Users },
         {
             name: "Categories",
             href: route("admin.categories"),
             icon: FolderTree,
-            current: false,
         },
         {
             name: "Merchant Applications",
             href: route("merchant.applications.index"),
             icon: ShoppingCart,
-            current: false,
         },
         {
-            name: "Single Marchant details",
-            href: route("marchantlist"),
-            icon: Info,
-            current: false,
-        },
-        {
-            name: "Product reports",
+            name: "Product Reports",
             href: route("admin.product-reports"),
             icon: AlertTriangle,
-            current: false,
         },
-        { name: "Help", href: "#", icon: HelpCircle, current: false },
     ];
 
     return (
@@ -164,7 +161,7 @@ export default function AdminDashboardLayout({ children }) {
                                     href={item.href}
                                     className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium 
                                     transition-colors hover:bg-muted ${
-                                        item.current ? "bg-muted" : ""
+                                        isActive(item.href) ? "bg-muted" : ""
                                     }`}
                                 >
                                     <item.icon className="h-5 w-5" />
@@ -191,12 +188,17 @@ export default function AdminDashboardLayout({ children }) {
                         </Button>
 
                         <div className="flex flex-1 items-center gap-4">
-                            <form className="flex-1 max-w-lg hidden md:block">
+                            <form
+                                onSubmit={handleSearch}
+                                className="flex-1 max-w-lg hidden md:block"
+                            >
                                 <div className="relative">
                                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                                     <Input
                                         type="search"
-                                        placeholder="Search..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        placeholder="Search merchants..."
                                         className="pl-8 bg-background"
                                     />
                                 </div>
@@ -204,9 +206,51 @@ export default function AdminDashboardLayout({ children }) {
                         </div>
 
                         <div className="flex mr-8 justify-end items-center gap-3">
-                            <Button variant="ghost" size="icon">
-                                <Bell className="h-5 w-5" />
-                            </Button>
+                            {/* User menu with logout */}
+                            <Dropdown>
+                                <Dropdown.Trigger>
+                                    <button className="flex items-center gap-2 rounded-full border pl-1 pr-3 py-1 hover:bg-muted transition">
+                                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">
+                                            {(user?.name || "A")
+                                                .charAt(0)
+                                                .toUpperCase()}
+                                        </span>
+                                        <span className="hidden sm:block max-w-[120px] truncate text-sm font-medium">
+                                            {user?.name || "Admin"}
+                                        </span>
+                                    </button>
+                                </Dropdown.Trigger>
+                                <Dropdown.Content>
+                                    {user && (
+                                        <>
+                                            <div className="px-4 py-2">
+                                                <p className="text-sm font-medium text-gray-800 truncate">
+                                                    {user.name}
+                                                </p>
+                                                <p className="text-xs text-gray-500 truncate">
+                                                    {user.email}
+                                                </p>
+                                            </div>
+                                            <hr className="my-1" />
+                                        </>
+                                    )}
+                                    <Dropdown.Link href={route("profile.edit")}>
+                                        <span className="flex items-center gap-2">
+                                            <UserIcon className="h-4 w-4" />{" "}
+                                            Profile
+                                        </span>
+                                    </Dropdown.Link>
+                                    <Dropdown.Link
+                                        href={route("logout")}
+                                        method="post"
+                                        as="button"
+                                    >
+                                        <span className="flex items-center gap-2 text-red-600">
+                                            <LogOut className="h-4 w-4" /> Log Out
+                                        </span>
+                                    </Dropdown.Link>
+                                </Dropdown.Content>
+                            </Dropdown>
                         </div>
                     </div>
                 </header>

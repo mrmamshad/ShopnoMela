@@ -17,22 +17,20 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $merchant = auth()->user(); // Get logged-in merchant
+        $q = $request->input('q');
 
         $products = Product::where('user_id', $merchant->id)
             ->with('category', 'brand', 'details') // Load relations
+            ->when($q, fn($query) => $query->where('title', 'like', "%{$q}%"))
             ->latest()
             ->get();
 
-        // dd($products); // ✅ Now it should return products!
-
-        // dd($products->image);
-
-        // Fetch products and pass to Inertia view
         return Inertia::render('Marchant/Products/Index', [
-            'products' => $products, // Assuming a merchant-user relationship
+            'products' => $products,
+            'filters' => ['q' => $q],
         ]);
     }
 
@@ -157,6 +155,10 @@ class ProductController extends Controller
             'des' => 'required|string',
             'color' => 'nullable|array',
             'size' => 'nullable|array',
+            'attributes' => 'nullable|array',
+            'attributes.*.name' => 'required_with:attributes|string|max:50',
+            'attributes.*.values' => 'nullable|array',
+            'attributes.*.values.*' => 'nullable|string|max:50',
             'img1' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
             'img2' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
             'img3' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
@@ -194,11 +196,27 @@ class ProductController extends Controller
             }
         }
 
+        // Clean up dynamic attributes: keep only those with a name and at least one value
+        $attributes = collect($validated['attributes'] ?? [])
+            ->map(function ($attr) {
+                $name = trim($attr['name'] ?? '');
+                $values = collect($attr['values'] ?? [])
+                    ->map(fn($v) => trim($v))
+                    ->filter()
+                    ->values()
+                    ->all();
+                return ['name' => $name, 'values' => $values];
+            })
+            ->filter(fn($attr) => $attr['name'] !== '' && count($attr['values']) > 0)
+            ->values()
+            ->all();
+
         ProductDetail::create([
             'product_id' => $product->id,
             'des' => $validated['des'],
-            'color' => json_encode($validated['color'] ?? []),
-            'size' => json_encode($validated['size'] ?? []),
+            'color' => $validated['color'] ?? [],
+            'size' => $validated['size'] ?? [],
+            'attributes' => $attributes,
             'img1' => $storedImages['img1'],
             'img2' => $storedImages['img2'],
             'img3' => $storedImages['img3'],

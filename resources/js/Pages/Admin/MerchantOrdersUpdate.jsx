@@ -4,7 +4,6 @@ import { usePage } from '@inertiajs/react';
 
 export default function MerchantOrdersUpdate() {
     const { orders, stores } = usePage().props;
-    console.log(orders);
 
     return (
         <AdminLayout>

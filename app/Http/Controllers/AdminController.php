@@ -13,24 +13,99 @@ class AdminController extends Controller
 {
     public function index()
     {
-        // dd('admin');
-        return Inertia::render('Admin/Index');
+        $now = now();
+
+        // Revenue only from completed/relevant orders (exclude cancelled)
+        $paidOrders = Order::whereNotIn('status', ['Cancelled', 'cancelled']);
+        $totalRevenue = (clone $paidOrders)->sum('amount');
+        $lastMonthRevenue = (clone $paidOrders)
+            ->whereBetween('created_at', [$now->copy()->subMonths(2), $now->copy()->subMonth()])
+            ->sum('amount');
+        $thisMonthRevenue = (clone $paidOrders)
+            ->where('created_at', '>=', $now->copy()->subMonth())
+            ->sum('amount');
+
+        $totalMerchants = User::whereHas('roles', fn($q) => $q->where('name', 'merchant'))->count();
+        $totalCustomers = User::whereHas('roles', fn($q) => $q->where('name', 'customer'))->count();
+        $totalOrders = Order::count();
+        $ordersLastHour = Order::where('created_at', '>=', $now->copy()->subHour())->count();
+
+        // Monthly sales for the last 6 months (chart)
+        $salesChart = collect(range(5, 0))->map(function ($i) use ($now) {
+            $month = $now->copy()->subMonths($i);
+            $value = Order::whereNotIn('status', ['Cancelled', 'cancelled'])
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->sum('amount');
+            return ['name' => $month->format('M'), 'value' => round($value, 2)];
+        })->values();
+
+        // Recent activity = latest orders
+        $recentActivities = Order::with('product')
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(fn($o) => [
+                'user' => $o->name ?: ($o->email ?: 'Guest'),
+                'action' => 'Ordered ' . ($o->product->title ?? $o->product_name ?? 'a product'),
+                'time' => $o->created_at?->diffForHumans(),
+            ]);
+
+        $pct = fn($cur, $prev) => $prev > 0 ? round((($cur - $prev) / $prev) * 100, 1) : ($cur > 0 ? 100 : 0);
+
+        return Inertia::render('Admin/Index', [
+            'stats' => [
+                'totalRevenue' => round($totalRevenue, 2),
+                'revenueChange' => $pct($thisMonthRevenue, $lastMonthRevenue),
+                'totalMerchants' => $totalMerchants,
+                'totalCustomers' => $totalCustomers,
+                'totalOrders' => $totalOrders,
+                'ordersLastHour' => $ordersLastHour,
+            ],
+            'salesChart' => $salesChart,
+            'recentActivities' => $recentActivities,
+        ]);
     }
-    public function marchantlist()
+    public function marchantlist(Request $request)
     {
+        $q = $request->input('q');
+
         $merchants = User::whereHas('roles', function ($query) {
             $query->whereIn('name', ['merchant']);
-        })->get();
-        // dd($merchants); 
-        return Inertia::render('Admin/MarchantList', ['merchants' => $merchants]);
+        })
+            ->when($q, function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', "%{$q}%")
+                        ->orWhere('email', 'like', "%{$q}%");
+                });
+            })
+            ->get();
+
+        return Inertia::render('Admin/MarchantList', [
+            'merchants' => $merchants,
+            'filters' => ['q' => $q],
+        ]);
     }
 
-    public function userlist()
+    public function userlist(Request $request)
     {
+        $q = $request->input('q');
+
         $users = User::whereHas('roles', function ($query) {
             $query->whereIn('name', ['customer']);
-        })->get();
-        return Inertia::render('Admin/UserList', ['users' => $users]);
+        })
+            ->when($q, function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', "%{$q}%")
+                        ->orWhere('email', 'like', "%{$q}%");
+                });
+            })
+            ->get();
+
+        return Inertia::render('Admin/UserList', [
+            'users' => $users,
+            'filters' => ['q' => $q],
+        ]);
     }
 
     public function assignMerchant($id)

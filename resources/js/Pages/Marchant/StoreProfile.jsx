@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
 export default function StoreProfile({ store, user }) {
-  console.log("store", store);
   const { toast } = useToast();
   const { flash } = usePage().props;
 

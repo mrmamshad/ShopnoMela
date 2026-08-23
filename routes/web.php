@@ -35,7 +35,19 @@ use Inertia\Inertia;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    $user = auth()->user();
+
+    // Route users to the right place based on their role.
+    if ($user) {
+        if ($user->hasRole('admin')) {
+            return redirect()->route('admin');
+        }
+        if ($user->hasRole('merchant')) {
+            return redirect()->route('marchant');
+        }
+    }
+
+    return redirect()->route('home');
 })
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
