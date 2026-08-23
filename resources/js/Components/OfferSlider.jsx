@@ -45,7 +45,7 @@ const OfferSlider = ({ offers }) => {
                                     loading="lazy"
                                     decoding="async"
                                     onError={imageFallback}
-                                    className="w-full h-auto object-cover max-h-[400px] rounded-xl group-hover:scale-105 transition-transform duration-500"
+                                    className="w-full h-auto object-contain rounded-xl group-hover:scale-105 transition-transform duration-500"
                                 />
                                 {offer.discount > 0 && (
                                     <span className="absolute top-3 right-3 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
