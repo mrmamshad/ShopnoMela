@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductDetail;
+use App\Models\ProductReview;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -92,6 +93,51 @@ class ProductController extends Controller
         $brand->delete();
 
         return redirect()->back()->with('success', 'Brand deleted successfully.');
+    }
+
+    // Merchant reports (their products, orders, revenue)
+    public function reports()
+    {
+        $merchantId = auth()->id();
+        $products = Product::where('user_id', $merchantId)->get();
+        $productIds = $products->pluck('id');
+        $orders = Order::whereIn('product_id', $productIds)->get();
+
+        $topProducts = $orders->groupBy('product_id')->map(function ($o) {
+            $p = Product::find($o->first()->product_id);
+            return [
+                'title' => $p?->title ?? 'Unknown',
+                'count' => $o->count(),
+                'revenue' => $o->sum('amount'),
+            ];
+        })->sortByDesc('count')->take(5)->values();
+
+        return Inertia::render('Marchant/Reports', [
+            'productCount' => $products->count(),
+            'orderCount' => $orders->count(),
+            'revenue' => $orders->sum('amount'),
+            'byStatus' => $orders->groupBy('status')->map->count(),
+            'topProducts' => $topProducts,
+        ]);
+    }
+
+    // Reviews for the merchant's products
+    public function reviews()
+    {
+        $merchantId = auth()->id();
+        $productIds = Product::where('user_id', $merchantId)->pluck('id');
+        $reviews = ProductReview::with(['user', 'product'])
+            ->whereIn('product_id', $productIds)
+            ->latest()
+            ->get();
+
+        return Inertia::render('Marchant/Reviews', ['reviews' => $reviews]);
+    }
+
+    // Merchant help page
+    public function help()
+    {
+        return Inertia::render('Marchant/Help');
     }
 
     public function store(Request $request)

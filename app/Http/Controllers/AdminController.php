@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -109,5 +110,54 @@ class AdminController extends Controller
     {
         $category->delete();
         return redirect()->back()->with('success', 'Category deleted successfully.');
+    }
+
+    // Single merchant details (admin)
+    public function merchantDetails($id)
+    {
+        $merchant = User::with(['store'])
+            ->whereHas('roles', function ($q) { $q->where('name', 'merchant'); })
+            ->findOrFail($id);
+
+        $products = Product::where('user_id', $id)->get();
+        $productIds = $products->pluck('id');
+        $orders = Order::whereIn('product_id', $productIds)->with('product')->latest()->get();
+
+        return Inertia::render('Admin/MerchantDetails', [
+            'merchant' => $merchant,
+            'store' => $merchant->store,
+            'products' => $products,
+            'orders' => $orders,
+            'productCount' => $products->count(),
+            'orderCount' => $orders->count(),
+            'totalSales' => $orders->sum('amount'),
+        ]);
+    }
+
+    // Product reports (admin)
+    public function productReports()
+    {
+        $products = Product::with('user')->get();
+
+        $orderStats = Order::selectRaw('product_id, COUNT(*) as order_count, SUM(amount) as revenue')
+            ->groupBy('product_id')
+            ->get()
+            ->keyBy('product_id');
+
+        $products = $products->map(function ($p) use ($orderStats) {
+            $p->order_count = $orderStats[$p->id]->order_count ?? 0;
+            $p->revenue = $orderStats[$p->id]->revenue ?? 0;
+            return $p;
+        })->sortByDesc('revenue')->values();
+
+        $merchantCounts = $products->groupBy('user_id')->map->count();
+
+        return Inertia::render('Admin/ProductReports', [
+            'products' => $products,
+            'totalProducts' => $products->count(),
+            'merchantCounts' => $merchantCounts,
+            'totalRevenue' => $products->sum('revenue'),
+            'totalOrders' => Order::count(),
+        ]);
     }
 }

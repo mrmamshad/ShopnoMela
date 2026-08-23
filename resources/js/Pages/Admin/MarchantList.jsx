@@ -1,4 +1,4 @@
-import { useForm } from "@inertiajs/react";
+import { useForm, Link } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/admin-dashboard-layout";
 import {
     Table,
@@ -85,16 +85,29 @@ export default function MerchantList({ merchants }) {
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-center">
-                                        <Button
-                                            variant="destructive"
-                                            size="sm"
-                                            onClick={() =>
-                                                handleTakeOver(merchant.id)
-                                            }
-                                        >
-                                            <Trash2 className="w-4 h-4 mr-1" />{" "}
-                                            Take Over
-                                        </Button>
+                                        <div className="flex items-center justify-center gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                asChild
+                                            >
+                                                <Link
+                                                    href={route("admin.merchant.details", { id: merchant.id })}
+                                                >
+                                                    View Details
+                                                </Link>
+                                            </Button>
+                                            <Button
+                                                variant="destructive"
+                                                size="sm"
+                                                onClick={() =>
+                                                    handleTakeOver(merchant.id)
+                                                }
+                                            >
+                                                <Trash2 className="w-4 h-4 mr-1" />{" "}
+                                                Take Over
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}

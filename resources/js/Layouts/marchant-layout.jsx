@@ -40,9 +40,9 @@ export default function MarchantDashboardLayout({ children, marchantuser }) {
         },
         { name: "Orders", href: route("merchant.orders"), icon: ShoppingCart, current: false },
         { name: "Brands", href: route("merchant.brands.index"), icon: MdBrandingWatermark, current: false },
-        { name: "Reports", href: "#", icon: MdReport, current: false },
-        { name: "Reviews", href: "#", icon: MdOutlineRateReview, current: false },
-        { name: "Help", href: "#", icon: HelpCircle, current: false },
+        { name: "Reports", href: route("merchant.reports"), icon: MdReport, current: false },
+        { name: "Reviews", href: route("merchant.reviews"), icon: MdOutlineRateReview, current: false },
+        { name: "Help", href: route("merchant.help"), icon: HelpCircle, current: false },
     ];
 
     return (

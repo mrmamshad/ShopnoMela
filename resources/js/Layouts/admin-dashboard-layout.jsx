@@ -72,14 +72,14 @@ export default function AdminDashboardLayout({ children }) {
             current: false,
         },
         {
-            name: "Single Marchant details ",
-            href: "#",
+            name: "Single Marchant details",
+            href: route("marchantlist"),
             icon: Info,
             current: false,
         },
         {
-            name: "Product reports ",
-            href: "#",
+            name: "Product reports",
+            href: route("admin.product-reports"),
             icon: AlertTriangle,
             current: false,
         },

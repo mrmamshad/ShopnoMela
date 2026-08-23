@@ -115,6 +115,8 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
 
     // marchant manage routes
     Route::get('/admin/marchants', [AdminController::class, 'marchantlist'])->name('marchantlist');
+    Route::get('/admin/marchants/{id}', [AdminController::class, 'merchantDetails'])->name('admin.merchant.details');
+    Route::get('/admin/product-reports', [AdminController::class, 'productReports'])->name('admin.product-reports');
     // all users manage routes
     Route::get('/admin/users', [AdminController::class, 'userlist'])->name('userlist');
     //  to give a user merchant role
@@ -148,6 +150,9 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,
     Route::get('/marchant/brands', [MerchantProductController::class, 'brands'])->name('merchant.brands.index');
     Route::delete('/marchant/brands/{id}', [MerchantProductController::class, 'deleteBrand'])->name('merchant.brands.destroy');
     Route::get('/marchant/orders', [MerchantProductController::class, 'orders'])->name('merchant.orders');
+    Route::get('/marchant/reports', [MerchantProductController::class, 'reports'])->name('merchant.reports');
+    Route::get('/marchant/reviews', [MerchantProductController::class, 'reviews'])->name('merchant.reviews');
+    Route::get('/marchant/help', [MerchantProductController::class, 'help'])->name('merchant.help');
     Route::post('/merchant/orders/confirm/{id}', [MerchantOrderController::class, 'confirmOrder'])->name('merchant.orders.confirm');
     Route::post('/merchant/orders/delivered/{id}', [MerchantOrderController::class, 'markAsDelivered'])->name('merchant.orders.delivered');
     Route::delete('/merchant/orders/delete/{id}', [MerchantOrderController::class, 'deleteOrder'])->name('merchant.orders.delete');
