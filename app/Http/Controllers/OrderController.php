@@ -113,7 +113,7 @@ $orders = Order::with('product') // Eager load product
         $user = User::firstOrCreate(
             ['email' => $email],
             [
-                'name' => $name ?: 'ShopnoMela User',
+                'name' => $name ?: 'Tajim User',
                 'phone' => $phone,
                 'password' => Hash::make($password ?: Str::random(16)),
             ]

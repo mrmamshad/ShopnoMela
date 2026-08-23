@@ -76,7 +76,7 @@ const OrderPDF = ({ order }) => (
             <View style={styles.headerSection}>
                 <Image style={styles.logo} src="/logo/logo.png" />
                 <View style={styles.shopNameContainer}>
-                    <Text style={styles.shopName}>স্বপ্ন</Text>
+                    <Text style={styles.shopName}>Tajim</Text>
                     <Text
                         style={{
                             fontSize: 18,
@@ -85,7 +85,7 @@ const OrderPDF = ({ order }) => (
                             marginLeft: 2, // Ensure text is next to each other
                         }}
                     >
-                        Mela
+                        Foods
                     </Text>
                 </View>
             </View>

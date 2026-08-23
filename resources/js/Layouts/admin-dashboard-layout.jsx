@@ -108,7 +108,7 @@ export default function AdminDashboardLayout({ children }) {
                     <div className="flex items-center gap-2 font-semibold text-lg">
                         <div className="h-8 w-8 rounded-lg bg-primary"></div>
                         <Link href={route("admin")}>
-                            স্বপ্ন মেলা Admin Panel
+                            Tajim Foods Admin Panel
                         </Link>
                     </div>
                     <Button
