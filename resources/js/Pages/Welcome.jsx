@@ -42,11 +42,11 @@ export default function Welcome({
     return (
         <div className="min-h-screen bg-gray-100">
             <Head>
-                <title>Tajim Foods Products</title>
+                <title>Tajim BD</title>
                 <meta
                     head-key="description"
                     name="description"
-                    content="Tajim Foods Products - মুক্তিনগর, সানারপাড়, সিদ্ধিরগঞ্জ, নারায়ণগঞ্জ। যোগাযোগ: 01838891448"
+                    content="Tajim BD - মুক্তিনগর, সানারপাড়, সিদ্ধিরগঞ্জ, নারায়ণগঞ্জ। যোগাযোগ: 01838891448"
                 />
                 <link rel="preconnect" href="https://picsum.photos" />
                 <link rel="preconnect" href="https://img.lazcdn.com" />

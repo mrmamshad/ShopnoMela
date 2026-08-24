@@ -253,7 +253,7 @@ const Footer = () => {
 
                 {/* Copyright */}
                 <div className="text-center text-gray-600 border-t border-gray-200 pt-6">
-                    <p>&copy; 2025 Tajim Foods Products. All rights reserved.</p>
+                    <p>&copy; 2025 Tajim BD. All rights reserved.</p>
                 </div>
             </div>
 

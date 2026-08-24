@@ -146,16 +146,48 @@ const ProductDetails = ({
             return [];
         }
     })();
+    // selectedAttributes maps attribute name -> selected option object { label, price }
     const [selectedAttributes, setSelectedAttributes] = useState({});
+
+    const basePrice = Number(singleproduct.price) || 0;
+
+    // Sum of all selected variant option price adjustments
+    const attributesExtra = Object.values(selectedAttributes).reduce(
+        (sum, opt) => sum + (opt ? Number(opt.price) || 0 : 0),
+        0
+    );
+
+    // Final unit price = base price + selected option adjustments
+    const computedPrice = basePrice + attributesExtra;
 
     // {console.log("size",productdetails.size)}
     const cartForm = useForm({
         product_id: singleproduct.id,
         color: selectedColor,
         size: selectedSize,
+        variant: "",
         qty: 1,
-        price: singleproduct.price,
+        price: computedPrice,
     });
+
+    // Keep cartForm price / variant selections in sync with user choices
+    useEffect(() => {
+        const variantParts = [];
+        if (selectedColor) variantParts.push(selectedColor);
+        if (selectedSize) variantParts.push(selectedSize);
+        Object.entries(selectedAttributes).forEach(([name, opt]) => {
+            if (opt?.label) variantParts.push(`${name}: ${opt.label}`);
+        });
+
+        cartForm.setData((prev) => ({
+            ...prev,
+            color: selectedColor,
+            size: selectedSize,
+            variant: variantParts.join(", "),
+            price: computedPrice,
+        }));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedColor, selectedSize, selectedAttributes, computedPrice]);
 
     const wishlistForm = useForm({
         product_id: singleproduct.id,
@@ -367,8 +399,14 @@ const ProductDetails = ({
 
                         <div className="border-t pt-4">
                             <div className="text-3xl font-bold">
-                                ৳ {singleproduct.price}
+                                ৳ {computedPrice.toLocaleString()}
                             </div>
+                            {attributesExtra > 0 && (
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Base ৳ {basePrice.toLocaleString()} +
+                                    variants ৳ {attributesExtra.toLocaleString()}
+                                </p>
+                            )}
                         </div>
 
                         {/* Size Selection */}
@@ -463,29 +501,49 @@ const ProductDetails = ({
                                 <div key={i} className="space-y-2">
                                     <h3 className="font-medium">{attr.name}</h3>
                                     <div className="flex flex-wrap gap-2">
-                                        {attr.values.map((val, j) => (
-                                            <button
-                                                key={j}
-                                                type="button"
-                                                onClick={() =>
-                                                    setSelectedAttributes(
-                                                        (prev) => ({
-                                                            ...prev,
-                                                            [attr.name]: val,
-                                                        })
-                                                    )
-                                                }
-                                                className={`px-3 py-1 border rounded-lg text-sm font-medium transition ${
-                                                    selectedAttributes[
-                                                        attr.name
-                                                    ] === val
-                                                        ? "bg-orange-500 text-white border-orange-500"
-                                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                                }`}
-                                            >
-                                                {val}
-                                            </button>
-                                        ))}
+                                        {attr.values.map((opt, j) => {
+                                            // Support both new {label, price} shape and legacy string values
+                                            const label =
+                                                typeof opt === "object"
+                                                    ? opt.label
+                                                    : opt;
+                                            const price =
+                                                typeof opt === "object"
+                                                    ? Number(opt.price) || 0
+                                                    : 0;
+                                            const isSelected =
+                                                selectedAttributes[attr.name]
+                                                    ?.label === label;
+                                            return (
+                                                <button
+                                                    key={j}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setSelectedAttributes(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                [attr.name]: {
+                                                                    label,
+                                                                    price,
+                                                                },
+                                                            })
+                                                        )
+                                                    }
+                                                    className={`px-3 py-1 border rounded-lg text-sm font-medium transition ${
+                                                        isSelected
+                                                            ? "bg-orange-500 text-white border-orange-500"
+                                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                                    }`}
+                                                >
+                                                    {label}
+                                                    {price > 0 && (
+                                                        <span className="ml-1 opacity-80">
+                                                            (+৳{price})
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             ) : null

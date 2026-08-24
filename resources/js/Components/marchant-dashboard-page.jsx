@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import { ArrowUpRight, ArrowDownRight, DollarSign, ShoppingCart, Clock } from "lucide-react"
+import { ArrowUpRight, ArrowDownRight, DollarSign, ShoppingCart, Clock, Percent, Wallet, Landmark } from "lucide-react"
 import { RiProductHuntFill } from "react-icons/ri"
 
 const bdt = (n) =>
@@ -18,7 +18,7 @@ function ChangeBadge({ value }) {
   )
 }
 
-export default function MarchantDashboardPage({ marchantuser, stats = {}, salesChart = [], recentActivities = [] }) {
+export default function MarchantDashboardPage({ marchantuser, stats = {}, commission = {}, salesChart = [], recentActivities = [] }) {
   const chartData = salesChart.length ? salesChart : [{ name: "-", value: 0 }]
 
   return (
@@ -79,6 +79,74 @@ export default function MarchantDashboardPage({ marchantuser, stats = {}, salesC
           </CardContent>
         </Card>
       </div>
+
+      {/* Earnings and Commission */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wallet className="h-5 w-5 text-emerald-600" />
+            Earnings and Commission
+          </CardTitle>
+          <CardDescription>
+            Admin commission rate:{" "}
+            <span className="font-semibold">{commission.rate ?? 0}%</span>
+            {" "}(applied to your non-cancelled orders)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-lg border p-4 bg-gray-50">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <DollarSign className="h-4 w-4" /> Total Sales
+              </div>
+              <div className="text-2xl font-bold mt-1">
+                {bdt(commission.total_sales)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                From {stats.totalOrders ?? 0} orders
+              </p>
+            </div>
+
+            <div className="rounded-lg border p-4 bg-red-50">
+              <div className="flex items-center gap-2 text-sm text-red-600">
+                <Percent className="h-4 w-4" /> Admin Commission
+              </div>
+              <div className="text-2xl font-bold mt-1 text-red-600">
+                {"− "}{bdt(commission.commission)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {commission.rate ?? 0}% of total sales
+              </p>
+            </div>
+
+            <div className="rounded-lg border p-4 bg-emerald-50">
+              <div className="flex items-center gap-2 text-sm text-emerald-700">
+                <Landmark className="h-4 w-4" /> Your Net Earnings
+              </div>
+              <div className="text-2xl font-bold mt-1 text-emerald-700">
+                {bdt(commission.net)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                After commission deducted
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 text-sm text-muted-foreground border-t pt-3">
+            <span className="font-medium text-gray-700">
+              Settled (Delivered) only:
+            </span>{" "}
+            Sales {bdt(commission.delivered_sales)} {"·"} Commission{" "}
+            <span className="text-red-600">
+              {"−"}{bdt(commission.delivered_commission)}
+            </span>{" "}
+            {"·"} Net{" "}
+            <span className="text-emerald-700 font-medium">
+              {bdt(commission.delivered_net)}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Chart */}
       <Card>

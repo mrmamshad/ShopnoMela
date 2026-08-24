@@ -25,7 +25,13 @@ class CartController extends Controller
         if ($request->filled('color')) {
             $cartData['color'] = $request->color;
         }
-        if ($request->filled('size')) {
+
+        // Prefer the full variant summary (color, size + custom attributes like
+        // "RAM: 16GB") when provided so the chosen options are visible in the
+        // cart, checkout and order. Fall back to the plain size value.
+        if ($request->filled('variant')) {
+            $cartData['size'] = $request->variant;
+        } elseif ($request->filled('size')) {
             $cartData['size'] = $request->size;
         }
 

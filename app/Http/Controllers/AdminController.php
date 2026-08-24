@@ -6,11 +6,54 @@ use App\Models\Order;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Commission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 
 class AdminController extends Controller
 {
+    /**
+     * Compute the earnings breakdown for a single merchant.
+     *
+     * Commission is charged on every non-cancelled order (matching the app's
+     * existing revenue definition). We also expose a "settled" view based on
+     * Delivered orders so a merchant can see confirmed earnings vs. in-flight.
+     *
+     * @return array{rate: float, order_count: int, total_sales: float, commission: float, net: float, delivered_sales: float, delivered_commission: float, delivered_net: float}
+     */
+    private function merchantEarnings(int $merchantId): array
+    {
+        $rate = (float) (Commission::where('merchant_id', $merchantId)->value('rate') ?? 0);
+
+        $productIds = Product::where('user_id', $merchantId)->pluck('id');
+
+        $base = Order::whereIn('product_id', $productIds)
+            ->whereNotIn('status', ['Cancelled', 'cancelled']);
+
+        $orderCount = (clone $base)->count();
+        $totalSales = (float) (clone $base)->sum('amount');
+        $commission = round($totalSales * $rate / 100, 2);
+        $net = round($totalSales - $commission, 2);
+
+        $deliveredSales = (float) (clone $base)
+            ->whereIn('status', ['Delivered', 'delivered'])
+            ->sum('amount');
+        $deliveredCommission = round($deliveredSales * $rate / 100, 2);
+
+        return [
+            'rate' => $rate,
+            'order_count' => $orderCount,
+            'total_sales' => round($totalSales, 2),
+            'commission' => $commission,
+            'net' => $net,
+            'delivered_sales' => round($deliveredSales, 2),
+            'delivered_commission' => $deliveredCommission,
+            'delivered_net' => round($deliveredSales - $deliveredCommission, 2),
+        ];
+    }
+
     public function index()
     {
         $now = now();
@@ -70,20 +113,35 @@ class AdminController extends Controller
     {
         $q = $request->input('q');
 
-        $merchants = User::whereHas('roles', function ($query) {
-            $query->whereIn('name', ['merchant']);
-        })
+        $merchants = User::with('commission')
+            ->whereHas('roles', function ($query) {
+                $query->whereIn('name', ['merchant']);
+            })
             ->when($q, function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {
                     $sub->where('name', 'like', "%{$q}%")
                         ->orWhere('email', 'like', "%{$q}%");
                 });
             })
-            ->get();
+            ->get()
+            ->map(function ($merchant) {
+                $earnings = $this->merchantEarnings($merchant->id);
+                $merchant->commission_rate = $earnings['rate'];
+                $merchant->earnings = $earnings;
+                return $merchant;
+            });
+
+        // Platform-wide commission earned across all merchants
+        $totalCommission = $merchants->sum(fn($m) => $m->earnings['commission']);
+        $totalMerchantSales = $merchants->sum(fn($m) => $m->earnings['total_sales']);
 
         return Inertia::render('Admin/MarchantList', [
             'merchants' => $merchants,
             'filters' => ['q' => $q],
+            'summary' => [
+                'total_commission' => round($totalCommission, 2),
+                'total_sales' => round($totalMerchantSales, 2),
+            ],
         ]);
     }
 
@@ -123,6 +181,91 @@ class AdminController extends Controller
 
         return back()->with('success', 'User has been assigned the Merchant role.');
     }
+    // Admin creates a new merchant account directly
+    public function storeMerchant(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'phone' => 'nullable|string|max:20',
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        $user->assignRole('merchant');
+
+        // Optionally set an initial commission rate for this merchant
+        $rate = $request->input('commission_rate');
+        if ($rate !== null && $rate !== '') {
+            Commission::updateOrCreate(
+                ['merchant_id' => $user->id],
+                ['rate' => round((float) $rate, 2)]
+            );
+        }
+
+        return back()->with('success', 'Merchant account created successfully.');
+    }
+
+    // Admin sets or updates a merchant's commission rate
+    public function setCommission(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'rate' => 'required|numeric|min:0|max:100',
+        ]);
+
+        $user = User::findOrFail($id);
+
+        if (!$user->hasRole('merchant')) {
+            return back()->with('error', 'Commission can only be set for merchants.');
+        }
+
+        Commission::updateOrCreate(
+            ['merchant_id' => $user->id],
+            ['rate' => round((float) $validated['rate'], 2)]
+        );
+
+        return back()->with('success', 'Commission rate updated.');
+    }
+
+    // Admin resets a merchant's password
+    public function resetMerchantPassword(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ]);
+
+        $user = User::findOrFail($id);
+
+        if (!$user->hasRole('merchant')) {
+            return back()->with('error', 'This user is not a merchant.');
+        }
+
+        $user->password = Hash::make($validated['password']);
+        $user->save();
+
+        return back()->with('success', 'Merchant password has been reset.');
+    }
+
+    public function deleteUser($id)
+    {
+        $user = User::findOrFail($id);
+
+        // Safety: never allow deleting an admin account from here
+        if ($user->hasRole('admin')) {
+            return back()->with('error', 'Admin accounts cannot be deleted.');
+        }
+
+        $user->delete();
+
+        return back()->with('success', 'User has been deleted.');
+    }
+
     public function takeOverMerchantRole($id)
     {
         // dd($id);
@@ -206,6 +349,9 @@ class AdminController extends Controller
             'productCount' => $products->count(),
             'orderCount' => $orders->count(),
             'totalSales' => $orders->sum('amount'),
+            // Commission breakdown for this merchant (same figures the
+            // merchant sees in their own panel).
+            'earnings' => $this->merchantEarnings((int) $id),
         ]);
     }
 

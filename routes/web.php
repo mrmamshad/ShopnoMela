@@ -127,12 +127,20 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
 
     // marchant manage routes
     Route::get('/admin/marchants', [AdminController::class, 'marchantlist'])->name('marchantlist');
+    // admin creates a new merchant account
+    Route::post('/admin/marchants', [AdminController::class, 'storeMerchant'])->name('admin.merchants.store');
+    // admin resets a merchant's password
+    Route::post('/admin/marchants/{id}/reset-password', [AdminController::class, 'resetMerchantPassword'])->name('admin.merchants.reset-password');
+    // admin sets/updates a merchant's commission rate
+    Route::post('/admin/marchants/{id}/commission', [AdminController::class, 'setCommission'])->name('admin.merchants.commission');
     Route::get('/admin/marchants/{id}', [AdminController::class, 'merchantDetails'])->name('admin.merchant.details');
     Route::get('/admin/product-reports', [AdminController::class, 'productReports'])->name('admin.product-reports');
     // all users manage routes
     Route::get('/admin/users', [AdminController::class, 'userlist'])->name('userlist');
     //  to give a user merchant role
     Route::post('/admin/users/{id}/assign-merchant', [AdminController::class, 'assignMerchant'])->name('admin.assign-merchant');
+    //  delete a user account
+    Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
     //  to take back marchant role from a user and give them normal customer role
     Route::post('/admin/users/{id}/take-over', [AdminController::class, 'takeOverMerchantRole'])->name('admin.takeOverMerchant');
 

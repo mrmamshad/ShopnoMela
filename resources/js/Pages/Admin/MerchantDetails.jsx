@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, imageSrc } from "@/lib/utils";
 
-export default function MerchantDetails({ merchant, store, products, orders, productCount, orderCount, totalSales }) {
+export default function MerchantDetails({ merchant, store, products, orders, productCount, orderCount, totalSales, earnings = {} }) {
     return (
         <DashboardLayout>
             <div className="mb-6">
@@ -17,6 +17,61 @@ export default function MerchantDetails({ merchant, store, products, orders, pro
                 <Card><CardContent className="p-4"><CardTitle className="text-lg">{orderCount}</CardTitle><p className="text-sm text-gray-500">Orders</p></CardContent></Card>
                 <Card><CardContent className="p-4"><CardTitle className="text-lg">{formatCurrency(totalSales)}</CardTitle><p className="text-sm text-gray-500">Total Sales</p></CardContent></Card>
             </div>
+            {/* Commission breakdown */}
+            <Card className="mb-6">
+                <CardHeader>
+                    <CardTitle>
+                        Commission and Earnings ({earnings.rate ?? 0}%)
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="rounded-lg border p-4 bg-blue-50">
+                            <p className="text-sm text-blue-700">
+                                Total Sales
+                            </p>
+                            <p className="text-xl font-bold text-blue-800">
+                                {formatCurrency(earnings.total_sales)}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                                {earnings.order_count ?? 0} orders
+                            </p>
+                        </div>
+                        <div className="rounded-lg border p-4 bg-emerald-50">
+                            <p className="text-sm text-emerald-700">
+                                Admin Commission ({earnings.rate ?? 0}%)
+                            </p>
+                            <p className="text-xl font-bold text-emerald-800">
+                                {formatCurrency(earnings.commission)}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                                Platform earns from this merchant
+                            </p>
+                        </div>
+                        <div className="rounded-lg border p-4 bg-gray-50">
+                            <p className="text-sm text-gray-600">
+                                Merchant Net
+                            </p>
+                            <p className="text-xl font-bold text-gray-800">
+                                {formatCurrency(earnings.net)}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                                Paid to merchant
+                            </p>
+                        </div>
+                    </div>
+                    <p className="mt-3 text-sm text-gray-500 border-t pt-3">
+                        Settled (Delivered): Sales{" "}
+                        {formatCurrency(earnings.delivered_sales)} {"·"} Commission{" "}
+                        <span className="text-emerald-700">
+                            {formatCurrency(earnings.delivered_commission)}
+                        </span>{" "}
+                        {"·"} Merchant Net{" "}
+                        {formatCurrency(earnings.delivered_net)}
+                    </p>
+                </CardContent>
+            </Card>
+
             {store && (
                 <Card className="mb-6">
                     <CardHeader><CardTitle>Store</CardTitle></CardHeader>

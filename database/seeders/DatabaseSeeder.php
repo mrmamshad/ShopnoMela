@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
         // Create a merchant user
         $merchant = User::factory()->create([
             'name' => 'Merchant',
-            'email' => 'merchant@shopnomela.com',
+            'email' => 'merchant@tajimbd.com',
             'password' => bcrypt('marchant123'), 
         ]);
 
@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
         // Create a customer user
         $customer = User::factory()->create([
             'name' => 'Customer User',
-            'email' => 'customer@shopnomela.com',
+            'email' => 'customer@tajimbd.com',
         ]);
 
         $customer->assignRole('customer');

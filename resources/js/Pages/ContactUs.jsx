@@ -76,7 +76,7 @@ const ContactPage = () => {
             <div>
               <h3 className="text-xl mb-4">Can't find the answer you are looking for?</h3>
               <p className="text-gray-600 mb-6">
-                <span className="font-medium">Tajim Foods Products</span> is here to assist you{" "}
+                <span className="font-medium">Tajim BD</span> is here to assist you{" "}
                 <span className="text-green-500">24 hours</span> a day!
               </p>
               <div className="space-y-3 mb-6">

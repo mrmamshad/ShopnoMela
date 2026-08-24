@@ -51,7 +51,7 @@ class SslCommerzPaymentController extends Controller
     // Find existing user by email, otherwise create one with the checkout details
     protected function findOrCreateUser($email, $name, $phone = null, $password = null)
     {
-        $email = $email ?: 'guest@shopnomela.com';
+        $email = $email ?: 'guest@tajimbd.com';
         $phone = $phone ? preg_replace('/\D+/', '', $phone) : null;
 
         $user = User::firstOrCreate(

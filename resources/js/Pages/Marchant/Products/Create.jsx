@@ -216,17 +216,50 @@ export default function CreateProduct({ category, brands }) {
             )
         );
 
-    const updateAttributeValues = (index, valuesStr) =>
+    // Add a single option (with its own price adjustment) to an attribute
+    const addOption = (attrIndex) =>
         setData(
             "attributes",
             data.attributes.map((attr, i) =>
-                i === index
+                i === attrIndex
                     ? {
                           ...attr,
-                          values: valuesStr
-                              .split(",")
-                              .map((v) => v.trim())
-                              .filter(Boolean),
+                          values: [
+                              ...attr.values,
+                              { label: "", price: "0" },
+                          ],
+                      }
+                    : attr
+            )
+        );
+
+    const removeOption = (attrIndex, optIndex) =>
+        setData(
+            "attributes",
+            data.attributes.map((attr, i) =>
+                i === attrIndex
+                    ? {
+                          ...attr,
+                          values: attr.values.filter(
+                              (_, oi) => oi !== optIndex
+                          ),
+                      }
+                    : attr
+            )
+        );
+
+    const updateOption = (attrIndex, optIndex, field, value) =>
+        setData(
+            "attributes",
+            data.attributes.map((attr, i) =>
+                i === attrIndex
+                    ? {
+                          ...attr,
+                          values: attr.values.map((opt, oi) =>
+                              oi === optIndex
+                                  ? { ...opt, [field]: value }
+                                  : opt
+                          ),
                       }
                     : attr
             )
@@ -552,52 +585,132 @@ export default function CreateProduct({ category, brands }) {
                                     {data.attributes.map((attr, index) => (
                                         <div
                                             key={index}
-                                            className="grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-3 items-start rounded-lg border p-3 bg-gray-50"
+                                            className="rounded-lg border p-3 bg-gray-50 space-y-3"
                                         >
-                                            <div>
-                                                <label className="text-xs text-gray-500 mb-1 block">
-                                                    Variant name
-                                                </label>
-                                                <Input
-                                                    type="text"
-                                                    placeholder="e.g. RAM"
-                                                    value={attr.name}
-                                                    onChange={(e) =>
-                                                        updateAttributeName(
-                                                            index,
-                                                            e.target.value
-                                                        )
+                                            <div className="flex items-end gap-3">
+                                                <div className="flex-1">
+                                                    <label className="text-xs text-gray-500 mb-1 block">
+                                                        Variant name
+                                                    </label>
+                                                    <Input
+                                                        type="text"
+                                                        placeholder="e.g. RAM"
+                                                        value={attr.name}
+                                                        onChange={(e) =>
+                                                            updateAttributeName(
+                                                                index,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        removeAttribute(index)
                                                     }
-                                                />
+                                                    className="p-2 text-red-500 hover:text-red-600"
+                                                    aria-label="Remove variant"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
                                             </div>
-                                            <div>
-                                                <label className="text-xs text-gray-500 mb-1 block">
-                                                    Options (comma separated)
-                                                </label>
-                                                <Input
-                                                    type="text"
-                                                    placeholder="e.g. 8GB, 12GB, 16GB"
-                                                    defaultValue={attr.values.join(
-                                                        ", "
-                                                    )}
-                                                    onChange={(e) =>
-                                                        updateAttributeValues(
-                                                            index,
-                                                            e.target.value
-                                                        )
+
+                                            <div className="space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <label className="text-xs text-gray-500 block">
+                                                        Options and price
+                                                    </label>
+                                                    <span className="text-[11px] text-gray-400">
+                                                        Extra price added to base
+                                                        price (৳)
+                                                    </span>
+                                                </div>
+
+                                                {attr.values.length === 0 && (
+                                                    <p className="text-xs text-gray-400 italic">
+                                                        No options yet. Click
+                                                        Add option below.
+                                                    </p>
+                                                )}
+
+                                                {attr.values.map(
+                                                    (opt, optIndex) => (
+                                                        <div
+                                                            key={optIndex}
+                                                            className="grid grid-cols-[2fr_1fr_auto] gap-2 items-center"
+                                                        >
+                                                            <Input
+                                                                type="text"
+                                                                placeholder="e.g. 16GB"
+                                                                value={
+                                                                    opt.label
+                                                                }
+                                                                onChange={(e) =>
+                                                                    updateOption(
+                                                                        index,
+                                                                        optIndex,
+                                                                        "label",
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                            />
+                                                            <div className="relative">
+                                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                                                                    +৳
+                                                                </span>
+                                                                <Input
+                                                                    type="number"
+                                                                    min="0"
+                                                                    step="0.01"
+                                                                    placeholder="0"
+                                                                    className="pl-8"
+                                                                    value={
+                                                                        opt.price
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        updateOption(
+                                                                            index,
+                                                                            optIndex,
+                                                                            "price",
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    removeOption(
+                                                                        index,
+                                                                        optIndex
+                                                                    )
+                                                                }
+                                                                className="p-2 text-red-400 hover:text-red-600"
+                                                                aria-label="Remove option"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
+                                                    )
+                                                )}
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        addOption(index)
                                                     }
-                                                />
+                                                    className="flex items-center gap-1 text-xs font-medium text-green-600 hover:text-green-700"
+                                                >
+                                                    <Plus className="h-3.5 w-3.5" />{" "}
+                                                    Add option
+                                                </button>
                                             </div>
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    removeAttribute(index)
-                                                }
-                                                className="mt-6 p-2 text-red-500 hover:text-red-600"
-                                                aria-label="Remove variant"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
                                         </div>
                                     ))}
                                 </div>

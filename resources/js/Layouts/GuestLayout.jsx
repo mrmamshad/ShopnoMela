@@ -5,12 +5,12 @@ return (
 <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0">
     <div className ="mb-4 flex items-center justify-center px-10 py-2 rounded-lg  bg-green-500 " >
         <Link href="/" className="flex  items-center justify-start w-full ">
-        <img src="/logo/logo.png" alt="Tajim Foods" className="w-20 h-[60px] mr-6 object-contain" />
+        <img src="/logo/logo.png" alt="Tajim BD" className="w-20 h-[60px] mr-6 object-contain" />
         <span
             className="text-transparent text-nowrap  -ml-10 sm:-ml-0  bg-clip-text bg-gradient-to-r from-yellow-400 to-green-500 text-4xl font-extrabold drop-shadow-lg">
             Tajim{" "}
             <span className="text-3xl text-white font-semibold">
-                Foods Products
+                BD
             </span>
         </span>
         </Link>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Checkout | Tajim Foods Products</title>
+    <title>Checkout | Tajim BD</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -92,7 +92,7 @@
     </div>
 
     <footer class="my-5 pt-5 text-muted text-center text-small">
-        <p class="mb-1">&copy; 2025 Tajim Foods Products</p>
+        <p class="mb-1">&copy; 2025 Tajim BD</p>
     </footer>
 </div>
 </body>

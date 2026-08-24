@@ -158,7 +158,8 @@ class ProductController extends Controller
             'attributes' => 'nullable|array',
             'attributes.*.name' => 'required_with:attributes|string|max:50',
             'attributes.*.values' => 'nullable|array',
-            'attributes.*.values.*' => 'nullable|string|max:50',
+            'attributes.*.values.*.label' => 'nullable|string|max:50',
+            'attributes.*.values.*.price' => 'nullable|numeric|min:0',
             'img1' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
             'img2' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
             'img3' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
@@ -196,13 +197,21 @@ class ProductController extends Controller
             }
         }
 
-        // Clean up dynamic attributes: keep only those with a name and at least one value
+        // Clean up dynamic attributes: keep only those with a name and at least one
+        // labelled option. Each option carries its own price adjustment (extra
+        // amount added on top of the base product price).
         $attributes = collect($validated['attributes'] ?? [])
             ->map(function ($attr) {
                 $name = trim($attr['name'] ?? '');
                 $values = collect($attr['values'] ?? [])
-                    ->map(fn($v) => trim($v))
-                    ->filter()
+                    ->map(function ($opt) {
+                        $label = trim($opt['label'] ?? '');
+                        $price = isset($opt['price']) && $opt['price'] !== ''
+                            ? round((float) $opt['price'], 2)
+                            : 0;
+                        return ['label' => $label, 'price' => $price];
+                    })
+                    ->filter(fn($opt) => $opt['label'] !== '')
                     ->values()
                     ->all();
                 return ['name' => $name, 'values' => $values];

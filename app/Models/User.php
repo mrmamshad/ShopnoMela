@@ -65,6 +65,22 @@ class User extends Authenticatable
     }
 
     /**
+     * The commission rate configured by the admin for this merchant.
+     */
+    public function commission()
+    {
+        return $this->hasOne(Commission::class, 'merchant_id');
+    }
+
+    /**
+     * Convenience accessor: commission percentage (0 if none set).
+     */
+    public function commissionRate(): float
+    {
+        return (float) ($this->commission->rate ?? 0);
+    }
+
+    /**
      * Role-based destination after login.
      */
     public function homeRoute(): string

@@ -27,14 +27,13 @@ function Header() {
                 >
                     <img
                         src="/logo/logo.png"
-                        alt="Tajim Foods Products"
+                        alt="Tajim BD"
                         className="h-9 sm:h-11 w-auto object-contain shrink-0"
                     />
                     <div className="hidden min-[480px]:flex flex-col leading-tight min-w-0">
                         <h1 className="text-base sm:text-xl font-extrabold tracking-tight truncate">
                             Tajim{" "}
-                            <span className="text-yellow-300">Foods</span>{" "}
-                            Products
+                            <span className="text-yellow-300">BD</span>
                         </h1>
                     </div>
                 </Link>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Commission;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -64,6 +65,18 @@ class MarchantController extends Controller
 
         $pct = fn($cur, $prev) => $prev > 0 ? round((($cur - $prev) / $prev) * 100, 1) : ($cur > 0 ? 100 : 0);
 
+        // Commission breakdown: what the platform takes vs. what the merchant
+        // keeps. Rate is set by the admin (0 if none configured yet).
+        $commissionRate = (float) (Commission::where('merchant_id', auth()->id())->value('rate') ?? 0);
+        $commissionAmount = round($totalRevenue * $commissionRate / 100, 2);
+        $netEarnings = round($totalRevenue - $commissionAmount, 2);
+
+        // Settled (Delivered) earnings for a confirmed view
+        $deliveredRevenue = Order::whereIn('product_id', $productIds)
+            ->whereIn('status', ['Delivered', 'delivered'])
+            ->sum('amount');
+        $deliveredCommission = round($deliveredRevenue * $commissionRate / 100, 2);
+
         return Inertia::render('Marchant/Index', [
             'marchantuser' => $user,
             'stats' => [
@@ -72,6 +85,15 @@ class MarchantController extends Controller
                 'totalProducts' => $totalProducts,
                 'totalOrders' => $totalOrders,
                 'pendingOrders' => $pendingOrders,
+            ],
+            'commission' => [
+                'rate' => $commissionRate,
+                'total_sales' => round($totalRevenue, 2),
+                'commission' => $commissionAmount,
+                'net' => $netEarnings,
+                'delivered_sales' => round($deliveredRevenue, 2),
+                'delivered_commission' => $deliveredCommission,
+                'delivered_net' => round($deliveredRevenue - $deliveredCommission, 2),
             ],
             'salesChart' => $salesChart,
             'recentActivities' => $recentActivities,

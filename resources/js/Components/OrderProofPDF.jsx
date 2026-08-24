@@ -139,7 +139,7 @@ const OrderPDF = ({ order }) => (
             {/* Footer */}
             <View style={styles.footer}>
                 <Text>Thank you for your order!</Text>
-                <Text>Contact us: support@shopnomela.com</Text>
+                <Text>Contact us: support@tajimbd.com</Text>
                 <Text>Track your order: Go to your order page</Text>
             </View>
         </Page>
