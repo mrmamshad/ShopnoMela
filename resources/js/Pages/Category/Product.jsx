@@ -815,7 +815,7 @@ const ProductDetails = ({
                                     <img
                                         src={imageSrc(product.image) || "/product_images/demo/cat-1.png"}
                                         alt={product.title}
-                                        className="w-full h-[200px] object-cover rounded-t-lg"
+                                        className="w-full h-[200px] object-contain bg-white rounded-t-lg"
                                         onError={imageFallback}
                                     />
                                 </CardHeader>

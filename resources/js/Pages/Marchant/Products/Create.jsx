@@ -33,8 +33,8 @@ import { useToast } from "@/hooks/use-toast";
 import MarchantDashboardLayout from "@/Layouts/marchant-layout";
 import { cn } from "@/lib/utils";
 
-const MAX_IMAGE_SIZE_MB = 1;
-const MAX_IMAGE_SIZE_KB = 1024;
+const MAX_IMAGE_SIZE_MB = 5;
+const MAX_IMAGE_SIZE_KB = 5120;
 const IMAGE_TYPES = [
     "image/jpeg",
     "image/jpg",
@@ -48,8 +48,8 @@ const IMAGE_TYPES = [
     "image/heif",
 ];
 
-const IMAGE_NOTE = `সব ছবি ১:১ রেশিও (square), সর্বোচ্চ ১MB — JPG / PNG / WEBP`;
-const IMAGE_NOTE_EN = "1:1 ratio · max 1MB · JPG / PNG / WEBP";
+const IMAGE_NOTE = `সব ছবি বর্গাকার (১:১) দিন — প্রস্তাবিত রেজ্যুলেশন ৮০০×৮০০ পিক্সেল বা তার বেশি, সর্বোচ্চ ৫MB — JPG / PNG / WEBP`;
+const IMAGE_NOTE_EN = "Square (1:1) · recommended 800×800px or larger · max 5MB · JPG / PNG / WEBP";
 
 function FieldError({ message }) {
     if (!message) return null;
@@ -107,7 +107,7 @@ function ImageDropzone({ label, preview, error, onFile }) {
                         <img
                             src={preview}
                             alt={label}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain bg-white"
                         />
                         <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white text-xs font-medium">
                             <Trash2 className="w-4 h-4" /> Change

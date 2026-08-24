@@ -1,3 +1,17 @@
+# Allow product image uploads up to 5MB (per file). Some hosts default to 2MB.
+<IfModule mod_php.c>
+    php_value upload_max_filesize 6M
+    php_value post_max_size 25M
+</IfModule>
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 6M
+    php_value post_max_size 25M
+</IfModule>
+<IfModule mod_php8.c>
+    php_value upload_max_filesize 6M
+    php_value post_max_size 25M
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

@@ -155,7 +155,7 @@ export default function Brands() {
                         <div>
                             <ImageField
                                 label="Brand Logo"
-                                recommendation="Ratio 1:1 (square) · recommended 300×300px · max size 1MB · JPG / PNG / WEBP"
+                                recommendation="Ratio 1:1 (square) · recommended 300×300px · max size 5MB · JPG / PNG / WEBP"
                                 value={data.brandImg}
                                 error={errors?.brandImg}
                                 onChange={(val) => setData("brandImg", val)}

@@ -59,7 +59,7 @@ export default function Index({ category, products }) {
                         <img
                             src={`/${category.categoryImg}`}
                             alt={category.categoryName}
-                            className="w-full h-48 object-cover"
+                            className="w-full h-48 object-contain bg-white"
                         />
                         {/* Gradient Overlay for Text Readability */}
                         <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent hidden md:block" />
@@ -156,7 +156,7 @@ export default function Index({ category, products }) {
                                 <img
                                     src ={`/${product.image}`}
                                     alt={product.title}
-                                    className="h-48 w-full object-cover rounded-t-lg"
+                                    className="h-48 w-full object-contain bg-white rounded-t-lg"
                                 />
                             </div>
                             <div className="flex flex-col flex-1 p-4">

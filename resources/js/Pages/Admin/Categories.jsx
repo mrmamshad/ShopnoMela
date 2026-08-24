@@ -139,7 +139,7 @@ export default function Categories() {
                     <div>
                         <ImageField
                             label="Category Image"
-                            recommendation="Ratio 1:1 (square) · recommended 400×400px · max size 1MB · JPG / PNG / WEBP"
+                            recommendation="Ratio 1:1 (square) · recommended 400×400px · max size 5MB · JPG / PNG / WEBP"
                             value={data.categoryImg}
                             error={errors?.categoryImg}
                             onChange={(val) => setData("categoryImg", val)}

@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Info, ImagePlus } from "lucide-react";
 import { imageSrc } from "@/lib/utils";
 
-const MAX_SIZE_KB = 1024;
+const MAX_SIZE_KB = 5120;
 
 export default function ImageField({
     label = "Upload Image",
@@ -20,7 +20,7 @@ export default function ImageField({
         const file = e.target.files[0];
         if (file) {
             if (file.size > MAX_SIZE_KB * 1024) {
-                alert("Image must be 1MB or smaller.");
+                alert("Image must be 5MB or smaller.");
                 e.target.value = "";
                 return;
             }

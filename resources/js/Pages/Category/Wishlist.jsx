@@ -78,7 +78,7 @@ const WishlistPage = ({ wishlistItems }) => {
                                                             "/placeholder.svg"
                                                         }
                                                         alt={item.product.title}
-                                                        className="w-full md:w-48 h-48 object-cover rounded-xl border"
+                                                        className="w-full md:w-48 h-48 object-contain bg-white rounded-xl border"
                                                     />
 
                                                     {/* Product Details */}

@@ -25,7 +25,7 @@ export default function Help() {
                         <CardHeader><CardTitle>How to add a product</CardTitle></CardHeader>
                         <CardContent className="text-sm text-gray-600 space-y-2">
                             <p>1. Go to <strong>Products → Add Product</strong> in the sidebar.</p>
-                            <p>2. Fill in the product details, upload images (ratio 1:1, max 1MB).</p>
+                            <p>2. Fill in the product details, upload images (ratio 1:1, max 5MB).</p>
                             <p>3. Select a category and brand, then click <strong>Create Product</strong>.</p>
                             <p>4. You can create your own brand from the <strong>Brands</strong> page.</p>
                         </CardContent>

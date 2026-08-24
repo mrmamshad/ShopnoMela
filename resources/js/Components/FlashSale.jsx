@@ -87,7 +87,7 @@ const FlashSale = ({ flashSales }) => {
                                     loading="lazy"
                                     decoding="async"
                                     onError={imageFallback}
-                                    className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                                    className="w-full h-48 object-contain bg-white hover:scale-105 transition-transform duration-300"
                                 />
                             </div>
 

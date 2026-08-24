@@ -304,7 +304,7 @@ class AdminController extends Controller
         $request->validate([
             'categoryName' => 'required|string|max:255',
             'categoryImg' => $request->hasFile('categoryImg')
-                ? 'nullable|image|mimes:jpeg,jpg,png,webp|max:1024'
+                ? 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120'
                 : 'nullable|string|max:500',
         ]);
 

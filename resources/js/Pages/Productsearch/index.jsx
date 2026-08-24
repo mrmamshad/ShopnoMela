@@ -100,7 +100,7 @@ export default function Index({ products, query }) {
                                 <img
                                     src={`/${product.image}`}
                                     alt={product.title}
-                                    className="h-48 w-full object-cover rounded-t-lg"
+                                    className="h-48 w-full object-contain bg-white rounded-t-lg"
                                 />
                                 <div className="p-4">
                                     <h3 className="font-semibold text-lg">{product.title}</h3>

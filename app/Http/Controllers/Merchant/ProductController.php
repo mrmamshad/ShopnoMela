@@ -53,7 +53,7 @@ class ProductController extends Controller
         $request->validate([
             'brandName' => 'required|string|max:255',
             'brandImg' => $request->hasFile('brandImg')
-                ? 'nullable|image|mimes:jpeg,jpg,png,webp|max:1024'
+                ? 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120'
                 : 'nullable|url',
         ]);
 
@@ -147,7 +147,7 @@ class ProductController extends Controller
             'short_des' => 'required|string',
             'price' => 'required|numeric|min:0',
             'discount' => 'nullable|numeric|min:0|max:100',
-            'image' => 'required|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
+            'image' => 'required|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:5120',
             'star' => 'nullable|numeric|min:0|max:5',
             'status' => 'required|string',
             'category_id' => 'required|exists:categories,id',
@@ -160,10 +160,10 @@ class ProductController extends Controller
             'attributes.*.values' => 'nullable|array',
             'attributes.*.values.*.label' => 'nullable|string|max:50',
             'attributes.*.values.*.price' => 'nullable|numeric|min:0',
-            'img1' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
-            'img2' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
-            'img3' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
-            'img4' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:1024',
+            'img1' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:5120',
+            'img2' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:5120',
+            'img3' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:5120',
+            'img4' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:5120',
         ]);
 
         // Move main image to `public/product_images`
