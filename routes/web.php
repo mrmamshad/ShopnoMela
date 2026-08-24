@@ -213,4 +213,28 @@ Route::post('/offers', [OfferController::class, 'store']);
 Route::put('/offers/{offer}', [OfferController::class, 'update']);
 Route::delete('/offers/{offer}', [OfferController::class, 'destroy']);
 
+/*
+|--------------------------------------------------------------------------
+| One-time maintenance route: rename legacy "ShopnoMela" admin/users to
+| "Tajim BD Admin". Protected by a secret token in the URL so it cannot be
+| triggered by random visitors. Safe to remove after running once in prod.
+|--------------------------------------------------------------------------
+| Usage:  https://tajimbd.com/fix-admin-name/tajimbd-secret-2026
+*/
+Route::get('/fix-admin-name/{token}', function (string $token) {
+    abort_unless($token === 'tajimbd-secret-2026', 403, 'Invalid token');
+
+    $updated = \App\Models\User::where('name', 'like', '%ShopnoMela%')
+        ->orWhere('name', 'like', '%Shopno%')
+        ->update(['name' => 'Tajim BD Admin']);
+
+    return response()->json([
+        'status' => 'ok',
+        'updated_rows' => $updated,
+        'message' => $updated > 0
+            ? "Renamed {$updated} user(s) to 'Tajim BD Admin'."
+            : "No 'ShopnoMela' users found — nothing to change.",
+    ]);
+})->name('fix.admin.name');
+
 require __DIR__ . '/auth.php';
