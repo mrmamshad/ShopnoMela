@@ -10,10 +10,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useForm, router } from "@inertiajs/react";
+import { Link, useForm, router } from "@inertiajs/react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/Components/ui/input";
-import { Search } from "lucide-react";
+import { productImageSrc, imageFallback, formatCurrency } from "@/lib/utils";
+import { Pencil, Search, Trash2 } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -96,13 +97,14 @@ export default function MarchantProducts({ products, filters = {} }) {
                                     <TableRow key={product.id}>
                                         <TableCell>
                                             <img
-                                                src={`/${product.image}`}
+                                                src={productImageSrc(product.image)}
                                                 alt={product.title}
-                                                className="h-16 w-16 object-cover rounded-md"
+                                                onError={imageFallback}
+                                                className="h-16 w-16 rounded-md border bg-white object-contain"
                                             />
                                         </TableCell>
                                         <TableCell>{product.title}</TableCell>
-                                        <TableCell>${product.price}</TableCell>
+                                        <TableCell>{formatCurrency(product.price)}</TableCell>
                                         <TableCell>
                                             {product.discount}%
                                         </TableCell>
@@ -114,47 +116,67 @@ export default function MarchantProducts({ products, filters = {} }) {
                                             {product.brand?.brandName || "N/A"}
                                         </TableCell>
                                         <TableCell>
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="sm"
-                                                        disabled={
-                                                            deletingId ===
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    asChild
+                                                    className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                                                >
+                                                    <Link
+                                                        href={route(
+                                                            "merchant.products.edit",
                                                             product.id
-                                                        }
+                                                        )}
                                                     >
-                                                        Delete
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>
-                                                            Are you sure you
-                                                            want to delete this
-                                                            product?
-                                                        </AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            This action cannot
-                                                            be undone.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>
-                                                            Cancel
-                                                        </AlertDialogCancel>
-                                                        <AlertDialogAction
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    product.id
-                                                                )
+                                                        <Pencil className="mr-1 h-4 w-4" />
+                                                        Edit
+                                                    </Link>
+                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="sm"
+                                                            disabled={
+                                                                deletingId ===
+                                                                product.id
                                                             }
                                                         >
-                                                            Yes, Delete
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
+                                                            <Trash2 className="mr-1 h-4 w-4" />
+                                                            Delete
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>
+                                                                Are you sure you
+                                                                want to delete this
+                                                                product?
+                                                            </AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                This action cannot
+                                                                be undone.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>
+                                                                Cancel
+                                                            </AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                onClick={() =>
+                                                                    handleDelete(
+                                                                        product.id
+                                                                    )
+                                                                }
+                                                                className="bg-red-600 hover:bg-red-700"
+                                                            >
+                                                                Yes, Delete
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))

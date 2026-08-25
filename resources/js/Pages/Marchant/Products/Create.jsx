@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import MarchantDashboardLayout from "@/Layouts/marchant-layout";
-import { cn } from "@/lib/utils";
+import { cn, productImageSrc } from "@/lib/utils";
 
 const MAX_IMAGE_SIZE_MB = 5;
 const MAX_IMAGE_SIZE_KB = 5120;
@@ -56,7 +56,7 @@ function FieldError({ message }) {
     return <p className="mt-1 text-xs text-red-600">{message}</p>;
 }
 
-function ImageDropzone({ label, preview, error, onFile }) {
+function ImageDropzone({ label, preview, error, onFile, required = false }) {
     const inputRef = useRef(null);
     const [localError, setLocalError] = useState(null);
 
@@ -118,7 +118,7 @@ function ImageDropzone({ label, preview, error, onFile }) {
                         <ImagePlus className="w-7 h-7 text-gray-400 group-hover:text-green-500 transition-colors" />
                         <span className="mt-1 text-xs font-medium text-gray-500">
                             {label}
-                            {label === "Main Image" && (
+                            {required && (
                                 <span className="text-red-500"> *</span>
                             )}
                         </span>
@@ -169,30 +169,63 @@ function Field({ label, required, error, children }) {
     );
 }
 
-export default function CreateProduct({ category, brands }) {
+export default function CreateProduct({ category, brands, product = null }) {
     const { toast } = useToast();
-    const [previews, setPreviews] = useState({});
+    const isEditing = Boolean(product?.id);
+    const details = product?.details || {};
+
+    const normalizeAttributes = (attributes) =>
+        (Array.isArray(attributes) ? attributes : []).map((attribute) => ({
+            name: attribute?.name || "",
+            values: (Array.isArray(attribute?.values)
+                ? attribute.values
+                : []
+            ).map((option) =>
+                typeof option === "object"
+                    ? {
+                          label: option.label || "",
+                          price: String(option.price ?? 0),
+                      }
+                    : { label: String(option || ""), price: "0" }
+            ),
+        }));
+
+    const existingPreviews = {
+        ...(product?.image ? { image: productImageSrc(product.image) } : {}),
+        ...Object.fromEntries(
+            ["img1", "img2", "img3", "img4"]
+                .filter((field) => details?.[field])
+                .map((field) => [field, productImageSrc(details[field])])
+        ),
+    };
+
+    const [previews, setPreviews] = useState(existingPreviews);
     const [brandDialogOpen, setBrandDialogOpen] = useState(false);
     const brandForm = useForm({ brandName: "", brandImg: "" });
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        title: "",
-        short_des: "",
-        price: "",
-        discount: "0",
+        _method: isEditing ? "put" : "post",
+        title: product?.title || "",
+        short_des: product?.short_des || "",
+        price: product?.price ?? "",
+        discount: product?.discount ?? "0",
         image: null,
-        star: "",
-        status: "active",
-        category_id: "",
-        brand_id: "",
+        star: product?.star ?? "",
+        status: product?.status || "active",
+        category_id: product?.category_id
+            ? String(product.category_id)
+            : "",
+        brand_id: product?.brand_id ? String(product.brand_id) : "",
         img1: null,
         img2: null,
         img3: null,
         img4: null,
-        des: "",
-        color: [],
-        size: [],
-        attributes: [],
+        des: details?.des || "",
+        color: Array.isArray(details?.color)
+            ? details.color.filter(Boolean)
+            : [],
+        size: Array.isArray(details?.size) ? details.size.filter(Boolean) : [],
+        attributes: normalizeAttributes(details?.attributes),
     });
 
     // Dynamic variant attribute helpers
@@ -282,12 +315,22 @@ export default function CreateProduct({ category, brands }) {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        post(route("merchant.products.store"), {
+        post(
+            isEditing
+                ? route("merchant.products.update", product.id)
+                : route("merchant.products.store"),
+            {
             forceFormData: true,
             onSuccess: () => {
-                toast({ title: "Product created successfully!" });
-                reset();
-                setPreviews({});
+                toast({
+                    title: isEditing
+                        ? "Product updated successfully!"
+                        : "Product created successfully!",
+                });
+                if (!isEditing) {
+                    reset();
+                    setPreviews({});
+                }
             },
             onError: (errs) => {
                 const messages = Object.values(errs || []);
@@ -330,10 +373,12 @@ export default function CreateProduct({ category, brands }) {
             <div className="mx-auto max-w-5xl px-4 sm:px-0 py-6">
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold text-gray-800">
-                        Create Product
+                        {isEditing ? "Edit Product" : "Create Product"}
                     </h1>
                     <p className="text-sm text-gray-500 mt-1">
-                        Add a new product to your store
+                        {isEditing
+                            ? "Update product information, variants, pricing, and images"
+                            : "Add a new product to your store"}
                     </p>
                 </div>
 
@@ -758,6 +803,10 @@ export default function CreateProduct({ category, brands }) {
                                                     slot.field
                                                 )
                                             }
+                                            required={
+                                                slot.field === "image" &&
+                                                !isEditing
+                                            }
                                         />
                                     ))}
                                 </div>
@@ -768,7 +817,10 @@ export default function CreateProduct({ category, brands }) {
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={() => reset()}
+                                    onClick={() => {
+                                        reset();
+                                        setPreviews(existingPreviews);
+                                    }}
                                 >
                                     Reset
                                 </Button>
@@ -778,8 +830,12 @@ export default function CreateProduct({ category, brands }) {
                                     className="bg-green-600 hover:bg-green-700"
                                 >
                                     {processing
-                                        ? "Creating..."
-                                        : "Create Product"}
+                                        ? isEditing
+                                            ? "Updating..."
+                                            : "Creating..."
+                                        : isEditing
+                                          ? "Update Product"
+                                          : "Create Product"}
                                 </Button>
                             </div>
                         </form>

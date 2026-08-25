@@ -20,6 +20,20 @@ export function imageSrc(path) {
     return path.startsWith("/") ? path : `/${path}`;
 }
 
+// Product uploads historically exist in two DB formats:
+// "product_images/file.jpg" and just "file.jpg". Normalize both.
+export function productImageSrc(path) {
+    if (!path) return null;
+    if (/^(https?:)?\/\//.test(path)) return path;
+
+    const normalized = path.replace(/^\/+/, "").replace(/^public\//, "");
+    if (normalized.startsWith("product_images/")) {
+        return `/${normalized}`;
+    }
+
+    return `/product_images/${normalized}`;
+}
+
 export const DEMO_IMAGE = "/product_images/demo/cat-1.png";
 
 // Swap a broken <img> to the local demo image so cards never show a broken icon.

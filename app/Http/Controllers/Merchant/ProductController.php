@@ -250,6 +250,134 @@ class ProductController extends Controller
 
         return redirect()->route('merchant.products.index')->with('success', 'Product created successfully!');
     }
+
+    public function edit(int $id)
+    {
+        $product = Product::with('details')
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
+
+        $categories = Category::all();
+        $brands = Brand::where(function ($query) {
+            $query->where('user_id', auth()->id())->orWhereNull('user_id');
+        })->get();
+
+        return Inertia::render('Marchant/Products/Create', [
+            'category' => $categories,
+            'brands' => $brands,
+            'product' => $product,
+        ]);
+    }
+
+    public function update(Request $request, int $id)
+    {
+        $product = Product::with('details')
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'short_des' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0|max:100',
+            'image' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:5120',
+            'star' => 'nullable|numeric|min:0|max:5',
+            'status' => 'required|in:active,inactive',
+            'category_id' => 'required|exists:categories,id',
+            'brand_id' => 'required|exists:brands,id',
+            'des' => 'required|string',
+            'color' => 'nullable|array',
+            'size' => 'nullable|array',
+            'attributes' => 'nullable|array',
+            'attributes.*.name' => 'required_with:attributes|string|max:50',
+            'attributes.*.values' => 'nullable|array',
+            'attributes.*.values.*.label' => 'nullable|string|max:50',
+            'attributes.*.values.*.price' => 'nullable|numeric|min:0',
+            'img1' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:5120',
+            'img2' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:5120',
+            'img3' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:5120',
+            'img4' => 'nullable|file|mimetypes:image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/svg+xml,image/webp,image/avif,image/heic,image/heif|max:5120',
+        ]);
+
+        $productData = [
+            'title' => $validated['title'],
+            'short_des' => $validated['short_des'],
+            'price' => $validated['price'],
+            'discount' => $validated['discount'] ?? 0,
+            'star' => $validated['star'] ?? 0,
+            'status' => $validated['status'],
+            'category_id' => $validated['category_id'],
+            'brand_id' => $validated['brand_id'],
+        ];
+
+        if ($request->hasFile('image')) {
+            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $request->file('image')->move(public_path('product_images'), $imageName);
+            $this->deletePublicProductImage($product->image);
+            $productData['image'] = 'product_images/' . $imageName;
+        }
+
+        $product->update($productData);
+
+        $detail = $product->details ?: new ProductDetail(['product_id' => $product->id]);
+        $detailImages = [];
+        foreach (['img1', 'img2', 'img3', 'img4'] as $field) {
+            if ($request->hasFile($field)) {
+                $imageName = time() . '_' . $request->file($field)->getClientOriginalName();
+                $request->file($field)->move(public_path('product_images'), $imageName);
+                $this->deletePublicProductImage($detail->{$field});
+                $detailImages[$field] = 'product_images/' . $imageName;
+            } else {
+                $detailImages[$field] = $detail->{$field};
+            }
+        }
+
+        $colors = collect($validated['color'] ?? [])
+            ->map(fn($value) => is_string($value) ? trim($value) : '')
+            ->filter()->unique()->values()->all();
+        $sizes = collect($validated['size'] ?? [])
+            ->map(fn($value) => is_string($value) ? trim($value) : '')
+            ->filter()->unique()->values()->all();
+        $attributes = collect($validated['attributes'] ?? [])
+            ->map(function ($attribute) {
+                $name = trim($attribute['name'] ?? '');
+                $values = collect($attribute['values'] ?? [])
+                    ->map(fn($option) => [
+                        'label' => trim($option['label'] ?? ''),
+                        'price' => round((float) ($option['price'] ?? 0), 2),
+                    ])
+                    ->filter(fn($option) => $option['label'] !== '')
+                    ->values()->all();
+
+                return ['name' => $name, 'values' => $values];
+            })
+            ->filter(fn($attribute) => $attribute['name'] !== '' && count($attribute['values']) > 0)
+            ->values()->all();
+
+        $detail->fill(array_merge([
+            'des' => $validated['des'],
+            'color' => $colors,
+            'size' => $sizes,
+            'attributes' => $attributes,
+        ], $detailImages));
+        $detail->save();
+
+        return redirect()->route('merchant.products.index')
+            ->with('success', 'Product updated successfully!');
+    }
+
+    private function deletePublicProductImage(?string $path): void
+    {
+        if (!$path || !str_starts_with(ltrim($path, '/'), 'product_images/')) {
+            return;
+        }
+
+        $absolutePath = public_path(ltrim($path, '/'));
+        if (is_file($absolutePath)) {
+            @unlink($absolutePath);
+        }
+    }
+
     public function orders()
     {
         $merchantId = Auth::id(); // Get logged-in merchant ID

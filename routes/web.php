@@ -166,6 +166,8 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,
     Route::get('/marchant/products', [MerchantProductController::class, 'index'])->name('merchant.products.index');
     Route::get('/marchant/product/create', [MerchantProductController::class, 'create'])->name('merchant.products.create');
     Route::post('/marchant/product/store', [MerchantProductController::class, 'store'])->name('merchant.products.store');
+    Route::get('/marchant/products/{id}/edit', [MerchantProductController::class, 'edit'])->name('merchant.products.edit');
+    Route::put('/marchant/products/{id}', [MerchantProductController::class, 'update'])->name('merchant.products.update');
     Route::post('/marchant/brands', [MerchantProductController::class, 'storeBrand'])->name('merchant.brands.store');
     Route::get('/marchant/brands', [MerchantProductController::class, 'brands'])->name('merchant.brands.index');
     Route::delete('/marchant/brands/{id}', [MerchantProductController::class, 'deleteBrand'])->name('merchant.brands.destroy');
