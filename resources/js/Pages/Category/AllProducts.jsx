@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Header from "@/Components/Header";
 import Footer from "@/Components/Footer";
+import CategoryImage from "@/Components/CategoryImage";
 
 export default function Index({ category, products }) {
     console.log("category", category);
@@ -54,15 +55,16 @@ export default function Index({ category, products }) {
             {/* Category Title & Image */}
             <div className="container mx-auto px-4 md:px-8 py-6">
                 <div className="flex flex-col sm:flex-row items-start md:items-center gap-6 md:gap-8">
-                    {/* Image Container with Aspect Ratio */}
-                    <div className="relative w-full sm:w-64 md:w-64 overflow-hidden rounded-xl shadow-lg">
-                        <img
-                            src={`/${category.categoryImg}`}
+                    <div className="relative w-full overflow-hidden rounded-xl shadow-lg sm:w-64 md:w-64">
+                        <CategoryImage
+                            src={category.categoryImg}
                             alt={category.categoryName}
-                            className="w-full h-48 object-contain bg-white"
+                            className="h-48 w-full"
+                            imageClassName="object-contain bg-white"
                         />
-                        {/* Gradient Overlay for Text Readability */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent hidden md:block" />
+                        {category.categoryImg && (
+                            <div className="pointer-events-none absolute inset-0 hidden bg-gradient-to-r from-black/40 to-transparent md:block" />
+                        )}
                     </div>
 
                     {/* Title */}

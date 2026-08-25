@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Info, ImagePlus } from "lucide-react";
@@ -15,6 +15,13 @@ export default function ImageField({
     onChange,
 }) {
     const [filePreview, setFilePreview] = useState(null);
+
+    useEffect(() => {
+        const isFile = typeof File !== "undefined" && value instanceof File;
+        if (!isFile) {
+            setFilePreview(null);
+        }
+    }, [value, previewSrc]);
 
     const handleFile = (e) => {
         const file = e.target.files[0];

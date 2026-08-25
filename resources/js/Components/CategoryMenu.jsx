@@ -1,6 +1,6 @@
 import { Link } from "@inertiajs/react";
 import { motion } from "framer-motion";
-import { imageSrc, imageFallback } from "@/lib/utils";
+import CategoryImage from "@/Components/CategoryImage";
 
 const CategoryMenu = ({ category }) => {
     const categories = category || [];
@@ -34,13 +34,10 @@ const CategoryMenu = ({ category }) => {
                                 id: category.id,
                             })}
                         >
-                            <img
-                                src={imageSrc(category.categoryImg)}
+                            <CategoryImage
+                                src={category.categoryImg}
                                 alt={category.categoryName}
-                                loading="lazy"
-                                decoding="async"
-                                onError={imageFallback}
-                                className="w-full h-36 object-cover rounded-lg"
+                                className="h-36 w-full rounded-lg"
                             />
                             <p className="text-gray-700 font-semibold mt-2 text-sm line-clamp-1">
                                 {category.categoryName}

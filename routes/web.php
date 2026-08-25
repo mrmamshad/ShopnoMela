@@ -1,35 +1,31 @@
 <?php
 
 use App\Http\Controllers\Admin\MerchantOrderUpdateController;
+use App\Http\Controllers\Admin\StoreApplicationController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\FlashSaleController;
 use App\Http\Controllers\GoogleAuth;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\MarchantController;
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SslCommerzPaymentController;
-use App\Http\Controllers\OfferController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProductReviewController;
-use App\Http\Controllers\StoreController;
-use App\Http\Controllers\Admin\StoreApplicationController;
-use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Merchant\ProductController as MerchantProductController;
 use App\Http\Controllers\MerchantOrderController;
+use App\Http\Controllers\OfferController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderPdfController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductReviewController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SslCommerzPaymentController;
+use App\Http\Controllers\StoreController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Models\Category;
-use App\Models\FlashSale;
-use App\Models\Offer;
 use App\Models\Product;
+use App\Models\User;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -92,7 +88,6 @@ Route::post('/order/cod', [OrderController::class, 'storeCOD'])
     ->name('order.cod');
 Route::get('/order-proof/{orderId}', [OrderPdfController::class, 'generatePDF'])->name('order.proof');
 
-
 Route::post('/shipping/store', [CheckoutController::class, 'store'])->name('shipping.store');
 
 Route::get('/payments', [CategoryController::class, 'payments'])->name('payments');
@@ -101,11 +96,10 @@ Route::get('/products/search', [ProductController::class, 'search'])->name('prod
 Route::get('/products/mobilesearch', [ProductController::class, 'mobilesearch'])->name('products.mobilesearch');
 Route::get('/products/filter', [ProductController::class, 'filterByType'])->name('products.filter');
 
-
 // Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
 
 // Admin only
-Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function () {
+Route::middleware(['auth', RoleMiddleware::class.':admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin');
 
     // Slider manage routes
@@ -117,6 +111,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
     // category manage routes (admin)
     Route::get('/admin/categories', [AdminController::class, 'categories'])->name('admin.categories');
     Route::post('/admin/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
+    Route::put('/admin/categories/{category}', [AdminController::class, 'updateCategory'])->name('admin.categories.update');
     Route::delete('/admin/categories/{category}', [AdminController::class, 'destroyCategory'])->name('admin.categories.destroy');
 
     // flash sale manage routes
@@ -147,7 +142,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
     Route::get('/admin/merchant-orders-update', [MerchantOrderUpdateController::class, 'index'])->name('admin.merchant.orders.news');
 
     Route::get('/admin/allorders', [AdminController::class, 'allorders'])->name('admin.allorders');
-    //marchant applications
+    // marchant applications
 
     Route::get('/merchant-applications', [StoreApplicationController::class, 'index'])->name('merchant.applications.index');
     Route::post('/merchant-applications/{store}/approve', [StoreApplicationController::class, 'approve'])->name('merchant.applications.approve');
@@ -157,7 +152,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function ()
 Route::post('/merchant/orders/{id}/ship', [MerchantOrderController::class, 'sendForShipping'])->name('merchant.orders.ship');
 
 // Admin and Merchant
-Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin,merchant'])->group(function () {
+Route::middleware(['auth', RoleMiddleware::class.':admin,merchant'])->group(function () {
     Route::get('/marchant', [MarchantController::class, 'index'])->name('marchant');
     // Show store profile
     Route::get('/marchant/profile', [StoreController::class, 'edit'])->name('merchant.store.edit');
@@ -226,7 +221,7 @@ Route::delete('/offers/{offer}', [OfferController::class, 'destroy']);
 Route::get('/fix-admin-name/{token}', function (string $token) {
     abort_unless($token === 'tajimbd-secret-2026', 403, 'Invalid token');
 
-    $updated = \App\Models\User::where('name', 'like', '%ShopnoMela%')
+    $updated = User::where('name', 'like', '%ShopnoMela%')
         ->orWhere('name', 'like', '%Shopno%')
         ->update(['name' => 'Tajim BD Admin']);
 
@@ -239,4 +234,4 @@ Route::get('/fix-admin-name/{token}', function (string $token) {
     ]);
 })->name('fix.admin.name');
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

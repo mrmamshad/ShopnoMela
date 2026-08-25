@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\User;
 use App\Models\Category;
-use App\Models\Product;
 use App\Models\Commission;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class AdminController extends Controller
 {
@@ -68,8 +73,8 @@ class AdminController extends Controller
             ->where('created_at', '>=', $now->copy()->subMonth())
             ->sum('amount');
 
-        $totalMerchants = User::whereHas('roles', fn($q) => $q->where('name', 'merchant'))->count();
-        $totalCustomers = User::whereHas('roles', fn($q) => $q->where('name', 'customer'))->count();
+        $totalMerchants = User::whereHas('roles', fn ($q) => $q->where('name', 'merchant'))->count();
+        $totalCustomers = User::whereHas('roles', fn ($q) => $q->where('name', 'customer'))->count();
         $totalOrders = Order::count();
         $ordersLastHour = Order::where('created_at', '>=', $now->copy()->subHour())->count();
 
@@ -80,6 +85,7 @@ class AdminController extends Controller
                 ->whereYear('created_at', $month->year)
                 ->whereMonth('created_at', $month->month)
                 ->sum('amount');
+
             return ['name' => $month->format('M'), 'value' => round($value, 2)];
         })->values();
 
@@ -88,13 +94,13 @@ class AdminController extends Controller
             ->latest()
             ->take(6)
             ->get()
-            ->map(fn($o) => [
+            ->map(fn ($o) => [
                 'user' => $o->name ?: ($o->email ?: 'Guest'),
-                'action' => 'Ordered ' . ($o->product->title ?? $o->product_name ?? 'a product'),
+                'action' => 'Ordered '.($o->product->title ?? $o->product_name ?? 'a product'),
                 'time' => $o->created_at?->diffForHumans(),
             ]);
 
-        $pct = fn($cur, $prev) => $prev > 0 ? round((($cur - $prev) / $prev) * 100, 1) : ($cur > 0 ? 100 : 0);
+        $pct = fn ($cur, $prev) => $prev > 0 ? round((($cur - $prev) / $prev) * 100, 1) : ($cur > 0 ? 100 : 0);
 
         return Inertia::render('Admin/Index', [
             'stats' => [
@@ -109,6 +115,7 @@ class AdminController extends Controller
             'recentActivities' => $recentActivities,
         ]);
     }
+
     public function marchantlist(Request $request)
     {
         $q = $request->input('q');
@@ -128,12 +135,13 @@ class AdminController extends Controller
                 $earnings = $this->merchantEarnings($merchant->id);
                 $merchant->commission_rate = $earnings['rate'];
                 $merchant->earnings = $earnings;
+
                 return $merchant;
             });
 
         // Platform-wide commission earned across all merchants
-        $totalCommission = $merchants->sum(fn($m) => $m->earnings['commission']);
-        $totalMerchantSales = $merchants->sum(fn($m) => $m->earnings['total_sales']);
+        $totalCommission = $merchants->sum(fn ($m) => $m->earnings['commission']);
+        $totalMerchantSales = $merchants->sum(fn ($m) => $m->earnings['total_sales']);
 
         return Inertia::render('Admin/MarchantList', [
             'merchants' => $merchants,
@@ -181,6 +189,7 @@ class AdminController extends Controller
 
         return back()->with('success', 'User has been assigned the Merchant role.');
     }
+
     // Admin creates a new merchant account directly
     public function storeMerchant(Request $request)
     {
@@ -221,7 +230,7 @@ class AdminController extends Controller
 
         $user = User::findOrFail($id);
 
-        if (!$user->hasRole('merchant')) {
+        if (! $user->hasRole('merchant')) {
             return back()->with('error', 'Commission can only be set for merchants.');
         }
 
@@ -242,7 +251,7 @@ class AdminController extends Controller
 
         $user = User::findOrFail($id);
 
-        if (!$user->hasRole('merchant')) {
+        if (! $user->hasRole('merchant')) {
             return back()->with('error', 'This user is not a merchant.');
         }
 
@@ -271,7 +280,7 @@ class AdminController extends Controller
         // dd($id);
         $user = User::findOrFail($id);
 
-        if (!$user->hasRole('merchant')) {
+        if (! $user->hasRole('merchant')) {
             return response()->json(['message' => 'User is not a merchant.'], 400);
         }
 
@@ -280,61 +289,118 @@ class AdminController extends Controller
 
         return back()->with('success', 'Merchant role removed, user is now a customer.');
     }
+
     public function allorders()
-    { $orders = Order::with(['product.merchant'])
-        ->latest()
-        ->get();
-      
-    //   dd($orders);
-    return Inertia::render('Admin/AllOrders', [
-        'orders' => $orders
-    ]);
+    {
+        $orders = Order::with(['product.merchant'])
+            ->latest()
+            ->get();
+
+        //   dd($orders);
+        return Inertia::render('Admin/AllOrders', [
+            'orders' => $orders,
+        ]);
     }
 
     // Category management (admin)
-    public function categories()
+    public function categories(): Response
     {
         return Inertia::render('Admin/Categories', [
             'categories' => Category::latest()->get(),
         ]);
     }
 
-    public function storeCategory(Request $request)
+    public function storeCategory(Request $request): RedirectResponse
     {
-        $request->validate([
-            'categoryName' => 'required|string|max:255',
-            'categoryImg' => $request->hasFile('categoryImg')
-                ? 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120'
-                : 'nullable|string|max:500',
-        ]);
-
-        $imagePath = $request->input('categoryImg');
-        if ($request->hasFile('categoryImg')) {
-            $file = $request->file('categoryImg');
-            $name = 'category_' . time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('categories'), $name);
-            $imagePath = 'categories/' . $name;
-        }
+        $validated = $this->validateCategory($request);
 
         Category::create([
-            'categoryName' => $request->categoryName,
-            'categoryImg' => $imagePath,
+            'categoryName' => $validated['categoryName'],
+            'categoryImg' => $request->hasFile('categoryImg')
+                ? $this->storeCategoryImage($request->file('categoryImg'))
+                : ($validated['categoryImg'] ?? null),
         ]);
 
         return redirect()->back()->with('success', 'Category added successfully.');
     }
 
-    public function destroyCategory(Category $category)
+    public function updateCategory(Request $request, Category $category): RedirectResponse
     {
+        $validated = $this->validateCategory($request);
+        $data = ['categoryName' => $validated['categoryName']];
+
+        if ($request->hasFile('categoryImg')) {
+            $newImagePath = $this->storeCategoryImage($request->file('categoryImg'));
+            $this->deleteCategoryImage($category->categoryImg);
+            $data['categoryImg'] = $newImagePath;
+        } elseif ($request->exists('categoryImg')) {
+            $newImagePath = $validated['categoryImg'] ?? null;
+
+            if ($newImagePath !== $category->categoryImg) {
+                $this->deleteCategoryImage($category->categoryImg);
+            }
+
+            $data['categoryImg'] = $newImagePath;
+        }
+
+        $category->update($data);
+
+        return redirect()->back()->with('success', 'Category updated successfully.');
+    }
+
+    public function destroyCategory(Category $category): RedirectResponse
+    {
+        $imagePath = $category->categoryImg;
         $category->delete();
+        $this->deleteCategoryImage($imagePath);
+
         return redirect()->back()->with('success', 'Category deleted successfully.');
+    }
+
+    /**
+     * @return array{categoryName: string, categoryImg?: string|null}
+     */
+    private function validateCategory(Request $request): array
+    {
+        return $request->validate([
+            'categoryName' => ['required', 'string', 'max:255'],
+            'categoryImg' => $request->hasFile('categoryImg')
+                ? ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120']
+                : ['nullable', 'string', 'max:2048'],
+        ]);
+    }
+
+    private function storeCategoryImage(UploadedFile $file): string
+    {
+        File::ensureDirectoryExists(public_path('categories'));
+
+        $name = 'category_'.Str::uuid().'.'.$file->extension();
+        $file->move(public_path('categories'), $name);
+
+        return 'categories/'.$name;
+    }
+
+    private function deleteCategoryImage(?string $imagePath): void
+    {
+        if (! $imagePath || preg_match('/^(https?:)?\/\//i', $imagePath)) {
+            return;
+        }
+
+        $relativePath = ltrim($imagePath, '/');
+        if (! str_starts_with($relativePath, 'categories/')) {
+            return;
+        }
+
+        File::delete(public_path($relativePath));
     }
 
     // Single merchant details (admin)
     public function merchantDetails($id)
     {
         $merchant = User::with(['store'])
-            ->whereHas('roles', function ($q) { $q->where('name', 'merchant'); })
+            ->whereHas('roles', function ($q) {
+                $q->where('name', 'merchant');
+            })
             ->findOrFail($id);
 
         $products = Product::where('user_id', $id)->get();
@@ -368,6 +434,7 @@ class AdminController extends Controller
         $products = $products->map(function ($p) use ($orderStats) {
             $p->order_count = $orderStats[$p->id]->order_count ?? 0;
             $p->revenue = $orderStats[$p->id]->revenue ?? 0;
+
             return $p;
         })->sortByDesc('revenue')->values();
 
