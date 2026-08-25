@@ -72,6 +72,33 @@ const ProductDetails = ({
 
     const { auth } = usePage().props;
 
+    // Normalize optional size/color data. The database may contain null, JSON,
+    // an empty array, or legacy values like [""]; only real values should
+    // create a visible option on the product page.
+    const normalizeOptions = (value) => {
+        if (value == null || value === "") return [];
+
+        let options = value;
+        if (!Array.isArray(options)) {
+            try {
+                options = JSON.parse(options);
+            } catch {
+                return [];
+            }
+        }
+
+        if (!Array.isArray(options)) return [];
+
+        return options
+            .map((option) =>
+                typeof option === "string" ? option.trim() : ""
+            )
+            .filter(Boolean);
+    };
+
+    const availableSizes = normalizeOptions(productdetails.size);
+    const availableColors = normalizeOptions(productdetails.color);
+
     // Extract available images (skip null / empty values)
     const images = [
         productdetails.img1,
@@ -409,91 +436,55 @@ const ProductDetails = ({
                             )}
                         </div>
 
-                        {/* Size Selection */}
-                        <div className="space-y-2">
-                            <h3 className="font-medium">Size</h3>
-                            <div className="flex space-x-2">
-                                {Array.isArray(productdetails.size)
-                                    ? productdetails.size.map((size, index) => (
-                                          <button
-                                              key={index}
-                                              onClick={() =>
-                                                  setSelectedSize(size)
-                                              }
-                                              className={`px-3 py-1 border rounded-lg text-sm font-medium ${
-                                                  selectedSize === size
-                                                      ? "bg-orange-500 text-white border-orange-500"
-                                                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                              }`}
-                                          >
-                                              {size}
-                                          </button>
-                                      ))
-                                    : JSON.parse(productdetails.size).map(
-                                          (size, index) => (
-                                              <button
-                                                  key={index}
-                                                  onClick={() =>
-                                                      setSelectedSize(size)
-                                                  }
-                                                  className={`px-3 py-1 border rounded-lg text-sm font-medium ${
-                                                      selectedSize === size
-                                                          ? "bg-orange-500 text-white border-orange-500"
-                                                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                                  }`}
-                                              >
-                                                  {size}
-                                              </button>
-                                          )
-                                      )}
+                        {/* Size Selection — hidden when no real size exists */}
+                        {availableSizes.length > 0 && (
+                            <div className="space-y-2">
+                                <h3 className="font-medium">Size</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {availableSizes.map((size, index) => (
+                                        <button
+                                            key={`${size}-${index}`}
+                                            type="button"
+                                            onClick={() => setSelectedSize(size)}
+                                            className={`px-3 py-1 border rounded-lg text-sm font-medium ${
+                                                selectedSize === size
+                                                    ? "bg-orange-500 text-white border-orange-500"
+                                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                            }`}
+                                        >
+                                            {size}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
-                        {/* Color Selection */}
-                        <div className="space-y-2">
-                            <h3 className="font-medium">Color</h3>
-                            <RadioGroup
-                                value={selectedColor}
-                                onValueChange={setSelectedColor}
-                                className="flex space-x-3"
-                            >
-                                {/* {console.log("color", productdetails.color)} */}
-
-                                {Array.isArray(productdetails.color)
-                                    ? productdetails.color.map(
-                                          (color, index) => (
-                                              <RadioGroupItem
-                                                  key={index}
-                                                  value={color}
-                                                  className={`w-8 h-8 rounded-full border ${
-                                                      selectedColor === color
-                                                          ? "ring-2 ring-orange-500"
-                                                          : ""
-                                                  }`}
-                                                  style={{
-                                                      backgroundColor: color,
-                                                  }}
-                                              />
-                                          )
-                                      )
-                                    : JSON.parse(productdetails.color).map(
-                                          (color, index) => (
-                                              <RadioGroupItem
-                                                  key={index}
-                                                  value={color}
-                                                  className={`w-8 h-8 rounded-full border ${
-                                                      selectedColor === color
-                                                          ? "ring-2 ring-orange-500"
-                                                          : ""
-                                                  }`}
-                                                  style={{
-                                                      backgroundColor: color,
-                                                  }}
-                                              />
-                                          )
-                                      )}
-                            </RadioGroup>
-                        </div>
+                        {/* Color Selection — hidden when no real color exists */}
+                        {availableColors.length > 0 && (
+                            <div className="space-y-2">
+                                <h3 className="font-medium">Color</h3>
+                                <RadioGroup
+                                    value={selectedColor ?? ""}
+                                    onValueChange={setSelectedColor}
+                                    className="flex flex-wrap gap-3"
+                                >
+                                    {availableColors.map((color, index) => (
+                                        <RadioGroupItem
+                                            key={`${color}-${index}`}
+                                            value={color}
+                                            aria-label={color}
+                                            title={color}
+                                            className={`w-8 h-8 rounded-full border ${
+                                                selectedColor === color
+                                                    ? "ring-2 ring-orange-500"
+                                                    : ""
+                                            }`}
+                                            style={{ backgroundColor: color }}
+                                        />
+                                    ))}
+                                </RadioGroup>
+                            </div>
+                        )}
 
                         {/* Dynamic Variant Attributes (RAM, Storage, etc.) */}
                         {parsedAttributes.map((attr, i) =>

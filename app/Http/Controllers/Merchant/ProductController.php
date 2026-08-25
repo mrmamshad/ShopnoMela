@@ -220,11 +220,27 @@ class ProductController extends Controller
             ->values()
             ->all();
 
+        // Remove blank color/size entries (e.g. [""]) before persisting.
+        // Empty optional variants must remain [] so customer pages do not show
+        // blank swatches or empty selection sections.
+        $colors = collect($validated['color'] ?? [])
+            ->map(fn($value) => is_string($value) ? trim($value) : '')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+        $sizes = collect($validated['size'] ?? [])
+            ->map(fn($value) => is_string($value) ? trim($value) : '')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
         ProductDetail::create([
             'product_id' => $product->id,
             'des' => $validated['des'],
-            'color' => $validated['color'] ?? [],
-            'size' => $validated['size'] ?? [],
+            'color' => $colors,
+            'size' => $sizes,
             'attributes' => $attributes,
             'img1' => $storedImages['img1'],
             'img2' => $storedImages['img2'],
